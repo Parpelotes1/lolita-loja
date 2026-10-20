@@ -1,0 +1,2632 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lolita boutique: site novo com carrossel, 3D e colorimetria</title>
+  <meta name="description" content="Lolita boutique em Orlândia (SP). Roupas femininas do 34 ao 52 e consultoria de imagem e colorimetria.">
+
+  <!-- Fontes do Google -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+
+  <!-- Frameworks e estilos base permitidos -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/basecoat-css@1.0.2/dist/basecoat.cdn.min.css">
+  <style>
+/* Skip artifact shell — fixed styles served beside every artifact.
+   Complements basecoat; artifacts override --accent for their own identity. */
+:root {
+  color-scheme: light dark;
+  --accent: #2563eb;
+  --accent-contrast: #ffffff;
+  --accent-text: color-mix(in srgb, var(--accent) 72%, #000);
+  --bg: #f8f9fb;
+  --surface: #ffffff;
+  --text: #14171f;
+  --text-muted: #5b6472;
+  --border: rgba(20, 23, 31, 0.10);
+  --radius: 10px;
+  --shadow: 0 1px 3px rgba(20, 23, 31, 0.08);
+  --space: 16px;
+}
+/* Theme resolution. Without data-theme the viewer's system preference decides,
+   as it always did. With it, the artifact's own choice wins in BOTH directions:
+   a page that hardcodes one palette must not be handed the opposite set of
+   tokens by the machine it happens to be opened on. The dark values appear
+   twice because a media query cannot be folded into a selector list.
+   The attribute sits inside :where() so these blocks keep the specificity of a
+   bare :root — the page's own <style> is linked after this file and must go on
+   overriding any token it wants, exactly as it could before. */
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    --accent-text: color-mix(in srgb, var(--accent) 78%, #fff);
+    --bg: #101318;
+    --surface: #181c23;
+    --text: #eef1f6;
+    --text-muted: #9aa4b2;
+    --border: rgba(238, 241, 246, 0.12);
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  }
+}
+:root:where([data-theme="dark"]) {
+  color-scheme: dark;
+  --accent-text: color-mix(in srgb, var(--accent) 78%, #fff);
+  --bg: #101318;
+  --surface: #181c23;
+  --text: #eef1f6;
+  --text-muted: #9aa4b2;
+  --border: rgba(238, 241, 246, 0.12);
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+:root:where([data-theme="light"]) { color-scheme: light; }
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+img { max-width: 100%; display: block; }
+
+.shell-container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+.shell-section { padding: calc(var(--space) * 2) 0; }
+.shell-grid { display: grid; gap: var(--space); grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.shell-toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: var(--space); }
+.shell-footer { padding: 24px 0 40px; color: var(--text-muted); font-size: 13px; }
+
+.shell-hero { padding: calc(var(--space) * 3) 0 calc(var(--space) * 2); }
+.shell-hero h1 { font-size: clamp(26px, 4vw, 40px); line-height: 1.15; margin: 0 0 10px; text-wrap: balance; }
+.shell-hero p { color: var(--text-muted); max-width: 60ch; margin: 0; }
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: var(--space);
+}
+
+.kpi { display: flex; flex-direction: column; gap: 4px; }
+.kpi .kpi-value { font-size: 28px; font-weight: 650; line-height: 1.1; }
+.kpi .kpi-label { font-size: 13px; color: var(--text-muted); }
+.kpi .kpi-delta { font-size: 12.5px; font-weight: 600; }
+.kpi .kpi-delta.up { color: #0a8f3c; }
+.kpi .kpi-delta.down { color: #cf3131; }
+
+table.shell-table { border-collapse: collapse; width: 100%; font-size: 14px; }
+table.shell-table th {
+  text-align: left; font-size: 11.5px; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--text-muted); font-weight: 600;
+}
+table.shell-table th, table.shell-table td { padding: 9px 12px 9px 0; border-bottom: 1px solid var(--border); }
+table.shell-table td.num, table.shell-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
+table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 6%, transparent); }
+
+.chart-box { width: 100%; min-height: 220px; }
+.chart-box svg { width: 100%; height: auto; display: block; }
+
+.muted { color: var(--text-muted); }
+.accent { color: var(--accent-text); }
+.shell-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent-text);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .shell-fade { animation: shell-fade 400ms ease both; }
+  @keyframes shell-fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+}
+
+</style>
+  
+
+  <style>
+    /*
+      Paleta de cores derivada diretamente da logo da Lolita boutique:
+      Rosa suave (#E8B7B0) e Ocre luminoso (#F4C189), complementados pelo fundo
+      branco/creme e texto grafite intenso (#1A1A1A) para alto contraste e legibilidade.
+    */
+    :root {
+      --cor-fundo: #FFFFFF;
+      --cor-creme: #FAF7F2;
+      --cor-creme-alt: #F3ECE2;
+      --cor-texto: #1A1A1A;
+      --cor-texto-suave: #4A4A4A;
+      --cor-borda: #E6DFD5;
+      --cor-rosa: #E8B7B0;
+      --cor-rosa-escura: #9E5B53;
+      --cor-ocre: #F4C189;
+      --cor-ocre-escura: #8C541D;
+      --accent: #E8B7B0;
+      --accent-text: #8C473E;
+      --accent-contrast: #1A1A1A;
+
+      --fonte-serifa: 'Cormorant Garamond', Georgia, serif;
+      --fonte-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --raio-suave: 12px;
+      --raio-arco: 120px 120px 12px 12px;
+      --sombra-card: 0 10px 30px -10px rgba(26, 26, 26, 0.08);
+      --sombra-hover: 0 18px 40px -12px rgba(26, 26, 26, 0.14);
+      --transicao: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background-color: var(--cor-fundo);
+      color: var(--cor-texto);
+      font-family: var(--fonte-sans);
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    body {
+      background-color: var(--cor-fundo);
+      color: var(--cor-texto);
+      overflow-x: hidden;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button {
+      font-family: inherit;
+      border: none;
+      background: none;
+      cursor: pointer;
+    }
+
+    img, svg {
+      display: block;
+      max-width: 100%;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--cor-texto);
+      outline-offset: 3px;
+    }
+
+    /* Utilitários tipográficos */
+    .fonte-serifa {
+      font-family: var(--fonte-serifa);
+    }
+
+    .container-loja {
+      width: 100%;
+      max-width: 1240px;
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+
+    /* Logo SVG */
+    .logo-svg {
+      height: 44px;
+      width: auto;
+      transition: transform 0.25s ease;
+    }
+
+    @media (min-width: 992px) {
+      .logo-svg {
+        height: 56px;
+      }
+    }
+
+    .logo-link:hover .logo-svg {
+      transform: scale(1.02);
+    }
+
+    /* Top bar de aviso */
+    .barra-aviso {
+      background-color: var(--cor-creme-alt);
+      color: var(--cor-texto);
+      font-size: 0.8rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 6px 12px;
+      text-align: center;
+      border-bottom: 1px solid var(--cor-borda);
+    }
+
+    /* Header Fixo */
+    .cabecalho-fixo {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background-color: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--cor-borda);
+      transition: var(--transicao);
+    }
+
+    .nav-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 72px;
+    }
+
+    @media (min-width: 992px) {
+      .nav-container {
+        height: 84px;
+      }
+    }
+
+    .menu-principal {
+      display: none;
+      align-items: center;
+      gap: 24px;
+      list-style: none;
+    }
+
+    @media (min-width: 1024px) {
+      .menu-principal {
+        display: flex;
+      }
+    }
+
+    .link-nav {
+      position: relative;
+      font-size: 0.92rem;
+      font-weight: 500;
+      color: var(--cor-texto);
+      padding: 6px 0;
+      letter-spacing: 0.02em;
+      transition: color 0.2s ease;
+    }
+
+    /* Sublinhado fino crescendo do centro */
+    .link-nav::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: 0;
+      height: 1.5px;
+      background-color: var(--cor-rosa-escura);
+      transition: width 0.3s ease, left 0.3s ease;
+    }
+
+    .link-nav:hover::after,
+    .link-nav:focus-visible::after {
+      width: 100%;
+      left: 0;
+    }
+
+    .acoes-cabecalho {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: relative;
+    }
+
+    .btn-icone {
+      position: relative;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--cor-texto);
+      background: transparent;
+      border: 1px solid transparent;
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .btn-icone:hover {
+      background-color: var(--cor-creme);
+      border-color: var(--cor-borda);
+    }
+
+    .btn-icone svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      stroke-width: 1.7;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Contador da sacola */
+    .badge-sacola {
+      position: absolute;
+      top: 3px;
+      right: 3px;
+      background-color: var(--cor-rosa);
+      color: var(--cor-texto);
+      border: 1px solid var(--cor-texto);
+      font-size: 0.72rem;
+      font-weight: 700;
+      min-width: 18px;
+      height: 18px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 4px;
+      pointer-events: none;
+      transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .badge-sacola.pulso {
+      transform: scale(1.35);
+    }
+
+    /* Painel dos três pontinhos */
+    .painel-tres-pontos {
+      position: absolute;
+      top: calc(100% + 10px);
+      right: 0;
+      width: 240px;
+      background: #FFFFFF;
+      border: 1px solid var(--cor-borda);
+      border-radius: var(--raio-suave);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.12);
+      padding: 8px;
+      opacity: 0;
+      visibility: hidden;
+      transform: scale(0.92) translateY(-6px);
+      transform-origin: top right;
+      transition: opacity 0.22s ease, transform 0.22s ease, visibility 0.22s;
+      z-index: 1050;
+    }
+
+    .painel-tres-pontos.aberto {
+      opacity: 1;
+      visibility: visible;
+      transform: scale(1) translateY(0);
+    }
+
+    .item-painel {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 10px 14px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--cor-texto);
+      border-radius: 8px;
+      transition: background-color 0.2s ease, color 0.2s ease;
+      text-align: left;
+    }
+
+    .item-painel:hover {
+      background-color: var(--cor-creme);
+      color: var(--cor-rosa-escura);
+    }
+
+    .item-painel-navegar {
+      background-color: #FAF2EF;
+      border: 1px solid var(--cor-rosa);
+      color: var(--cor-texto);
+      font-weight: 600;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .item-painel-navegar::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 0%;
+      background-color: var(--cor-rosa);
+      z-index: -1;
+      transition: height 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .item-painel-navegar:hover::before {
+      height: 100%;
+    }
+
+    .item-painel svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      fill: none;
+    }
+
+    .divisor-painel {
+      height: 1px;
+      background: var(--cor-borda);
+      margin: 6px 0;
+    }
+
+    /* Botão com preenchimento que sobe no hover */
+    .btn-elevado {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 12px 28px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--cor-texto);
+      background-color: #FFFFFF;
+      border: 1.5px solid var(--cor-texto);
+      border-radius: 6px;
+      overflow: hidden;
+      cursor: pointer;
+      z-index: 1;
+      transition: color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .btn-elevado::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 0%;
+      background-color: var(--cor-rosa);
+      z-index: -1;
+      transition: height 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .btn-elevado:hover::before,
+    .btn-elevado:focus-visible::before {
+      height: 100%;
+    }
+
+    .btn-elevado-ocre::before {
+      background-color: var(--cor-ocre);
+    }
+
+    /* Estilo de destaque para a aba Navegar no header */
+    .btn-nav-navegar {
+      padding: 7px 18px;
+      font-size: 0.84rem;
+      letter-spacing: 0.04em;
+      border-radius: 20px;
+      border-color: var(--cor-texto);
+      box-shadow: 0 2px 8px rgba(232, 183, 176, 0.3);
+    }
+
+    .btn-solido {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 12px 28px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #FFFFFF;
+      background-color: var(--cor-texto);
+      border: 1.5px solid var(--cor-texto);
+      border-radius: 6px;
+      overflow: hidden;
+      cursor: pointer;
+      z-index: 1;
+      transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .btn-solido::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 0%;
+      background-color: var(--cor-rosa-escura);
+      z-index: -1;
+      transition: height 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .btn-solido:hover::before,
+    .btn-solido:focus-visible::before {
+      height: 100%;
+    }
+
+    /* Seção Hero com Cartão Flutuante */
+    .secao-hero {
+      position: relative;
+      background-color: #FAF7F2;
+      color: #1A1A1A;
+      padding: 48px 0 68px;
+      border-bottom: 1px solid var(--cor-borda);
+      overflow: hidden;
+    }
+
+    .hero-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 40px;
+      align-items: center;
+    }
+
+    @media (min-width: 992px) {
+      .hero-layout {
+        grid-template-columns: 1.05fr 1fr;
+        gap: 60px;
+        min-height: 520px;
+      }
+    }
+
+    .hero-texto {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .hero-selo {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      align-self: flex-start;
+      padding: 5px 14px;
+      border-radius: 30px;
+      background-color: #FFFFFF;
+      border: 1px solid var(--cor-borda);
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--cor-texto-suave);
+    }
+
+    .hero-titulo {
+      font-size: clamp(2.4rem, 5vw, 3.8rem);
+      line-height: 1.1;
+      font-weight: 600;
+      color: var(--cor-texto);
+      letter-spacing: -0.01em;
+    }
+
+    .hero-subtitulo {
+      font-size: 1.1rem;
+      color: var(--cor-texto-suave);
+      max-width: 500px;
+      line-height: 1.65;
+    }
+
+    .hero-botoes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 10px;
+    }
+
+    /* Cartão Flutuante da Loja com Flip 3D e Partículas */
+    .cartao-loja-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 440px;
+      margin: 0 auto;
+      perspective: 1200px;
+    }
+
+    .cartao-loja-card {
+      position: relative;
+      width: 100%;
+      min-height: 480px;
+      border-radius: var(--raio-arco);
+      cursor: pointer;
+      animation: flutuarLoja 4.8s ease-in-out infinite;
+      transition: box-shadow 0.3s ease;
+      user-select: none;
+    }
+
+    .cartao-loja-card:focus-visible {
+      outline: 3px solid var(--cor-texto);
+      outline-offset: 4px;
+    }
+
+    @keyframes flutuarLoja {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-12px);
+      }
+    }
+
+    .cartao-loja-card:hover {
+      box-shadow: 0 24px 50px -12px rgba(26, 26, 26, 0.22);
+    }
+
+    .cartao-loja-inner {
+      position: relative;
+      width: 100%;
+      min-height: 480px;
+      border-radius: inherit;
+      transform-style: preserve-3d;
+      transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 16px 36px -10px rgba(26, 26, 26, 0.16);
+    }
+
+    .cartao-loja-card.virando {
+      animation: none !important;
+    }
+
+    .cartao-loja-card.virando .cartao-loja-inner {
+      transform: rotateY(180deg);
+    }
+
+    .cartao-loja-frente,
+    .cartao-loja-verso {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      overflow: hidden;
+      border: 1px solid var(--cor-borda);
+    }
+
+    .cartao-loja-frente {
+      background: linear-gradient(135deg, #E8B7B0 0%, #F4C189 100%);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .foto-loja {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Fallback em gradiente rosa e ocre caso a imagem não carregue */
+    .fallback-loja {
+      display: none;
+      width: 100%;
+      height: 100%;
+      min-height: 480px;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #E8B7B0 0%, #F4C189 100%);
+      padding: 32px 24px;
+      text-align: center;
+      box-sizing: border-box;
+    }
+
+    .fallback-loja-conteudo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      color: #1A1A1A;
+    }
+
+    .fallback-loja-selo {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-weight: 700;
+      color: #1A1A1A;
+      background-color: rgba(255, 255, 255, 0.6);
+      padding: 4px 12px;
+      border-radius: 20px;
+    }
+
+    .fallback-loja-titulo {
+      font-size: 2.5rem;
+      font-weight: 600;
+      line-height: 1.1;
+      color: #1A1A1A;
+    }
+
+    .fallback-loja-desc {
+      font-size: 0.95rem;
+      color: #333333;
+      max-width: 280px;
+      line-height: 1.5;
+    }
+
+    .cartao-loja-legenda {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 24px 20px 18px;
+      background: linear-gradient(to top, rgba(26, 26, 26, 0.88) 0%, rgba(26, 26, 26, 0.45) 70%, transparent 100%);
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      z-index: 3;
+    }
+
+    .legenda-texto {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .legenda-sub {
+      font-size: 0.74rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0.9;
+    }
+
+    .legenda-titulo {
+      font-size: 1.05rem;
+      font-weight: 600;
+    }
+
+    .btn-indicador-entrar {
+      padding: 6px 14px;
+      background-color: #FFFFFF;
+      color: #1A1A1A;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      border-radius: 20px;
+      white-space: nowrap;
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .cartao-loja-card:hover .btn-indicador-entrar {
+      transform: scale(1.04);
+      background-color: var(--cor-ocre);
+    }
+
+    /* Verso do cartão durante o giro 3D */
+    .cartao-loja-verso {
+      background: linear-gradient(135deg, #FAF7F2 0%, #FFFFFF 100%);
+      transform: rotateY(180deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 24px;
+      text-align: center;
+    }
+
+    .cartao-loja-verso-conteudo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .verso-sub {
+      font-size: 0.82rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--cor-rosa-escura);
+    }
+
+    .verso-titulo {
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: #1A1A1A;
+      line-height: 1.2;
+    }
+
+    .verso-desc {
+      font-size: 0.95rem;
+      color: var(--cor-texto-suave);
+    }
+
+    /* Partículas em formato de folhas */
+    .particulas-folhas-container {
+      position: absolute;
+      inset: -60px;
+      pointer-events: none;
+      z-index: 60;
+      overflow: visible;
+    }
+
+    .particula-folha {
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      color: #1A1A1A;
+      pointer-events: none;
+      will-change: transform, opacity;
+      animation: dispersarFolha 1.2s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+    }
+
+    .particula-folha svg {
+      width: 100%;
+      height: 100%;
+      fill: #1A1A1A;
+    }
+
+    @keyframes dispersarFolha {
+      0% {
+        opacity: 1;
+        transform: translate(0, 0) rotate(0deg) scale(0.6);
+      }
+      40% {
+        opacity: 0.95;
+      }
+      100% {
+        opacity: 0;
+        transform: translate(var(--dest-x), var(--dest-y)) rotate(var(--rotacao)) scale(1.1);
+      }
+    }
+
+    /* Seções Gerais */
+    .secao-padrao {
+      padding: 70px 0;
+      border-bottom: 1px solid var(--cor-borda);
+    }
+
+    .secao-cabecalho {
+      text-align: center;
+      max-width: 720px;
+      margin: 0 auto 40px;
+    }
+
+    .secao-etiqueta {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-weight: 600;
+      color: var(--cor-rosa-escura);
+      margin-bottom: 8px;
+      display: inline-block;
+    }
+
+    .secao-titulo {
+      font-size: clamp(2rem, 3.6vw, 2.9rem);
+      line-height: 1.15;
+      font-weight: 600;
+      color: var(--cor-texto);
+      margin-bottom: 12px;
+    }
+
+    .secao-descricao {
+      font-size: 1.05rem;
+      color: var(--cor-texto-suave);
+      line-height: 1.6;
+    }
+
+    /* Seção Colorimetria */
+    .secao-colorimetria {
+      background-color: var(--cor-creme);
+      padding: 80px 0;
+      border-bottom: 1px solid var(--cor-borda);
+    }
+
+    .colorimetria-apresentacao {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 36px;
+      align-items: center;
+      margin-bottom: 50px;
+      background-color: #FFFFFF;
+      border: 1px solid var(--cor-borda);
+      border-radius: var(--raio-suave);
+      padding: 30px;
+      box-shadow: var(--sombra-card);
+    }
+
+    @media (min-width: 860px) {
+      .colorimetria-apresentacao {
+        grid-template-columns: 280px 1fr;
+        gap: 44px;
+        padding: 40px;
+      }
+    }
+
+    /* Moldura em arco para a consultora */
+    .moldura-arco {
+      position: relative;
+      width: 240px;
+      height: 310px;
+      margin: 0 auto;
+      border-radius: 120px 120px 16px 16px;
+      overflow: hidden;
+      border: 2px solid var(--cor-borda);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+      background: linear-gradient(135deg, var(--cor-rosa) 0%, var(--cor-ocre) 100%);
+    }
+
+    .foto-consultora {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .fallback-consultora {
+      display: none;
+      width: 100%;
+      height: 100%;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--fonte-serifa);
+      font-size: 5rem;
+      font-weight: 600;
+      color: #1A1A1A;
+      background: linear-gradient(135deg, var(--cor-rosa) 0%, var(--cor-ocre) 100%);
+    }
+
+    .consultora-bio {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .consultora-cargo {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+      color: var(--cor-rosa-escura);
+    }
+
+    .consultora-nome {
+      font-size: clamp(1.8rem, 3vw, 2.4rem);
+      font-weight: 600;
+      color: var(--cor-texto);
+      line-height: 1.2;
+    }
+
+    .consultora-texto {
+      font-size: 1rem;
+      color: var(--cor-texto-suave);
+      line-height: 1.7;
+    }
+
+    /* Três Cards de Colorimetria */
+    .grade-colorimetria {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+
+    @media (min-width: 768px) {
+      .grade-colorimetria {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .card-color-info {
+      background-color: #FFFFFF;
+      border: 1px solid var(--cor-borda);
+      border-radius: var(--raio-suave);
+      padding: 30px 24px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--sombra-card);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card-color-info:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--sombra-hover);
+    }
+
+    .card-color-icone {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background-color: var(--cor-creme-alt);
+      border: 1px solid var(--cor-borda);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 18px;
+      color: var(--cor-texto);
+    }
+
+    .card-color-icone svg {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      fill: none;
+    }
+
+    .card-color-titulo {
+      font-size: 1.35rem;
+      font-weight: 600;
+      margin-bottom: 14px;
+      color: var(--cor-texto);
+    }
+
+    .lista-colorimetria {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      font-size: 0.92rem;
+      color: var(--cor-texto-suave);
+      line-height: 1.5;
+    }
+
+    .lista-colorimetria li {
+      position: relative;
+      padding-left: 20px;
+    }
+
+    .lista-colorimetria li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 9px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: var(--cor-rosa-escura);
+    }
+
+    .lista-colorimetria.perdas li::before {
+      background-color: var(--cor-ocre-escura);
+    }
+
+    .area-cta-colorimetria {
+      text-align: center;
+      margin-top: 40px;
+    }
+
+    /* Seções Bazar e Dicas */
+    .grade-bazar,
+    .grade-dicas {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+
+    @media (min-width: 768px) {
+      .grade-bazar,
+      .grade-dicas {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .card-conteudo {
+      background-color: #FFFFFF;
+      border: 1px solid var(--cor-borda);
+      border-radius: var(--raio-suave);
+      padding: 28px 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: var(--sombra-card);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card-conteudo:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--sombra-hover);
+    }
+
+    .card-conteudo-topo {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .conteudo-tag {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--cor-rosa-escura);
+    }
+
+    .conteudo-titulo {
+      font-size: 1.35rem;
+      font-weight: 600;
+      line-height: 1.25;
+      color: var(--cor-texto);
+    }
+
+    .conteudo-texto {
+      font-size: 0.92rem;
+      color: var(--cor-texto-suave);
+      line-height: 1.6;
+      margin-top: 4px;
+    }
+
+    .conteudo-rodape {
+      margin-top: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--cor-borda);
+      padding-top: 14px;
+      font-size: 0.88rem;
+      font-weight: 600;
+    }
+
+    /* Seção Sobre */
+    .secao-sobre {
+      background-color: var(--cor-creme);
+      padding: 80px 0;
+      border-bottom: 1px solid var(--cor-borda);
+    }
+
+    .sobre-caixa {
+      max-width: 820px;
+      margin: 0 auto;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .sobre-paragrafo {
+      font-size: clamp(1.15rem, 2vw, 1.45rem);
+      line-height: 1.7;
+      color: var(--cor-texto);
+    }
+
+    .sobre-assinatura {
+      font-size: 0.9rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--cor-rosa-escura);
+      margin-top: 10px;
+    }
+
+    /* Rodapé */
+    .rodape-principal {
+      background-color: #FFFFFF;
+      padding: 60px 0 30px;
+      color: var(--cor-texto);
+    }
+
+    .grade-rodape {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 40px;
+      margin-bottom: 50px;
+    }
+
+    @media (min-width: 768px) {
+      .grade-rodape {
+        grid-template-columns: 1.5fr 1fr 1fr;
+        gap: 32px;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .grade-rodape {
+        grid-template-columns: 1.5fr 1fr 1fr 1.2fr;
+        gap: 40px;
+      }
+    }
+
+    .coluna-rodape {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .titulo-coluna-rodape {
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--cor-texto);
+    }
+
+    .links-rodape {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-size: 0.92rem;
+      color: var(--cor-texto-suave);
+    }
+
+    .links-rodape a:hover {
+      color: var(--cor-rosa-escura);
+      text-decoration: underline;
+    }
+
+    .formulario-newsletter {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .input-newsletter {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--cor-borda);
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-family: inherit;
+      color: var(--cor-texto);
+      background-color: var(--cor-creme);
+    }
+
+    .input-newsletter:focus {
+      outline: 2px solid var(--cor-texto);
+      background-color: #FFFFFF;
+    }
+
+    .barra-direitos {
+      border-top: 1px solid var(--cor-borda);
+      padding-top: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: var(--cor-texto-suave);
+      text-align: center;
+    }
+
+    @media (min-width: 768px) {
+      .barra-direitos {
+        flex-direction: row;
+        text-align: left;
+      }
+    }
+
+    /* Seção Consórcio Lolita */
+    .secao-consorcio {
+      background-color: #FFFFFF;
+      position: relative;
+    }
+
+    .consorcio-resumo-grade {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      max-width: 900px;
+      margin: 0 auto 40px;
+    }
+
+    @media (min-width: 640px) {
+      .consorcio-resumo-grade {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .consorcio-resumo-card {
+      background: linear-gradient(180deg, #FFFFFF 0%, var(--cor-creme) 100%);
+      border: 1px solid var(--cor-borda);
+      border-radius: var(--raio-suave);
+      padding: 24px 20px;
+      text-align: center;
+      box-shadow: var(--sombra-card);
+      border-top: 4px solid var(--cor-rosa);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .consorcio-resumo-card:nth-child(2) {
+      border-top-color: var(--cor-ocre);
+    }
+
+    .consorcio-resumo-card:nth-child(3) {
+      border-top-color: var(--cor-rosa-escura);
+    }
+
+    .consorcio-resumo-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--sombra-hover);
+    }
+
+    .resumo-rotulo {
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--cor-texto-suave);
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .resumo-valor {
+      font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+      font-weight: 700;
+      color: var(--cor-texto);
+      line-height: 1.15;
+    }
+
+    .grade-consorcio {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+
+    @media (min-width: 768px) {
+      .grade-consorcio {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .card-consorcio {
+      background-color: var(--cor-creme);
+      border: 1px solid var(--cor-borda);
+      border-radius: var(--raio-arco);
+      padding: 36px 26px 30px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--sombra-card);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card-consorcio:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--sombra-hover);
+    }
+
+    .card-consorcio-icone {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background-color: #FFFFFF;
+      border: 1px solid var(--cor-borda);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      color: var(--cor-rosa-escura);
+    }
+
+    .card-consorcio-icone svg {
+      width: 24px;
+      height: 24px;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      fill: none;
+    }
+
+    .card-consorcio-titulo {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--cor-texto);
+      text-align: center;
+      margin-bottom: 18px;
+    }
+
+    .lista-consorcio {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      font-size: 0.94rem;
+      color: var(--cor-texto-suave);
+      line-height: 1.5;
+    }
+
+    .lista-consorcio li {
+      position: relative;
+      padding-left: 22px;
+    }
+
+    .lista-consorcio li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 9px;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background-color: var(--cor-rosa-escura);
+    }
+
+    .card-consorcio:nth-child(2) .lista-consorcio li::before {
+      background-color: var(--cor-ocre-escura);
+    }
+
+    .card-consorcio:nth-child(3) .lista-consorcio li::before {
+      background-color: var(--cor-texto);
+    }
+
+    .consorcio-acoes {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      text-align: center;
+    }
+
+    /* Animações com Scroll Reveal */
+    .revelar-ao-rolar {
+      opacity: 1;
+      transform: none;
+      transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    html.js .revelar-ao-rolar.js-anim {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+
+    html.js .revelar-ao-rolar.js-anim.visivel {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Modal simples de Busca */
+    .dialog-busca {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      z-index: 1200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .dialog-busca.aberto {
+      display: flex;
+    }
+
+    .dialog-busca-caixa {
+      width: 100%;
+      max-width: 540px;
+      background: #FFFFFF;
+      border-radius: var(--raio-suave);
+      padding: 24px;
+      border: 1px solid var(--cor-borda);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Acessibilidade de Movimento Reduzido */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+
+      .slide-item {
+        transform: none !important;
+        transition: opacity 0.1s ease !important;
+      }
+
+      .card-produto {
+        transform: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Barra informativa superior -->
+  <aside class="barra-aviso">
+    Roupas femininas do 34 ao 52 &bull; Consultoria de imagem e colorimetria &bull; Orlândia (SP)
+  </aside>
+
+  <!-- Cabeçalho Principal com Logo e Navegação -->
+  <header class="cabecalho-fixo" id="topo">
+    <div class="container-loja nav-container">
+      
+      <!-- Logo SVG (Regra Crítica 2: proporção 2,5:1, viewBox="0 0 250 100") -->
+      <a href="#topo" class="logo-link" aria-label="Lolita Boutique - Ir para o início">
+        <svg class="logo-svg" viewBox="0 0 250 100" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Lolita Boutique">
+          <defs>
+            <!-- Pequeno padrão de pontos pretos -->
+            <pattern id="pontosPretos" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse">
+              <circle cx="5" cy="5" r="0.9" fill="#1A1A1A" opacity="0.65" />
+            </pattern>
+          </defs>
+
+          <!-- Forma orgânica rosa #E8B7B0 no canto superior direito -->
+          <path d="M 175,0 C 205,0 248,15 250,45 C 251,75 220,60 195,50 C 170,40 155,18 175,0 Z" fill="#E8B7B0" opacity="0.9" />
+          <path d="M 175,0 C 205,0 248,15 250,45 C 251,75 220,60 195,50 C 170,40 155,18 175,0 Z" fill="url(#pontosPretos)" />
+
+          <!-- Forma orgânica ocre #F4C189 no canto inferior esquerdo -->
+          <path d="M 0,60 C 20,40 55,50 68,72 C 80,95 50,100 25,100 C 5,100 0,85 0,60 Z" fill="#F4C189" opacity="0.9" />
+          <path d="M 0,60 C 20,40 55,50 68,72 C 80,95 50,100 25,100 C 5,100 0,85 0,60 Z" fill="url(#pontosPretos)" />
+
+          <!-- Ramos finos pretos com folhas no canto superior esquerdo -->
+          <g stroke="#1A1A1A" stroke-width="1.2" fill="none" stroke-linecap="round">
+            <path d="M 10,38 Q 22,22 45,12" />
+            <path d="M 22,25 Q 18,18 20,13" fill="#1A1A1A" />
+            <path d="M 32,18 Q 30,10 35,7" fill="#1A1A1A" />
+            <path d="M 45,12 Q 45,5 50,4" fill="#1A1A1A" />
+          </g>
+
+          <!-- Ramos finos pretos com folhas no canto inferior direito -->
+          <g stroke="#1A1A1A" stroke-width="1.2" fill="none" stroke-linecap="round">
+            <path d="M 235,62 Q 220,80 198,90" />
+            <path d="M 222,74 Q 227,82 225,87" fill="#1A1A1A" />
+            <path d="M 210,82 Q 212,90 207,93" fill="#1A1A1A" />
+            <path d="M 198,90 Q 196,96 190,97" fill="#1A1A1A" />
+          </g>
+
+          <!-- Texto "Lolita" em script em #1A1A1A, levemente inclinado, ocupando ~70% da altura -->
+          <text x="32" y="66"
+                font-family="'Brush Script MT', 'Segoe Script', cursive"
+                font-size="60"
+                font-style="italic"
+                fill="#1A1A1A"
+                transform="rotate(-4 32 66)">Lolita</text>
+
+          <!-- "Boutique" abaixo, alinhado à direita, em Georgia serif com letter-spacing largo -->
+          <text x="210" y="88"
+                text-anchor="end"
+                font-family="Georgia, serif"
+                font-size="16"
+                letter-spacing="5"
+                font-weight="normal"
+                fill="#1A1A1A">BOUTIQUE</text>
+        </svg>
+      </a>
+
+      <!-- Menu Principal Central -->
+      <nav aria-label="Menu principal de navegação">
+        <ul class="menu-principal">
+          <!-- página de listagem de produtos, a ser criada na próxima etapa -->
+          <li><a href="produtos.html" class="btn-elevado btn-nav-navegar">Navegar</a></li>
+          <li><a href="#colorimetria" class="link-nav">Colorimetria</a></li>
+          <li><a href="#consorcio" class="link-nav">Consórcio</a></li>
+          <li><a href="#sobre" class="link-nav">Sobre</a></li>
+        </ul>
+      </nav>
+
+      <!-- Ações: Busca, Sacola e Três Pontinhos -->
+      <div class="acoes-cabecalho">
+        
+        <!-- Botão Busca -->
+        <button type="button" class="btn-icone" id="btnAbrirBusca" aria-label="Abrir formulário de busca">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </button>
+
+        <!-- Botão Sacola com contador animado -->
+        <button type="button" class="btn-icone" id="btnSacola" aria-label="Sacola de compras, 0 itens adicionados">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+          <span class="badge-sacola" id="contadorSacola" aria-live="polite">0</span>
+        </button>
+
+        <!-- Botão Três Pontinhos -->
+        <button type="button" class="btn-icone" id="btnTresPontos" aria-label="Mais opções e acesso restrito" aria-expanded="false" aria-controls="painelTresPontos">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="1.5"></circle><circle cx="19" cy="12" r="1.5"></circle><circle cx="5" cy="12" r="1.5"></circle></svg>
+        </button>
+
+        <!-- Painel Popover dos Três Pontinhos -->
+        <div class="painel-tres-pontos" id="painelTresPontos" role="menu" aria-label="Menu de opções rápidas">
+          <!-- página de listagem de produtos, a ser criada na próxima etapa -->
+          <a href="produtos.html" class="item-painel item-painel-navegar" role="menuitem">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="3" y="3" width="7" height="7"></rect>
+              <rect x="14" y="3" width="7" height="7"></rect>
+              <rect x="14" y="14" width="7" height="7"></rect>
+              <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+            <span>Navegar produtos</span>
+          </a>
+          <!-- Link para área administrativa: admin.html (página a ser criada futuramente) -->
+          <a href="admin.html" class="item-painel" role="menuitem">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            <span>Área administrativa</span>
+          </a>
+          <div class="divisor-painel"></div>
+          <a href="#consorcio" class="item-painel" role="menuitem">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M12 6v12M15 9.5a3 3 0 0 0-3-2.5h-1a3 3 0 0 0 0 6h2a3 3 0 0 1 0 6h-1a3 3 0 0 1-3-2.5"></path>
+            </svg>
+            <span>Consórcio Lolita</span>
+          </a>
+          <a href="#colorimetria" class="item-painel" role="menuitem">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M12 2a10 10 0 0 1 0 20Z"></path>
+            </svg>
+            <span>Consultoria de cor</span>
+          </a>
+          <!-- Link do WhatsApp oficial (trocar pelo número real) -->
+          <a href="https://wa.me/5516000000000" target="_blank" rel="noopener noreferrer" class="item-painel" role="menuitem">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+            </svg>
+            <span>WhatsApp da loja</span>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- Modal de Busca Rápida -->
+  <div class="dialog-busca" id="modalBusca" role="dialog" aria-modal="true" aria-label="Pesquisar produtos">
+    <div class="dialog-busca-caixa">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <h3 class="fonte-serifa" style="font-size:1.4rem;">Buscar produtos</h3>
+        <button type="button" class="btn-icone" id="btnFecharBusca" aria-label="Fechar busca">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <label for="campoPesquisaModal" style="font-size:0.85rem; color:var(--cor-texto-suave); display:block; margin-bottom:6px;">Digite o que você procura:</label>
+      <input type="text" id="campoPesquisaModal" class="input-newsletter" placeholder="Exemplo: Vestido, Linho, Macacão, Saia..." />
+    </div>
+  </div>
+
+  <main>
+    <!-- Seção Hero com Cartão Flutuante da Fachada -->
+    <section class="secao-hero" id="inicio">
+      <div class="container-loja hero-layout">
+        
+        <!-- Apresentação Hero -->
+        <div class="hero-texto revelar-ao-rolar">
+          <span class="hero-selo">Lolita boutique &bull; Coleção 2025</span>
+          <h1 class="hero-titulo fonte-serifa">Delicadeza com estrutura</h1>
+          <p class="hero-subtitulo">
+            Roupas femininas do 34 ao 52 pensadas para valorizar sua beleza real, com caimento refinado e consultoria individual de imagem.
+          </p>
+          <div class="hero-botoes">
+            <!-- Botão Ver novidades direciona para o catálogo ou para o cartão interativo -->
+            <a href="produtos.html" class="btn-elevado">Ver novidades</a>
+            <a href="produtos.html" class="btn-elevado btn-elevado-ocre">Navegar pelas peças</a>
+            <!-- WhatsApp da loja: trocar 5516000000000 pelo telefone real -->
+            <a href="https://wa.me/5516000000000" target="_blank" rel="noopener noreferrer" class="btn-solido">Chamar no WhatsApp</a>
+          </div>
+        </div>
+
+        <!-- Cartão Flutuante com Foto da Loja e Interação Flip 3D com Folhas -->
+        <div class="cartao-loja-wrapper revelar-ao-rolar" id="areaCartaoLoja">
+          <!-- Recipiente para partículas de folhas que se espalham no clique -->
+          <div class="particulas-folhas-container" id="particulasContainer" aria-hidden="true"></div>
+
+          <!--
+            Cartão interativo da loja física:
+            - Flutua suavemente em loop
+            - Ao clicar ou teclar Enter/Espaço, executa flip 3D e solta folhas pretas (#1A1A1A)
+            - Navega para produtos.html (página Navegar, a ser criada na próxima etapa)
+          -->
+          <div class="cartao-loja-card"
+               id="cartaoLoja"
+               role="button"
+               tabindex="0"
+               aria-label="Ir para o catálogo">
+            <div class="cartao-loja-inner">
+              
+              <!-- Frente: Imagem real da fachada ou fallback em gradiente rosa/ocre -->
+              <div class="cartao-loja-frente">
+                <!--
+                  Foto da loja:
+                  src="IMAGEM_LOJA.png" (trocar pelo arquivo real da foto da loja).
+                  Fallback automático em caso de ausência da imagem.
+                -->
+                <img src="IMAGEM_LOJA.png"
+                     alt="Fachada da loja Lolita boutique"
+                     class="foto-loja"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                
+                <div class="fallback-loja" aria-hidden="true">
+                  <div class="fallback-loja-conteudo">
+                    <span class="fallback-loja-selo">Lolita boutique</span>
+                    <h2 class="fallback-loja-titulo fonte-serifa">Lolita boutique</h2>
+                    <p class="fallback-loja-desc">Nosso espaço físico em Orlândia (SP), pensado para acolher seu estilo.</p>
+                  </div>
+                </div>
+
+                <div class="cartao-loja-legenda">
+                  <div class="legenda-texto">
+                    <span class="legenda-sub">Espaço Lolita boutique</span>
+                    <span class="legenda-titulo">Visite nosso catálogo</span>
+                  </div>
+                  <span class="btn-indicador-entrar">Explorar &rarr;</span>
+                </div>
+              </div>
+
+              <!-- Verso: Revelado durante a rotação 3D -->
+              <div class="cartao-loja-verso" aria-hidden="true">
+                <div class="cartao-loja-verso-conteudo">
+                  <span class="verso-sub">Lolita boutique</span>
+                  <h3 class="verso-titulo fonte-serifa">Abrindo o catálogo...</h3>
+                  <p class="verso-desc">Carregando peças selecionadas do 34 ao 52.</p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Nova Seção: Consórcio Lolita -->
+    <section class="secao-padrao secao-consorcio" id="consorcio">
+      <div class="container-loja">
+        
+        <div class="secao-cabecalho revelar-ao-rolar">
+          <span class="secao-etiqueta">Planejamento & Sorteio Mensal</span>
+          <h2 class="secao-titulo fonte-serifa">Consórcio Lolita: suas compras com um prêmio de R$ 1.000,00</h2>
+          <p class="secao-descricao">
+            A participante paga R$ 100,00 por mês durante 10 meses. Todo mês há sorteio entre as participantes. Quem for sorteada recebe R$ 1.000,00 em crédito para gastar na loja.
+          </p>
+        </div>
+
+        <!-- Quadro de Resumo com Valores -->
+        <div class="consorcio-resumo-grade revelar-ao-rolar" aria-label="Valores do Consórcio Lolita">
+          <div class="consorcio-resumo-card">
+            <div class="resumo-rotulo">Parcela mensal</div>
+            <div class="resumo-valor fonte-serifa">R$ 100,00</div>
+          </div>
+          <div class="consorcio-resumo-card">
+            <div class="resumo-rotulo">Prazo</div>
+            <div class="resumo-valor fonte-serifa">10 meses</div>
+          </div>
+          <div class="consorcio-resumo-card">
+            <div class="resumo-rotulo">Crédito após contemplação</div>
+            <div class="resumo-valor fonte-serifa">R$ 1.000,00</div>
+          </div>
+        </div>
+
+        <!-- Três Cards do Consórcio -->
+        <div class="grade-consorcio revelar-ao-rolar">
+          
+          <!-- Card 1: Como funciona -->
+          <article class="card-consorcio">
+            <div class="card-consorcio-icone">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+            </div>
+            <h3 class="card-consorcio-titulo fonte-serifa">Como funciona</h3>
+            <ul class="lista-consorcio">
+              <li>1. Escolha a sua participação no grupo.</li>
+              <li>2. Pague a parcela de R$ 100,00 por mês.</li>
+              <li>3. Participe do sorteio realizado mensalmente.</li>
+              <li>4. Ao ser contemplada, use o crédito de R$ 1.000,00 na loja.</li>
+            </ul>
+          </article>
+
+          <!-- Card 2: Vantagens -->
+          <article class="card-consorcio">
+            <div class="card-consorcio-icone">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            </div>
+            <h3 class="card-consorcio-titulo fonte-serifa">Vantagens</h3>
+            <ul class="lista-consorcio">
+              <li>Valor fixo e previsível de R$ 100,00 por mês.</li>
+              <li>Crédito para usar nas peças e novidades da loja.</li>
+              <li>Possibilidade de fazer compras com planejamento e tranquilidade.</li>
+            </ul>
+          </article>
+
+          <!-- Card 3: Antes de participar -->
+          <article class="card-consorcio">
+            <div class="card-consorcio-icone">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            </div>
+            <h3 class="card-consorcio-titulo fonte-serifa">Antes de participar</h3>
+            <ul class="lista-consorcio">
+              <li>Leia atentamente o regulamento completo da edição.</li>
+              <li>As regras de contemplação estão descritas no regulamento.</li>
+              <li>As normas e prazos para o uso do crédito estão explicadas no documento oficial.</li>
+            </ul>
+          </article>
+
+        </div>
+
+        <!-- Ações do Consórcio -->
+        <div class="consorcio-acoes revelar-ao-rolar">
+          <!-- WhatsApp do consórcio: trocar 5516000000000 pelo telefone real da loja -->
+          <a href="https://wa.me/5516000000000?text=Ol%C3%A1%2C%20quero%20participar%20do%20cons%C3%B3rcio%20Lolita"
+             target="_blank"
+             rel="noopener noreferrer"
+             class="btn-solido"
+             style="padding: 14px 34px;">
+            Quero participar
+          </a>
+
+          <!-- Trocar pelo regulamento real da loja, ou pelo PDF oficial -->
+          <a href="#regulamento" class="btn-elevado btn-elevado-ocre" style="padding: 14px 28px;">
+            Ver regulamento
+          </a>
+        </div>
+
+      </div>
+    </section>
+
+
+
+    <!-- Seção Colorimetria e Consultoria de Imagem -->
+    <section class="secao-colorimetria" id="colorimetria">
+      <div class="container-loja">
+        
+        <div class="secao-cabecalho revelar-ao-rolar">
+          <span class="secao-etiqueta">Consultoria Personalizada</span>
+          <h2 class="secao-titulo fonte-serifa">Descubra as cores que valorizam você</h2>
+          <p class="secao-descricao">
+            A colorimetria identifica o subtom da pele (quente, frio ou neutro) e a intensidade (claro, médio ou escuro) para indicar as cores ideais para o rosto, a pele, o cabelo e os olhos.
+          </p>
+        </div>
+
+        <!-- Card de apresentação da consultora Marília -->
+        <div class="colorimetria-apresentacao revelar-ao-rolar">
+          <div class="moldura-arco">
+            <!--
+              Foto da Marília:
+              src="IMAGEM_MARILIA.png" (trocar pelo arquivo real da foto).
+              Fallback nativo caso o arquivo de imagem não seja encontrado localmente.
+            -->
+            <img src="IMAGEM_MARILIA.png"
+                 alt="Marília, consultora de colorimetria da Lolita boutique"
+                 class="foto-consultora"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div class="fallback-consultora" aria-hidden="true">M</div>
+          </div>
+
+          <div class="consultora-bio">
+            <span class="consultora-cargo">Consultora de colorimetria e imagem</span>
+            <h3 class="consultora-nome fonte-serifa">Marília</h3>
+            <p class="consultora-texto">
+              Especialista em guiar mulheres para a sua melhor versão por meio da ciência das cores e da proporção corporal. Com metodologia precisa e acolhedora, a consultoria na Lolita boutique transforma a sua relação com o espelho e com as suas compras.
+            </p>
+            <p class="consultora-texto">
+              Você aprende a escolher peças com segurança e descobre que vestir-se bem não depende de padrões, mas sim do equilíbrio entre o seu tom de pele e o seu estilo autêntico.
+            </p>
+          </div>
+        </div>
+
+        <!-- Três Cards Explicativos -->
+        <div class="grade-colorimetria revelar-ao-rolar">
+          
+          <!-- Card A: Como Funciona -->
+          <article class="card-color-info">
+            <div class="card-color-icone">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+            </div>
+            <h3 class="card-color-titulo fonte-serifa">Como funciona</h3>
+            <ul class="lista-colorimetria">
+              <li>1. Análise detalhada de tom e subtom utilizando drapês de tecido sob luz padronizada.</li>
+              <li>2. Construção do mapa completo de cores para roupas, maquiagem, acessórios e cabelos.</li>
+              <li>3. Entrega do guia impresso ou digital da sua cartela para levar sempre com você.</li>
+            </ul>
+          </article>
+
+          <!-- Card B: Vantagens de fazer a consultoria -->
+          <article class="card-color-info">
+            <div class="card-color-icone">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            </div>
+            <h3 class="card-color-titulo fonte-serifa">Vantagens da consultoria</h3>
+            <ul class="lista-colorimetria">
+              <li>Compras muito mais assertivas e sem arrependimentos futuros.</li>
+              <li>Guarda-roupa prático e versátil com peças que combinam com facilidade entre si.</li>
+              <li>Diminuição de trocas, devoluções e desperdício de dinheiro.</li>
+              <li>Imagem pessoal harmônica e confiança diária na escolha dos looks.</li>
+            </ul>
+          </article>
+
+          <!-- Card C: O que se perde sem a consultoria -->
+          <article class="card-color-info">
+            <div class="card-color-icone">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            </div>
+            <h3 class="card-color-titulo fonte-serifa">O que se perde sem ela</h3>
+            <ul class="lista-colorimetria perdas">
+              <li>Compras por tentativa e erro que pesam no orçamento.</li>
+              <li>Peças que causam aspecto pálido ou pesado por discordarem do subtom da pele.</li>
+              <li>Roupas com etiqueta esquecidas no armário por falta de coordenação visual.</li>
+            </ul>
+          </article>
+
+        </div>
+
+        <!-- Botão CTA para agendamento -->
+        <!-- Trocar 5516000000000 pelo número real do WhatsApp da loja -->
+        <div class="area-cta-colorimetria revelar-ao-rolar">
+          <a href="https://wa.me/5516000000000?text=Ol%C3%A1%2C%20quero%20agendar%20uma%20consultoria%20de%20colorimetria"
+             target="_blank"
+             rel="noopener noreferrer"
+             class="btn-solido"
+             style="padding: 16px 36px; font-size: 1rem;">
+            Agendar consultoria
+          </a>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Seção Bazar Lolita -->
+    <section class="secao-padrao" id="bazar">
+      <div class="container-loja">
+        
+        <div class="secao-cabecalho revelar-ao-rolar">
+          <span class="secao-etiqueta">Oportunidades Especiais</span>
+          <h2 class="secao-titulo fonte-serifa">Bazar Lolita</h2>
+          <p class="secao-descricao">Peças finais de coleção com condições exclusivas e a mesma excelência de acabamento da marca.</p>
+        </div>
+
+        <div class="grade-bazar revelar-ao-rolar">
+          
+          <article class="card-conteudo">
+            <div class="card-conteudo-topo">
+              <span class="conteudo-tag">Últimas Unidades</span>
+              <h3 class="conteudo-titulo fonte-serifa">Seleção Alfaiataria Leve</h3>
+              <p class="conteudo-texto">Blazers de linho misto, calças retas e coletes estruturados com descontos de até 40% para renovar seu closet profissional.</p>
+            </div>
+            <div class="conteudo-rodape">
+              <span>Grade do 36 ao 50</span>
+              <!-- página produtos.html a ser criada na próxima etapa -->
+              <a href="produtos.html" class="link-nav" style="font-weight:700;">Conferir peças &rarr;</a>
+            </div>
+          </article>
+
+          <article class="card-conteudo">
+            <div class="card-conteudo-topo">
+              <span class="conteudo-tag">Edição Limitada</span>
+              <h3 class="conteudo-titulo fonte-serifa">Vestidos de Festa & Noite</h3>
+              <p class="conteudo-texto">Modelos fluidos em crepe acetinado, comprimentos midi e longos selecionados para eventos e celebrações.</p>
+            </div>
+            <div class="conteudo-rodape">
+              <span>Grade do 34 ao 52</span>
+              <!-- página produtos.html a ser criada na próxima etapa -->
+              <a href="produtos.html" class="link-nav" style="font-weight:700;">Conferir peças &rarr;</a>
+            </div>
+          </article>
+
+          <article class="card-conteudo">
+            <div class="card-conteudo-topo">
+              <span class="conteudo-tag">Acessórios & Calçados</span>
+              <h3 class="conteudo-titulo fonte-serifa">Linha Couro & Metais</h3>
+              <p class="conteudo-texto">Sapatos confortáveis e cintos de fivela artesanal com preços promocionais para compor suas produções.</p>
+            </div>
+            <div class="conteudo-rodape">
+              <span>Numerações variadas</span>
+              <!-- página produtos.html a ser criada na próxima etapa -->
+              <a href="produtos.html" class="link-nav" style="font-weight:700;">Conferir peças &rarr;</a>
+            </div>
+          </article>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Seção Dicas de Estilo -->
+    <section class="secao-padrao" id="dicas" style="background-color: var(--cor-creme);">
+      <div class="container-loja">
+        
+        <div class="secao-cabecalho revelar-ao-rolar">
+          <span class="secao-etiqueta">Conteúdo e Prática</span>
+          <h2 class="secao-titulo fonte-serifa">Dicas de Estilo e Imagem</h2>
+          <p class="secao-descricao">Orientações simples e eficientes para você aplicar nas suas produções do dia a dia.</p>
+        </div>
+
+        <div class="grade-dicas revelar-ao-rolar">
+          
+          <article class="card-conteudo">
+            <div class="card-conteudo-topo">
+              <span class="conteudo-tag">Coordenação de Cores</span>
+              <h3 class="conteudo-titulo fonte-serifa">Monocromático e Alongamento</h3>
+              <p class="conteudo-texto">Utilizar tonalidades próximas na parte superior e inferior cria uma linha visual contínua que traz sofisticação e harmonia estética instantânea.</p>
+            </div>
+            <div class="conteudo-rodape">
+              <span>Consultoria Lolita</span>
+              <a href="#colorimetria" class="link-nav" style="font-weight:700;">Saiba mais &rarr;</a>
+            </div>
+          </article>
+
+          <article class="card-conteudo">
+            <div class="card-conteudo-topo">
+              <span class="conteudo-tag">Proporção e Caimento</span>
+              <h3 class="conteudo-titulo fonte-serifa">A Regra dos Três Terços</h3>
+              <p class="conteudo-texto">Descubra como a marcação correta da linha de cintura realça as proporções corporais em vestidos, saias e macacões sem apertar ou incomodar.</p>
+            </div>
+            <div class="conteudo-rodape">
+              <span>Guia de Silhueta</span>
+              <a href="#colorimetria" class="link-nav" style="font-weight:700;">Saiba mais &rarr;</a>
+            </div>
+          </article>
+
+          <article class="card-conteudo">
+            <div class="card-conteudo-topo">
+              <span class="conteudo-tag">Guarda-Roupa Inteligente</span>
+              <h3 class="conteudo-titulo fonte-serifa">Multiplicação de Looks</h3>
+              <p class="conteudo-texto">Uma única peça de alfaiataria bem escolhida transita do tênis de passeio ao salto fino de jantar, bastando trocar os complementos certos.</p>
+            </div>
+            <div class="conteudo-rodape">
+              <span>Versatilidade Real</span>
+              <a href="#colorimetria" class="link-nav" style="font-weight:700;">Saiba mais &rarr;</a>
+            </div>
+          </article>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Seção Sobre -->
+    <section class="secao-sobre" id="sobre">
+      <div class="container-loja">
+        <div class="sobre-caixa revelar-ao-rolar">
+          <span class="secao-etiqueta">Nossa História</span>
+          <h2 class="secao-titulo fonte-serifa">Sobre a Lolita boutique</h2>
+          <p class="sobre-paragrafo fonte-serifa">
+            A Lolita boutique nasceu em Orlândia com a missão de vestir mulheres reais através de uma curadoria refinada do tamanho 34 ao 52, honrando cada forma sem rótulos.
+          </p>
+          <p class="sobre-paragrafo fonte-serifa">
+            Aliamos coleções de alta qualidade com um atendimento consultivo de colorimetria e proporção corporal, guiando cada cliente rumo a escolhas conscientes e duradouras.
+          </p>
+          <p class="sobre-paragrafo fonte-serifa">
+            Nosso espaço físico e atendimento digital acolhem quem busca estilo autêntico, conforto diário e a certeza de encontrar peças que realmente se adaptam à sua rotina.
+          </p>
+          <div class="sobre-assinatura">Orlândia &bull; São Paulo</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Rodapé Completo -->
+  <footer class="rodape-principal">
+    <div class="container-loja">
+      
+      <div class="grade-rodape">
+        
+        <!-- Coluna 1: Logo e Identidade -->
+        <div class="coluna-rodape">
+          <a href="#topo" aria-label="Lolita Boutique - Ir para o início">
+            <svg class="logo-svg" viewBox="0 0 250 100" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Lolita Boutique">
+              <defs>
+                <pattern id="pontosPretosFooter" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse">
+                  <circle cx="5" cy="5" r="0.9" fill="#1A1A1A" opacity="0.65" />
+                </pattern>
+              </defs>
+              <path d="M 175,0 C 205,0 248,15 250,45 C 251,75 220,60 195,50 C 170,40 155,18 175,0 Z" fill="#E8B7B0" opacity="0.9" />
+              <path d="M 175,0 C 205,0 248,15 250,45 C 251,75 220,60 195,50 C 170,40 155,18 175,0 Z" fill="url(#pontosPretosFooter)" />
+              <path d="M 0,60 C 20,40 55,50 68,72 C 80,95 50,100 25,100 C 5,100 0,85 0,60 Z" fill="#F4C189" opacity="0.9" />
+              <path d="M 0,60 C 20,40 55,50 68,72 C 80,95 50,100 25,100 C 5,100 0,85 0,60 Z" fill="url(#pontosPretosFooter)" />
+              <g stroke="#1A1A1A" stroke-width="1.2" fill="none" stroke-linecap="round">
+                <path d="M 10,38 Q 22,22 45,12" />
+                <path d="M 22,25 Q 18,18 20,13" fill="#1A1A1A" />
+                <path d="M 32,18 Q 30,10 35,7" fill="#1A1A1A" />
+                <path d="M 45,12 Q 45,5 50,4" fill="#1A1A1A" />
+              </g>
+              <g stroke="#1A1A1A" stroke-width="1.2" fill="none" stroke-linecap="round">
+                <path d="M 235,62 Q 220,80 198,90" />
+                <path d="M 222,74 Q 227,82 225,87" fill="#1A1A1A" />
+                <path d="M 210,82 Q 212,90 207,93" fill="#1A1A1A" />
+                <path d="M 198,90 Q 196,96 190,97" fill="#1A1A1A" />
+              </g>
+              <text x="32" y="66" font-family="'Brush Script MT', 'Segoe Script', cursive" font-size="60" font-style="italic" fill="#1A1A1A" transform="rotate(-4 32 66)">Lolita</text>
+              <text x="210" y="88" text-anchor="end" font-family="Georgia, serif" font-size="16" letter-spacing="5" font-weight="normal" fill="#1A1A1A">BOUTIQUE</text>
+            </svg>
+          </a>
+          <p style="font-size:0.92rem; color:var(--cor-texto-suave); line-height:1.6;">
+            Roupas femininas do 34 ao 52 e consultoria de imagem. Presença acolhedora e compromisso com o seu bem-estar.
+          </p>
+          <p style="font-size:0.88rem; color:var(--cor-texto-suave);">
+            <strong>Instagram:</strong> <a href="https://instagram.com/lolitaboutique_store" target="_blank" rel="noopener noreferrer" style="color:var(--cor-rosa-escura); font-weight:600;">@lolitaboutique_store</a>
+          </p>
+        </div>
+
+        <!-- Coluna 2: Navegação Rápida -->
+        <div class="coluna-rodape">
+          <h4 class="titulo-coluna-rodape">Navegação</h4>
+          <ul class="links-rodape">
+            <!-- página de listagem de produtos, a ser criada na próxima etapa -->
+            <li><a href="produtos.html">Navegar produtos</a></li>
+            <li><a href="#colorimetria">Colorimetria & Imagem</a></li>
+            <li><a href="#consorcio">Consórcio Lolita</a></li>
+            <li><a href="#bazar">Bazar Lolita</a></li>
+            <li><a href="#dicas">Dicas de Estilo</a></li>
+            <li><a href="#sobre">Nossa História</a></li>
+          </ul>
+        </div>
+
+        <!-- Coluna 3: Loja Física e Contato -->
+        <div class="coluna-rodape">
+          <h4 class="titulo-coluna-rodape">Atendimento & Endereço</h4>
+          <p style="font-size:0.92rem; color:var(--cor-texto-suave); line-height:1.6;">
+            Rua 4, 684, Centro<br>
+            Orlândia (SP)<br>
+            CEP 14620-000
+          </p>
+          <p style="font-size:0.92rem; color:var(--cor-texto-suave); line-height:1.6;">
+            Atendimento presencial, direct no Instagram e pedidos pelo WhatsApp com envio para todo o país.
+          </p>
+          <!-- WhatsApp oficial da loja (trocar 5516000000000 pelo número real) -->
+          <a href="https://wa.me/5516000000000" target="_blank" rel="noopener noreferrer" class="link-nav" style="font-weight:700; color:var(--cor-rosa-escura);">
+            Conversar no WhatsApp &rarr;
+          </a>
+        </div>
+
+        <!-- Coluna 4: Newsletter -->
+        <div class="coluna-rodape">
+          <h4 class="titulo-coluna-rodape">Receber Lançamentos</h4>
+          <p style="font-size:0.88rem; color:var(--cor-texto-suave); line-height:1.5;">
+            Cadastre seu e-mail para ser avisada sobre novas coleções, reposições e dicas de colorimetria.
+          </p>
+          <form class="formulario-newsletter" id="formNewsletter" onsubmit="event.preventDefault(); alert('Obrigado pelo cadastro na Lolita boutique.'); this.reset();">
+            <label for="inputEmailNews" style="display:none;">Seu e-mail</label>
+            <input type="email" id="inputEmailNews" class="input-newsletter" placeholder="Digite seu melhor e-mail" required>
+            <button type="submit" class="btn-elevado" style="padding: 10px 20px; font-size: 0.82rem;">Inscrever-se</button>
+          </form>
+        </div>
+
+      </div>
+
+      <div class="barra-direitos">
+        <span>&copy; 2025 Lolita boutique &bull; CNPJ registrado &bull; Todos os direitos reservados.</span>
+        <span>Rua 4, 684, Centro, Orlândia (SP) &bull; @lolitaboutique_store</span>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- Scripts exclusivos da aplicação -->
+  <script>
+    // Ativa suporte a JavaScript logo no início
+    document.documentElement.classList.add("js");
+
+    /*
+      Array principal de produtos da Lolita boutique.
+      Preços de exemplo: trocar pelos valores reais conforme tabela vigente.
+    */
+    const PRODUTOS_LOJA = [
+      {
+        id: 1,
+        nome: "Vestido Midi Linho Puro",
+        categoria: "Vestidos",
+        preco: 299.90, // Trocar pelo preço real
+        tamanhos: ["36", "40", "44", "48", "52"],
+        cores: ["#E8B7B0", "#FAF7F2", "#2F3E46"],
+        descricao: "Fibra 100% natural com caimento fluido, decote estruturado e faixa para amarração na cintura.",
+        imagem: "vestido-midi",
+        destaque: true,
+        novo: true
+      },
+      {
+        id: 2,
+        nome: "Macacão Pantalona Alfaiataria",
+        categoria: "Macacões",
+        preco: 349.90, // Trocar pelo preço real
+        tamanhos: ["38", "42", "46", "50"],
+        cores: ["#F4C189", "#1A1A1A"],
+        descricao: "Corte reto impecável com bolsos laterais faca, decote em V sutil e fechamento invisível.",
+        imagem: "macacao-pantalona",
+        destaque: true,
+        novo: false
+      },
+      {
+        id: 3,
+        nome: "Vestido Envelope Terracota",
+        categoria: "Vestidos",
+        preco: 279.90, // Trocar pelo preço real
+        tamanhos: ["34", "38", "42", "46", "50"],
+        cores: ["#B25D4C", "#4A5859"],
+        descricao: "Design transpassado que se ajusta com precisão ao busto e à cintura, com manga flare leve.",
+        imagem: "vestido-envelope",
+        destaque: true,
+        novo: true
+      },
+      {
+        id: 4,
+        nome: "Saia Evasê Botões Frontais",
+        categoria: "Saias",
+        preco: 199.90, // Trocar pelo preço real
+        tamanhos: ["38", "40", "44", "48"],
+        cores: ["#F4C189", "#E8B7B0"],
+        descricao: "Cintura alta com passantes, abotoamento forrado e comprimento midi clássico em sarja leve.",
+        imagem: "saia-evase",
+        destaque: true,
+        novo: false
+      },
+      {
+        id: 5,
+        nome: "Scarpin Salto Bloco Couro",
+        categoria: "Calçados",
+        preco: 259.90, // Trocar pelo preço real
+        tamanhos: ["35", "36", "37", "38", "39"],
+        cores: ["#D4A373", "#1A1A1A"],
+        descricao: "Salto estável de 6cm com palmilha acolchoada desenvolvida para rotinas longas sem fadiga.",
+        imagem: "scarpin-couro",
+        destaque: true,
+        novo: false
+      },
+      {
+        id: 6,
+        nome: "Saia Plissada Toque Seda",
+        categoria: "Saias",
+        preco: 229.90, // Trocar pelo preço real
+        tamanhos: ["P", "M", "G", "GG"],
+        cores: ["#E8B7B0", "#A3B18A"],
+        descricao: "Caimento etéreo com elástico embutido no cós, perfeita tanto com t-shirt quanto com alfaiataria.",
+        imagem: "saia-plissada",
+        destaque: false,
+        novo: true
+      },
+      {
+        id: 7,
+        nome: "Macacão Utilitário em Sarja",
+        categoria: "Macacões",
+        preco: 319.90, // Trocar pelo preço real
+        tamanhos: ["36", "40", "44", "48"],
+        cores: ["#588157", "#FAF7F2"],
+        descricao: "Design prático com bolsos cargo sutis, zíper tratorado de metal e punhos ajustáveis.",
+        imagem: "macacao-utilitario",
+        destaque: false,
+        novo: false
+      },
+      {
+        id: 8,
+        nome: "Cinto Fivela Orgânica",
+        categoria: "Acessórios",
+        preco: 139.90, // Trocar pelo preço real
+        tamanhos: ["P/M", "G/GG", "Plus"],
+        cores: ["#1A1A1A", "#7F4F24"],
+        descricao: "Couro legítimo com acabamento acetinado e metal martelado que valoriza o visual instantaneamente.",
+        imagem: "cinto-organico",
+        destaque: false,
+        novo: false
+      }
+    ];
+
+    document.addEventListener("DOMContentLoaded", () => {
+      // Fallback de garantia: revela todos os elementos caso haja demora ou bloqueio
+      setTimeout(() => {
+        document.querySelectorAll(".revelar-ao-rolar").forEach((el) => {
+          el.classList.add("visivel");
+        });
+      }, 1000);
+
+      /* ----------------------------------------------------
+         1. CONTROLE DO PAINEL DE TRÊS PONTINHOS
+         Regra: fecha ao clicar fora, em qualquer link ou
+         no conteúdo, e com Esc.
+      ---------------------------------------------------- */
+      const btnTresPontos = document.getElementById("btnTresPontos");
+      const painelTresPontos = document.getElementById("painelTresPontos");
+
+      const abrirPainel = () => {
+        painelTresPontos.classList.add("aberto");
+        btnTresPontos.setAttribute("aria-expanded", "true");
+      };
+
+      const fecharPainel = () => {
+        painelTresPontos.classList.remove("aberto");
+        btnTresPontos.setAttribute("aria-expanded", "false");
+      };
+
+      btnTresPontos.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const estaAberto = painelTresPontos.classList.contains("aberto");
+        if (estaAberto) {
+          fecharPainel();
+        } else {
+          abrirPainel();
+        }
+      });
+
+      // Fecha ao clicar em qualquer link interno do painel
+      painelTresPontos.querySelectorAll("a").forEach((link) => {
+        link.addEventListener("click", () => {
+          fecharPainel();
+        });
+      });
+
+      // Clicar em qualquer área fora do botão dos três pontinhos fecha o painel
+      document.addEventListener("click", (e) => {
+        if (!painelTresPontos.contains(e.target) && e.target !== btnTresPontos) {
+          fecharPainel();
+        }
+      });
+
+      // Fechar com teclado (Esc)
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          fecharPainel();
+          fecharBusca();
+        }
+      });
+
+      /* ----------------------------------------------------
+         2. MODAL DE BUSCA
+      ---------------------------------------------------- */
+      const btnAbrirBusca = document.getElementById("btnAbrirBusca");
+      const btnFecharBusca = document.getElementById("btnFecharBusca");
+      const modalBusca = document.getElementById("modalBusca");
+      const campoPesquisaModal = document.getElementById("campoPesquisaModal");
+
+      const abrirBusca = () => {
+        modalBusca.classList.add("aberto");
+        setTimeout(() => campoPesquisaModal.focus(), 100);
+      };
+
+      const fecharBusca = () => {
+        modalBusca.classList.remove("aberto");
+      };
+
+      btnAbrirBusca.addEventListener("click", abrirBusca);
+      btnFecharBusca.addEventListener("click", fecharBusca);
+      modalBusca.addEventListener("click", (e) => {
+        if (e.target === modalBusca) fecharBusca();
+      });
+
+      // Busca modal: redireciona para a página de produtos com o termo de busca
+      campoPesquisaModal.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          const termo = encodeURIComponent(campoPesquisaModal.value.trim());
+          fecharBusca();
+          // página de listagem de produtos, a ser criada na próxima etapa
+          window.location.href = `produtos.html?busca=${termo}`;
+        }
+      });
+
+      /* ----------------------------------------------------
+         3. CARTÃO FLUTUANTE DA LOJA: FLIP 3D E FOLHAS PRETAS
+         - Ao clicar ou teclar Enter/Espaço, executa rotação 3D
+         - Dispersa partículas de folhas na cor preta (#1A1A1A)
+         - Redireciona para produtos.html após ~1,2s
+         - Com prefers-reduced-motion, pula animações e navega direto
+      ---------------------------------------------------- */
+      const cartaoLoja = document.getElementById("cartaoLoja");
+      const particulasContainer = document.getElementById("particulasContainer");
+      let transicaoEmAndamento = false;
+
+      const dispararTransicaoCatalogo = () => {
+        if (transicaoEmAndamento) return;
+        transicaoEmAndamento = true;
+
+        const prefereReduzido = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        // Com prefers-reduced-motion, pular a animação de partículas e a rotação e navegar direto
+        if (prefereReduzido) {
+          // página Navegar (produtos.html), a ser criada na próxima etapa
+          window.location.href = "produtos.html";
+          return;
+        }
+
+        if (cartaoLoja) {
+          cartaoLoja.classList.add("virando");
+        }
+
+        // Gera partículas em formato de folhas na cor preta (#1A1A1A)
+        if (particulasContainer && cartaoLoja) {
+          particulasContainer.innerHTML = "";
+          const totalFolhas = 24;
+          const rect = cartaoLoja.getBoundingClientRect();
+          const contRect = particulasContainer.getBoundingClientRect();
+          const centroX = rect.left + rect.width / 2 - contRect.left;
+          const centroY = rect.top + rect.height / 2 - contRect.top;
+
+          // SVG de folha delicada preta (#1A1A1A)
+          const svgFolhaPreta = `
+            <svg viewBox="0 0 24 24" role="presentation">
+              <path d="M 12,2 C 18,2 22,8 22,14 C 22,19 18,22 12,22 C 6,22 2,19 2,14 C 2,8 6,2 12,2 Z" fill="#1A1A1A" />
+              <path d="M 12,4 Q 12,12 12,20" stroke="#FFFFFF" stroke-width="1" fill="none" opacity="0.6" />
+            </svg>
+          `;
+
+          for (let i = 0; i < totalFolhas; i++) {
+            const folha = document.createElement("div");
+            folha.className = "particula-folha";
+            folha.innerHTML = svgFolhaPreta;
+
+            // Dispersão radial a partir do centro do cartão
+            folha.style.left = `${centroX + (Math.random() - 0.5) * 50}px`;
+            folha.style.top = `${centroY + (Math.random() - 0.5) * 50}px`;
+
+            const angulo = Math.random() * Math.PI * 2;
+            const distancia = 120 + Math.random() * 220;
+            const gravidade = 30 + Math.random() * 90; // suave queda natural
+            const destX = Math.cos(angulo) * distancia;
+            const destY = Math.sin(angulo) * distancia + gravidade;
+            const rotacao = (Math.random() - 0.5) * 720;
+
+            folha.style.setProperty("--dest-x", `${destX.toFixed(1)}px`);
+            folha.style.setProperty("--dest-y", `${destY.toFixed(1)}px`);
+            folha.style.setProperty("--rotacao", `${rotacao.toFixed(0)}deg`);
+
+            particulasContainer.appendChild(folha);
+          }
+        }
+
+        // Ao terminar a animação (~1,2 segundo), navegar automaticamente para produtos.html
+        setTimeout(() => {
+          // página Navegar (produtos.html), a ser criada na próxima etapa
+          window.location.href = "produtos.html";
+        }, 1200);
+      };
+
+      if (cartaoLoja) {
+        cartaoLoja.addEventListener("click", dispararTransicaoCatalogo);
+        cartaoLoja.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
+            e.preventDefault();
+            dispararTransicaoCatalogo();
+          }
+        });
+      }
+
+      /* ----------------------------------------------------
+         4. REVELAÇÃO DAS SEÇÕES AO ROLAR (SCROLL REVEAL)
+         Apenas elementos fora do hero iniciam com animação
+      ---------------------------------------------------- */
+      const elementosParaRevelar = Array.from(document.querySelectorAll(".revelar-ao-rolar"));
+      const prefereMovimentoReduzido = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      if ("IntersectionObserver" in window && !prefereMovimentoReduzido) {
+        const elementosFiltrados = elementosParaRevelar.filter((el) => !el.closest(".secao-hero"));
+
+        elementosFiltrados.forEach((el) => {
+          el.classList.add("js-anim");
+        });
+
+        const observerScroll = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("visivel");
+              observerScroll.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.12 });
+
+        elementosFiltrados.forEach((el) => observerScroll.observe(el));
+      } else {
+        elementosParaRevelar.forEach((el) => el.classList.add("visivel"));
+      }
+    });
+  </script>
+<script>
+/* Skip artifact shell — fixed helpers served beside every artifact. */
+(function () {
+  "use strict";
+
+  var fmt = {
+    num: function (v, opts) { return new Intl.NumberFormat("pt-BR", opts || {}).format(v); },
+    brl: function (v) { return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v); },
+    pct: function (v) { return new Intl.NumberFormat("pt-BR", { style: "percent", maximumFractionDigits: 1 }).format(v); }
+  };
+
+  // axisFmt keeps axis tick labels short (compact notation) so long values
+  // (e.g. full BRL amounts) never clip against the plot edge.
+  function axisFmt(v) {
+    return fmt.num(v, { notation: "compact", maximumFractionDigits: 1 });
+  }
+
+  // format accepts a function OR one of the fmt names ("num" | "brl" | "pct").
+  function coerceFormat(spec) {
+    if (typeof spec === "function") return spec;
+    if (typeof spec === "string" && fmt[spec]) return fmt[spec];
+    return function (v) { return fmt.num(v); };
+  }
+
+  function accent() {
+    return getComputedStyle(document.documentElement).getPropertyValue("--accent").trim() || "#2563eb";
+  }
+  function mutedColor() {
+    return getComputedStyle(document.documentElement).getPropertyValue("--text-muted").trim() || "#5b6472";
+  }
+  function svgEl(tag, attrs) {
+    var el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+    for (var k in attrs) el.setAttribute(k, attrs[k]);
+    return el;
+  }
+  function frame(el, w, h) {
+    var svg = svgEl("svg", { viewBox: "0 0 " + w + " " + h, role: "img" });
+    el.innerHTML = "";
+    el.appendChild(svg);
+    return svg;
+  }
+
+  // maxOf guards the axis scale: empty values would give -Infinity (truthy,
+  // so "|| 1" can't catch it) and a non-positive max would flip the chart.
+  function maxOf(values) {
+    var m = values.length ? Math.max.apply(null, values) : 0;
+    return m > 0 ? m : 1;
+  }
+
+  // bar(el, {labels:[], values:[], color?, format?}) — vertical bar chart.
+  function bar(el, cfg) {
+    var W = 640, H = 280, padL = 46, padB = 30, padT = 12;
+    var svg = frame(el, W, H);
+    var max = maxOf(cfg.values);
+    var n = cfg.values.length;
+    var plotW = W - padL - 12, plotH = H - padT - padB;
+    var step = plotW / n, bw = Math.min(step * 0.62, 64);
+    var color = cfg.color || accent();
+    var f = coerceFormat(cfg.format);
+    for (var g = 0; g <= 4; g++) {
+      var gy = padT + plotH - (plotH * g) / 4;
+      svg.appendChild(svgEl("line", { x1: padL, y1: gy, x2: W - 12, y2: gy, stroke: "currentColor", "stroke-opacity": 0.08 }));
+      var lbl = svgEl("text", { x: padL - 8, y: gy + 4, "text-anchor": "end", "font-size": 10, fill: mutedColor() });
+      lbl.textContent = axisFmt((max * g) / 4);
+      svg.appendChild(lbl);
+    }
+    cfg.values.forEach(function (v, i) {
+      var bh = Math.max(0, (v / max) * plotH);
+      var x = padL + i * step + (step - bw) / 2;
+      var y = padT + plotH - bh;
+      var r = svgEl("rect", { x: x, y: y, width: bw, height: bh, rx: 4, fill: color });
+      var t = svgEl("title", {});
+      t.textContent = cfg.labels[i] + ": " + f(v);
+      r.appendChild(t);
+      svg.appendChild(r);
+      var tx = svgEl("text", { x: x + bw / 2, y: H - 10, "text-anchor": "middle", "font-size": 11, fill: mutedColor() });
+      tx.textContent = cfg.labels[i];
+      svg.appendChild(tx);
+    });
+  }
+
+  // line(el, {labels:[], values:[], color?, format?}) — single-series line.
+  function line(el, cfg) {
+    var W = 640, H = 280, padL = 46, padB = 30, padT = 12;
+    var svg = frame(el, W, H);
+    var max = maxOf(cfg.values);
+    var n = cfg.values.length;
+    var plotW = W - padL - 16, plotH = H - padT - padB;
+    var color = cfg.color || accent();
+    var f = coerceFormat(cfg.format);
+    for (var g = 0; g <= 4; g++) {
+      var gy = padT + plotH - (plotH * g) / 4;
+      svg.appendChild(svgEl("line", { x1: padL, y1: gy, x2: W - 16, y2: gy, stroke: "currentColor", "stroke-opacity": 0.08 }));
+      var lbl = svgEl("text", { x: padL - 8, y: gy + 4, "text-anchor": "end", "font-size": 10, fill: mutedColor() });
+      lbl.textContent = axisFmt((max * g) / 4);
+      svg.appendChild(lbl);
+    }
+    var pts = cfg.values.map(function (v, i) {
+      var x = padL + (n === 1 ? plotW / 2 : (plotW * i) / (n - 1));
+      var y = padT + plotH - (v / max) * plotH;
+      return [x, y];
+    });
+    var d = pts.map(function (p, i) { return (i ? "L" : "M") + p[0].toFixed(1) + " " + p[1].toFixed(1); }).join(" ");
+    svg.appendChild(svgEl("path", { d: d, fill: "none", stroke: color, "stroke-width": 2, "stroke-linejoin": "round" }));
+    pts.forEach(function (p, i) {
+      var c = svgEl("circle", { cx: p[0], cy: p[1], r: 3.5, fill: color });
+      var t = svgEl("title", {});
+      t.textContent = cfg.labels[i] + ": " + f(cfg.values[i]);
+      c.appendChild(t);
+      svg.appendChild(c);
+      var tx = svgEl("text", { x: p[0], y: H - 10, "text-anchor": "middle", "font-size": 11, fill: mutedColor() });
+      tx.textContent = cfg.labels[i];
+      svg.appendChild(tx);
+    });
+  }
+
+  // donut(el, {labels:[], values:[], colors?}) — donut with center total.
+  function donut(el, cfg) {
+    var W = 320, H = 280, cx = W / 2, cy = H / 2, R = 92, r = 58;
+    var svg = frame(el, W, H);
+    var total = cfg.values.reduce(function (a, b) { return a + b; }, 0) || 1;
+    var palette = cfg.colors || [accent(), "#1baf7a", "#eda100", "#e34948", "#4a3aa7", "#e87ba4"];
+    var a0 = -Math.PI / 2;
+    cfg.values.forEach(function (v, i) {
+      var a1 = a0 + (v / total) * Math.PI * 2;
+      var large = a1 - a0 > Math.PI ? 1 : 0;
+      var p = ["M", cx + R * Math.cos(a0), cy + R * Math.sin(a0),
+        "A", R, R, 0, large, 1, cx + R * Math.cos(a1), cy + R * Math.sin(a1),
+        "L", cx + r * Math.cos(a1), cy + r * Math.sin(a1),
+        "A", r, r, 0, large, 0, cx + r * Math.cos(a0), cy + r * Math.sin(a0), "Z"].join(" ");
+      var path = svgEl("path", { d: p, fill: palette[i % palette.length] });
+      var t = svgEl("title", {});
+      t.textContent = cfg.labels[i] + ": " + fmt.num(v) + " (" + fmt.pct(v / total) + ")";
+      path.appendChild(t);
+      svg.appendChild(path);
+      a0 = a1;
+    });
+    var center = svgEl("text", { x: cx, y: cy + 5, "text-anchor": "middle", "font-size": 20, "font-weight": 650, fill: "currentColor" });
+    center.textContent = fmt.num(total);
+    svg.appendChild(center);
+  }
+
+  window.skipShell = { fmt: fmt };
+  window.skipChart = { bar: bar, line: line, donut: donut };
+})();
+
+</script>
+</body>
+</html>
