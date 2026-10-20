@@ -1687,27 +1687,30 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
       `;
     }
 
-    // Carregar Produtos (localStorage ou PRODUTOS_EXEMPLO)
-    function carregarProdutos() {
-      try {
-        const salvos = localStorage.getItem("lolita_produtos");
-        if (salvos) {
-          const listaParseada = JSON.parse(salvos);
-          if (Array.isArray(listaParseada) && listaParseada.length > 0) {
-            // Filtrar entradas válidas com id e nome
-            const validos = listaParseada.filter(item => item && item.id && item.nome);
-            if (validos.length > 0) {
-              produtosCatalogo = validos;
-              return;
-            }
-          }
-        }
-      } catch (e) {
-        console.warn("Falha ao ler lolita_produtos de localStorage, usando lista padrão:", e);
-      }
-      produtosCatalogo = [...PRODUTOS_EXEMPLO];
+   // Carregar Produtos (API do banco de dados)
+async function carregarProdutos() {
+  try {
+    const resposta = await fetch("/api/produtos");
+    if (!resposta.ok) throw new Error("API indisponível");
+    const lista = await resposta.json();
+    if (Array.isArray(lista) && lista.length > 0) {
+      produtosCatalogo = lista.map(p => ({
+        ...p,
+        preco: Number(p.preco),
+        tamanhos: p.tamanhos ? JSON.parse(p.tamanhos) : [],
+        cores: p.cores ? JSON.parse(p.cores) : [],
+        imagem: p.imagem && p.imagem.startsWith("data:image")
+          ? p.imagem
+          : (p.imagem ? "/fotos/" + p.imagem : p.categoria)
+      }));
+    } else {
+      produtosCatalogo = [];
     }
-
+  } catch (e) {
+    console.warn("Falha ao buscar produtos da API:", e);
+    produtosCatalogo = [];
+  }
+}
     // Formatar Preço em BRL com vírgula
     function formatarMoeda(valor) {
       if (typeof valor !== "number") {
@@ -2319,8 +2322,10 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
 
     // Configuração dos Eventos da Interface
     document.addEventListener("DOMContentLoaded", () => {
-      carregarProdutos();
-      inicializarSacola();
+    carregarProdutos().then(() => {
+  // chame aqui a função que renderiza a lista, ex.:
+  renderizarCatalogo(); // use o nome real da sua função de renderização
+});
 
       // Checa se veio ?produto=ID na URL inicial
       const params = new URLSearchParams(window.location.search);
