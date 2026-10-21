@@ -19,12 +19,5 @@
       "binding": "FOTOS",
       "bucket_name": "fotos-loja"
     }
-  ],
- 
-}
-"assets": {
-  "directory": "./",
-  "binding": "ASSETS",
-  "run_worker_first": ["/api/*", "/fotos/*"],
-  "exclude": [".git"]
+  ]
 }
