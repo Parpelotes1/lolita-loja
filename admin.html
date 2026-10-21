@@ -1,345 +1,2649 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="light">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin - Lolita Loja</title>
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
-  body { background: #f5f0ee; min-height: 100vh; }
-  .login-caixa { max-width: 400px; margin: 80px auto; background: #fff; padding: 32px; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,.1); }
-  .login-caixa h1 { font-size: 1.5rem; margin-bottom: .35rem; color: #333; }
-  .login-subtitulo { color: #888; font-size: .9rem; margin-bottom: 20px; }
-  .campo-grupo { margin-bottom: 16px; }
-  .campo-grupo label { display: block; font-size: .85rem; color: #555; margin-bottom: 6px; }
-  .campo-com-acao { display: flex; gap: 8px; }
-  input[type=password], input[type=text], input[type=number], textarea, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: .95rem; }
-  textarea { min-height: 70px; resize: vertical; }
-  .btn-icone-input { background: none; border: 1px solid #ddd; border-radius: 8px; padding: 0 12px; cursor: pointer; font-size: .8rem; }
-  .btn-lolita { background: #c2185b; color: #fff; border: none; padding: 12px 20px; border-radius: 8px; font-size: 1rem; cursor: pointer; }
-  .btn-lolita:hover { background: #a01449; }
-  .btn-lolita:disabled { background: #ccc; cursor: not-allowed; }
-  .btn-secundario { background: #eee; color: #555; border: none; padding: 8px 14px; border-radius: 8px; cursor: pointer; }
-  .btn-excluir { background: #ffebee; color: #c62828; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; }
-  .msg-erro-login { color: #c62828; font-size: .85rem; min-height: 20px; margin-top: 4px; }
-  header { background: #fff; padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,.06); display: none; }
-  header.visivel { display: flex; }
-  header h2 { font-size: 1.1rem; color: #333; }
-  main#secao-painel { display: none; max-width: 900px; margin: 24px auto; padding: 0 16px; }
-  .card { background: #fff; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
-  .card h3 { color: #333; margin-bottom: 14px; }
-  .grid-campos { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  .lista-produto { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee; }
-  .lista-produto:last-child { border-bottom: none; }
-  .lista-produto img { width: 54px; height: 54px; object-fit: cover; border-radius: 8px; margin-right: 12px; }
-  .prod-info { display: flex; align-items: center; flex: 1; }
-  .prod-nome { font-weight: bold; color: #333; }
-  .prod-detalhe { font-size: .8rem; color: #999; }
-  .fotos-preview { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
-  .fotos-preview img { width: 70px; height: 70px; object-fit: cover; border-radius: 8px; }
-  #toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 10px 20px; border-radius: 8px; display: none; font-size: .9rem; }
-  @media (max-width: 600px) { .grid-campos { grid-template-columns: 1fr; } }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lolita boutique: painel administrativo de produtos</title>
+  
+  <!-- Basecoat CSS CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/basecoat-css@1.0.2/dist/basecoat.cdn.min.css">
+  
+  <!-- Shell CSS do sistema -->
+  <style>
+/* Skip artifact shell — fixed styles served beside every artifact.
+   Complements basecoat; artifacts override --accent for their own identity. */
+:root {
+  color-scheme: light dark;
+  --accent: #2563eb;
+  --accent-contrast: #ffffff;
+  --accent-text: color-mix(in srgb, var(--accent) 72%, #000);
+  --bg: #f8f9fb;
+  --surface: #ffffff;
+  --text: #14171f;
+  --text-muted: #5b6472;
+  --border: rgba(20, 23, 31, 0.10);
+  --radius: 10px;
+  --shadow: 0 1px 3px rgba(20, 23, 31, 0.08);
+  --space: 16px;
+}
+/* Theme resolution. Without data-theme the viewer's system preference decides,
+   as it always did. With it, the artifact's own choice wins in BOTH directions:
+   a page that hardcodes one palette must not be handed the opposite set of
+   tokens by the machine it happens to be opened on. The dark values appear
+   twice because a media query cannot be folded into a selector list.
+   The attribute sits inside :where() so these blocks keep the specificity of a
+   bare :root — the page's own <style> is linked after this file and must go on
+   overriding any token it wants, exactly as it could before. */
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    --accent-text: color-mix(in srgb, var(--accent) 78%, #fff);
+    --bg: #101318;
+    --surface: #181c23;
+    --text: #eef1f6;
+    --text-muted: #9aa4b2;
+    --border: rgba(238, 241, 246, 0.12);
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  }
+}
+:root:where([data-theme="dark"]) {
+  color-scheme: dark;
+  --accent-text: color-mix(in srgb, var(--accent) 78%, #fff);
+  --bg: #101318;
+  --surface: #181c23;
+  --text: #eef1f6;
+  --text-muted: #9aa4b2;
+  --border: rgba(238, 241, 246, 0.12);
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+:root:where([data-theme="light"]) { color-scheme: light; }
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+img { max-width: 100%; display: block; }
+
+.shell-container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+.shell-section { padding: calc(var(--space) * 2) 0; }
+.shell-grid { display: grid; gap: var(--space); grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.shell-toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: var(--space); }
+.shell-footer { padding: 24px 0 40px; color: var(--text-muted); font-size: 13px; }
+
+.shell-hero { padding: calc(var(--space) * 3) 0 calc(var(--space) * 2); }
+.shell-hero h1 { font-size: clamp(26px, 4vw, 40px); line-height: 1.15; margin: 0 0 10px; text-wrap: balance; }
+.shell-hero p { color: var(--text-muted); max-width: 60ch; margin: 0; }
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: var(--space);
+}
+
+.kpi { display: flex; flex-direction: column; gap: 4px; }
+.kpi .kpi-value { font-size: 28px; font-weight: 650; line-height: 1.1; }
+.kpi .kpi-label { font-size: 13px; color: var(--text-muted); }
+.kpi .kpi-delta { font-size: 12.5px; font-weight: 600; }
+.kpi .kpi-delta.up { color: #0a8f3c; }
+.kpi .kpi-delta.down { color: #cf3131; }
+
+table.shell-table { border-collapse: collapse; width: 100%; font-size: 14px; }
+table.shell-table th {
+  text-align: left; font-size: 11.5px; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--text-muted); font-weight: 600;
+}
+table.shell-table th, table.shell-table td { padding: 9px 12px 9px 0; border-bottom: 1px solid var(--border); }
+table.shell-table td.num, table.shell-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
+table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 6%, transparent); }
+
+.chart-box { width: 100%; min-height: 220px; }
+.chart-box svg { width: 100%; height: auto; display: block; }
+
+.muted { color: var(--text-muted); }
+.accent { color: var(--accent-text); }
+.shell-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent-text);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .shell-fade { animation: shell-fade 400ms ease both; }
+  @keyframes shell-fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+}
+
 </style>
+  
+  <!-- Shell JS do sistema -->
+  
+
+  <style>
+    /*
+      Variaveis de identidade visual derivadas da paleta da marca:
+      --cor-fundo: fundo puro e neutro;
+      --cor-creme: tom de apoio acolhedor para cartões e faixas;
+      --cor-texto: contraste principal;
+      --cor-rosa e --cor-ocre: tons institucionais presentes na logotipo.
+    */
+    :root {
+      --cor-fundo: #FFFFFF;
+      --cor-creme: #FAF7F2;
+      --cor-texto: #1A1A1A;
+      --cor-rosa: #E8B7B0;
+      --cor-ocre: #F4C189;
+      --cor-borda: #E2DDD5;
+      --cor-erro: #941B1B;
+      --cor-sucesso: #1E6B3A;
+
+      --accent: #D48F85;
+      --accent-text: #8C3E33;
+      --accent-contrast: #FFFFFF;
+      --bg: var(--cor-fundo);
+      --surface: #FFFFFF;
+      --text: var(--cor-texto);
+      --text-muted: #57534E;
+      --border: var(--cor-borda);
+      --radius: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--cor-texto);
+      background-color: var(--cor-creme);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    h1, h2, h3, .serifa {
+      font-family: Georgia, "Times New Roman", serif;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin-top: 0;
+      color: var(--cor-texto);
+    }
+
+    /* Logo SVG */
+    .logo-container {
+      display: inline-flex;
+      align-items: center;
+      text-decoration: none;
+    }
+
+    .logo-svg {
+      height: 48px;
+      width: auto;
+      display: block;
+    }
+
+    /* Botoes com efeito rosa que sobe no hover */
+    .btn-lolita {
+      background-color: var(--cor-rosa);
+      color: #1A1A1A;
+      border: 1px solid #D69F96;
+      font-weight: 600;
+      font-size: 0.9375rem;
+      padding: 0.65rem 1.25rem;
+      border-radius: 20px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.15s ease;
+      text-decoration: none;
+    }
+
+    .btn-lolita:hover {
+      background-color: #DE9F96;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(232, 183, 176, 0.45);
+    }
+
+    .btn-lolita:active {
+      transform: translateY(0);
+    }
+
+    .btn-lolita:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--cor-texto);
+      border: 1px solid var(--cor-borda);
+      font-weight: 500;
+      font-size: 0.9375rem;
+      padding: 0.65rem 1.25rem;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .btn-outline:hover {
+      background-color: #F0EAE1;
+      border-color: #C8BEB2;
+    }
+
+    .btn-perigo {
+      background: #FFFFFF;
+      color: var(--cor-erro);
+      border: 1px solid #F0C4C4;
+      font-weight: 600;
+      font-size: 0.875rem;
+      padding: 0.45rem 0.9rem;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .btn-perigo:hover {
+      background: #FDF2F2;
+      border-color: var(--cor-erro);
+    }
+
+    /* Cartões e Molduras Arredondadas */
+    .card-painel {
+      background: #FFFFFF;
+      border: 1px solid var(--cor-borda);
+      border-radius: 14px;
+      padding: 1.75rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    }
+
+    /* Cabecalho */
+    header.barra-topo {
+      background: #FFFFFF;
+      border-bottom: 1px solid var(--cor-borda);
+      padding: 0.75rem 1.5rem;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .barra-topo-conteudo {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .topo-identidade {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .divisor-v {
+      height: 28px;
+      width: 1px;
+      background-color: var(--cor-borda);
+    }
+
+    .badge-admin {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      background: var(--cor-creme);
+      padding: 0.25rem 0.6rem;
+      border-radius: 4px;
+      border: 1px solid var(--cor-borda);
+    }
+
+    /* Tela de Login */
+    #secao-login {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    .login-caixa {
+      width: 100%;
+      max-width: 420px;
+      background: #FFFFFF;
+      border: 1px solid var(--cor-borda);
+      border-radius: 16px;
+      padding: 2.25rem 2rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      text-align: center;
+    }
+
+    .login-subtitulo {
+      color: var(--text-muted);
+      font-size: 0.9375rem;
+      margin-top: 0.25rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .campo-grupo {
+      text-align: left;
+      margin-bottom: 1.25rem;
+    }
+
+    .campo-grupo label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+      color: var(--cor-texto);
+    }
+
+    .campo-com-acao {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .campo-com-acao input {
+      width: 100%;
+      padding: 0.75rem 2.75rem 0.75rem 0.875rem;
+      border: 1px solid var(--cor-borda);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      background: #FAFAFA;
+      color: var(--cor-texto);
+    }
+
+    .btn-icone-input {
+      position: absolute;
+      right: 0.5rem;
+      background: none;
+      border: none;
+      padding: 0.4rem;
+      cursor: pointer;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-decoration: underline;
+    }
+
+    .msg-erro-login {
+      margin-top: 0.75rem;
+      color: var(--cor-erro);
+      font-size: 0.875rem;
+      font-weight: 500;
+      min-height: 1.25rem;
+    }
+
+    .dica-senha {
+      margin-top: 1rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      border-top: 1px dashed var(--cor-borda);
+      padding-top: 0.75rem;
+    }
+
+    /* Conteudo autenticado */
+    #secao-painel {
+      display: none;
+      flex: 1;
+      padding: 1.5rem 1rem 3rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* Navegação por Abas */
+    .navegacao-abas {
+      display: flex;
+      gap: 0.5rem;
+      border-bottom: 2px solid var(--cor-borda);
+      margin-bottom: 1.75rem;
+      overflow-x: auto;
+    }
+
+    .aba-botao {
+      background: transparent;
+      border: none;
+      padding: 0.85rem 1.25rem;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      position: relative;
+      white-space: nowrap;
+      transition: color 0.15s ease;
+    }
+
+    .aba-botao:hover {
+      color: var(--cor-texto);
+    }
+
+    .aba-botao.ativa {
+      color: var(--cor-texto);
+    }
+
+    .aba-botao.ativa::after {
+      content: "";
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background-color: var(--cor-rosa);
+      border-radius: 3px 3px 0 0;
+    }
+
+    /* Formulario de Novo Produto */
+    .grid-duas-colunas {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+
+    .grid-tres-colunas {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 1.25rem;
+    }
+
+    .input-texto, select.input-texto, textarea.input-texto {
+      width: 100%;
+      padding: 0.65rem 0.85rem;
+      border: 1px solid var(--cor-borda);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      background: #FFFFFF;
+      color: var(--cor-texto);
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .input-texto:focus, .campo-com-acao input:focus {
+      outline: none;
+      border-color: #C88D83;
+      box-shadow: 0 0 0 3px rgba(232, 183, 176, 0.35);
+    }
+
+    .input-texto.com-erro {
+      border-color: var(--cor-erro);
+      background-color: #FFF9F9;
+    }
+
+    .msg-campo-erro {
+      color: var(--cor-erro);
+      font-size: 0.8rem;
+      margin-top: 0.35rem;
+      display: block;
+    }
+
+    .contador-caracteres {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-align: right;
+      display: block;
+      margin-top: 0.25rem;
+    }
+
+    /* Seleção de Cores */
+    .lista-cores-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      margin-top: 0.5rem;
+    }
+
+    .linha-cor {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    .input-cor-preview {
+      width: 38px;
+      height: 38px;
+      border: 1px solid var(--cor-borda);
+      border-radius: 50%;
+      padding: 2px;
+      background: none;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    /* Chips de Tamanhos */
+    .grade-tamanhos-seletor {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .chip-tamanho {
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .chip-tamanho input {
+      display: none;
+    }
+
+    .chip-tamanho span {
+      display: inline-block;
+      padding: 0.4rem 0.85rem;
+      border: 1px solid var(--cor-borda);
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      background: #FAFAFA;
+      color: var(--cor-texto);
+      transition: all 0.15s ease;
+    }
+
+    .chip-tamanho input:checked + span {
+      background-color: #1A1A1A;
+      color: #FFFFFF;
+      border-color: #1A1A1A;
+    }
+
+    .tipo-grade-toggle {
+      font-size: 0.8125rem;
+      margin-bottom: 0.5rem;
+      color: var(--text-muted);
+    }
+
+    /* Upload de Fotos */
+    .dropzone-fotos {
+      border: 2px dashed var(--cor-borda);
+      border-radius: 12px;
+      background: var(--cor-creme);
+      padding: 1.5rem 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.15s ease, background-color 0.15s ease;
+    }
+
+    .dropzone-fotos:hover, .dropzone-fotos.arrastando {
+      border-color: var(--cor-rosa);
+      background: #FDF9F5;
+    }
+
+    .grade-miniaturas {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .card-miniatura {
+      position: relative;
+      border: 1px solid var(--cor-borda);
+      border-radius: 12px 12px 6px 6px; /* moldura em arco */
+      overflow: hidden;
+      background: #FFFFFF;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-miniatura.is-capa {
+      border: 2px solid #8C3E33;
+    }
+
+    .card-miniatura img {
+      width: 100%;
+      height: 130px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .miniatura-acoes {
+      padding: 0.35rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      background: #FFFFFF;
+    }
+
+    .selo-capa {
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      background: #1A1A1A;
+      color: #FFFFFF;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      padding: 0.2rem 0.45rem;
+      border-radius: 4px;
+      letter-spacing: 0.03em;
+    }
+
+    .btn-mini {
+      font-size: 0.75rem;
+      padding: 0.25rem;
+      border: 1px solid var(--cor-borda);
+      border-radius: 4px;
+      background: #FAFAFA;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .btn-mini:hover {
+      background: #EEE;
+    }
+
+    /* Checkboxes destacados */
+    .bloco-opcoes-extras {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      background: var(--cor-creme);
+      padding: 1rem 1.25rem;
+      border-radius: 10px;
+      border: 1px solid var(--cor-borda);
+      margin-top: 1rem;
+    }
+
+    .checkbox-rotulo {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-weight: 500;
+      font-size: 0.9375rem;
+      cursor: pointer;
+    }
+
+    .checkbox-rotulo input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: #8C3E33;
+    }
+
+    /* Botoes de Ação do Form */
+    .rodape-formulario {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--cor-borda);
+    }
+
+    /* Lista de Produtos */
+    .filtros-topo-lista {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+
+    .barra-busca-filtros {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      flex: 1;
+      min-width: 280px;
+    }
+
+    .tabela-responsiva {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    .tabela-responsiva th {
+      background: var(--cor-creme);
+      padding: 0.85rem 1rem;
+      font-size: 0.8125rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--cor-borda);
+    }
+
+    .tabela-responsiva td {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid var(--cor-borda);
+      font-size: 0.9375rem;
+      vertical-align: middle;
+    }
+
+    .tabela-responsiva tr:hover td {
+      background-color: #FCFBF9;
+    }
+
+    .capa-tabela {
+      width: 52px;
+      height: 64px;
+      object-fit: cover;
+      border-radius: 8px 8px 4px 4px;
+      border: 1px solid var(--cor-borda);
+      display: block;
+      background: #F0EAE1;
+    }
+
+    .bolinha-cor-lista {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      display: inline-block;
+      border: 1px solid rgba(0,0,0,0.2);
+      margin-right: 3px;
+      vertical-align: middle;
+    }
+
+    .badge-status {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      margin-right: 0.25rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .badge-novidade {
+      background-color: #E8B7B0;
+      color: #1A1A1A;
+    }
+
+    .badge-destaque {
+      background-color: #F4C189;
+      color: #1A1A1A;
+    }
+
+    .acoes-celula {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .estado-vazio {
+      text-align: center;
+      padding: 3.5rem 1.5rem;
+      color: var(--text-muted);
+    }
+
+    /* Ferramentas */
+    .grid-ferramentas {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .card-kpis-resumo {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .caixa-kpi-item {
+      background: #FFFFFF;
+      border: 1px solid var(--cor-borda);
+      border-radius: 12px;
+      padding: 1.25rem 1rem;
+      text-align: center;
+    }
+
+    .caixa-kpi-item .kpi-num {
+      font-size: 2rem;
+      font-weight: 700;
+      font-family: Georgia, serif;
+      color: #1A1A1A;
+      display: block;
+      margin-top: 0.25rem;
+    }
+
+    .caixa-kpi-item .kpi-rotulo {
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    /* Modal de Confirmacao */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 1rem;
+    }
+
+    .modal-overlay.visivel {
+      display: flex;
+    }
+
+    .modal-dialogo {
+      background: #FFFFFF;
+      border-radius: 14px;
+      padding: 2rem;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      border: 1px solid var(--cor-borda);
+    }
+
+    .modal-acoes {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+
+    /* Toast Discreto */
+    #toast-notificacao {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #1A1A1A;
+      color: #FFFFFF;
+      padding: 0.85rem 1.4rem;
+      border-radius: 8px;
+      font-size: 0.9375rem;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      z-index: 200;
+      pointer-events: none;
+    }
+
+    #toast-notificacao.ativo {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Acessibilidade de foco e leitores de tela */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+      outline: 2px solid #1A1A1A;
+      outline-offset: 2px;
+    }
+
+    /* Ajustes responsivos */
+    @media (max-width: 768px) {
+      .grid-duas-colunas, .grid-tres-colunas {
+        grid-template-columns: 1fr;
+      }
+
+      .barra-topo-conteudo {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .topo-acoes {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .tabela-responsiva thead {
+        display: none;
+      }
+
+      .tabela-responsiva, .tabela-responsiva tbody, .tabela-responsiva tr, .tabela-responsiva td {
+        display: block;
+        width: 100%;
+      }
+
+      .tabela-responsiva tr {
+        margin-bottom: 1rem;
+        background: #FFFFFF;
+        border: 1px solid var(--cor-borda);
+        border-radius: 10px;
+        padding: 0.75rem;
+      }
+
+      .tabela-responsiva td {
+        border-bottom: none;
+        padding: 0.4rem 0;
+      }
+
+      .tabela-responsiva td.td-capa {
+        text-align: center;
+      }
+
+      .capa-tabela {
+        margin: 0 auto;
+        width: 70px;
+        height: 90px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    @media print {
+      .barra-topo, .navegacao-abas, .rodape-formulario, .filtros-topo-lista, .acoes-celula, #secao-login, .modal-overlay {
+        display: none !important;
+      }
+      body {
+        background: #FFFFFF;
+      }
+      .card-painel {
+        box-shadow: none;
+        border: none;
+      }
+    }
+  </style>
 </head>
 <body>
 
-<main id="secao-login">
-  <section class="login-caixa">
-    <h1>Acesso Restrito</h1>
-    <p class="login-subtitulo">Informe a credencial cadastrada para gerenciar os produtos da loja.</p>
-    <form id="form-login" novalidate>
-      <div class="campo-grupo">
-        <label for="senha-acesso">Senha do administrador</label>
-        <div class="campo-com-acao">
-          <input type="password" id="senha-acesso" autocomplete="current-password" required placeholder="Digite sua senha">
-          <button type="button" id="btn-mostrar-senha" class="btn-icone-input">Mostrar</button>
-        </div>
-        <div id="msg-erro-login" class="msg-erro-login" role="alert"></div>
+  <!-- Cabecalho Institucional -->
+  <header class="barra-topo">
+    <div class="barra-topo-conteudo">
+      <div class="topo-identidade">
+        <a href="index.html" class="logo-container" title="Ir para a página inicial">
+          <!-- Logo Vetorial Inline Lolita Boutique -->
+          <svg class="logo-svg" viewBox="0 0 250 100" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Lolita Boutique">
+            <g aria-hidden="true">
+              <!-- Forma organica rosa no canto superior direito -->
+              <path d="M165,10 C190,5 235,15 240,40 C245,65 210,80 185,65 C160,50 145,15 165,10 Z" fill="#E8B7B0" opacity="0.85" />
+              <!-- Pontos escuros na mancha rosa -->
+              <circle cx="180" cy="25" r="1.5" fill="#1A1A1A" />
+              <circle cx="195" cy="20" r="1.5" fill="#1A1A1A" />
+              <circle cx="210" cy="30" r="1.5" fill="#1A1A1A" />
+              <circle cx="190" cy="40" r="1.5" fill="#1A1A1A" />
+              <circle cx="225" cy="45" r="1.5" fill="#1A1A1A" />
+
+              <!-- Forma organica ocre no canto inferior esquerdo -->
+              <path d="M15,50 C40,45 80,55 75,80 C70,95 35,98 20,88 C5,78 0,55 15,50 Z" fill="#F4C189" opacity="0.85" />
+              <!-- Pontos escuros na mancha ocre -->
+              <circle cx="30" cy="65" r="1.5" fill="#1A1A1A" />
+              <circle cx="45" cy="70" r="1.5" fill="#1A1A1A" />
+              <circle cx="35" cy="82" r="1.5" fill="#1A1A1A" />
+              <circle cx="55" cy="80" r="1.5" fill="#1A1A1A" />
+
+              <!-- Ramos finos pretos com folhas (superior esquerdo) -->
+              <path d="M12,40 Q25,25 45,18" stroke="#1A1A1A" stroke-width="1.2" fill="none" stroke-linecap="round" />
+              <path d="M22,30 C20,24 25,22 28,26 C25,29 23,30 22,30 Z" fill="#1A1A1A" />
+              <path d="M35,22 C34,16 40,15 42,19 C39,22 36,23 35,22 Z" fill="#1A1A1A" />
+              <path d="M45,18 C48,13 53,16 51,20 C48,21 46,20 45,18 Z" fill="#1A1A1A" />
+
+              <!-- Ramos finos pretos com folhas (inferior direito) -->
+              <path d="M195,85 Q215,80 235,65" stroke="#1A1A1A" stroke-width="1.2" fill="none" stroke-linecap="round" />
+              <path d="M208,82 C212,86 216,84 214,80 C211,79 209,80 208,82 Z" fill="#1A1A1A" />
+              <path d="M222,74 C227,77 230,73 227,70 C224,70 223,72 222,74 Z" fill="#1A1A1A" />
+
+              <!-- Tipografia Lolita (Script) -->
+              <text x="110" y="55" text-anchor="middle" font-family="'Brush Script MT', 'Segoe Script', cursive" font-size="44" fill="#1A1A1A" transform="rotate(-3 110 55)">Lolita</text>
+
+              <!-- Tipografia Boutique (Serifa com espacamento) -->
+              <text x="180" y="78" text-anchor="end" font-family="Georgia, serif" font-size="12" font-weight="600" letter-spacing="4" fill="#1A1A1A">BOUTIQUE</text>
+            </g>
+          </svg>
+        </a>
+        <div class="divisor-v"></div>
+        <span class="badge-admin">Painel Administrativo</span>
       </div>
-      <button type="submit" id="btn-entrar" class="btn-lolita" style="width:100%;">Entrar no sistema</button>
-    </form>
-  </section>
-</main>
 
-<header id="topo-admin">
-  <h2>Painel da Lolita Loja</h2>
-  <button id="btn-sair" class="btn-secundario">Sair</button>
-</header>
+      <div class="topo-acoes" id="topo-acoes-autenticado" style="display: none;">
+        <a href="index.html" target="_blank" rel="noopener noreferrer" class="btn-outline" style="font-size: 0.875rem; padding: 0.5rem 1rem;">
+          Ver site
+        </a>
+        <button type="button" id="btn-sair-sessao" class="btn-outline" style="font-size: 0.875rem; padding: 0.5rem 1rem; margin-left: 0.5rem;">
+          Sair
+        </button>
+      </div>
+    </div>
+  </header>
 
-<main id="secao-painel">
-  <div class="card">
-    <h3 id="titulo-formulario">Cadastrar novo produto</h3>
-    <input type="hidden" id="produto-id">
-    <div class="grid-campos">
-      <div class="campo-grupo"><label>Código</label><input type="text" id="f-codigo" placeholder="Ex: VST-001"></div>
-      <div class="campo-grupo"><label>Nome</label><input type="text" id="f-nome" placeholder="Ex: Vestido Midi Floral"></div>
-      <div class="campo-grupo"><label>Categoria</label><input type="text" id="f-categoria" placeholder="Ex: Vestidos"></div>
-      <div class="campo-grupo"><label>Preço</label><input type="number" id="f-preco" step="0.01" placeholder="0.00"></div>
-      <div class="campo-grupo"><label>Tamanhos (separe por vírgula)</label><input type="text" id="f-tamanhos" placeholder="P,M,G"></div>
-      <div class="campo-grupo"><label>Cores (separe por vírgula)</label><input type="text" id="f-cores" placeholder="Preto,Azul"></div>
+  <!-- SEÇÃO 1: TELA DE ACESSO (RENDERIZADA DIRETAMENTE EM HTML) -->
+  <main id="secao-login">
+    <section class="login-caixa">
+      <h1 style="font-size: 1.5rem; margin-bottom: 0.35rem;">Acesso Restrito</h1>
+      <p class="login-subtitulo">Informe a credencial cadastrada para gerenciar os produtos da loja.</p>
+
+      <form id="form-login" novalidate>
+        <div class="campo-grupo">
+          <label for="senha-acesso">Senha do administrador</label>
+          <div class="campo-com-acao">
+            <input type="password" id="senha-acesso" name="senha" autocomplete="current-password" required placeholder="Digite sua senha">
+            <button type="button" id="btn-mostrar-senha" class="btn-icone-input" aria-label="Mostrar ou ocultar senha">Mostrar</button>
+          </div>
+          <div id="msg-erro-login" class="msg-erro-login" role="alert" aria-live="polite"></div>
+        </div>
+
+        <button type="submit" id="btn-entrar" class="btn-lolita" style="width: 100%;">
+          Entrar no sistema
+        </button>
+      </form>
+
+
+    </section>
+  </main>
+
+  <!-- SEÇÃO 2: PAINEL ADMINISTRATIVO (ABAS E CONTEÚDO) -->
+  <main id="secao-painel">
+    <!-- Abas de Navegação -->
+    <nav class="navegacao-abas" role="tablist" aria-label="Navegação do painel">
+      <button type="button" role="tab" id="tab-btn-novo" class="aba-botao ativa" aria-selected="true" aria-controls="painel-novo-produto">
+        Novo produto
+      </button>
+      <button type="button" role="tab" id="tab-btn-lista" class="aba-botao" aria-selected="false" aria-controls="painel-lista-produtos">
+        Produtos cadastrados (<span id="contagem-aba-produtos">0</span>)
+      </button>
+      <button type="button" role="tab" id="tab-btn-ferramentas" class="aba-botao" aria-selected="false" aria-controls="painel-ferramentas">
+        Ferramentas
+      </button>
+    </nav>
+
+    <!-- ABA A: NOVO PRODUTO / EDIÇÃO -->
+    <section id="painel-novo-produto" role="tabpanel" aria-labelledby="tab-btn-novo" class="card-painel">
+      <div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: baseline;">
+        <div>
+          <h2 id="titulo-form-produto" style="font-size: 1.35rem; margin-bottom: 0.25rem;">Cadastrar novo produto</h2>
+          <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0;">Preencha as informações detalhadas da peça para o catálogo.</p>
+        </div>
+        <button type="button" id="btn-cancelar-edicao" class="btn-outline" style="display: none;">Cancelar edição</button>
+      </div>
+
+      <form id="form-produto" novalidate>
+        <input type="hidden" id="produto-id-edicao" value="">
+
+        <div class="grid-duas-colunas">
+          <div class="campo-grupo">
+            <label for="prod-nome">Nome do produto *</label>
+            <input type="text" id="prod-nome" class="input-texto" maxlength="80" placeholder="Ex.: Vestido Midi Floral Aurora" required>
+            <span class="msg-campo-erro" id="erro-prod-nome"></span>
+          </div>
+
+          <div class="campo-grupo">
+            <label for="prod-codigo">Código do produto * (letras, números e hífen)</label>
+            <input type="text" id="prod-codigo" class="input-texto" placeholder="Ex.: VES-101" required>
+            <span class="msg-campo-erro" id="erro-prod-codigo"></span>
+          </div>
+        </div>
+
+        <div class="grid-tres-colunas">
+          <div class="campo-grupo">
+            <label for="prod-categoria">Categoria *</label>
+            <select id="prod-categoria" class="input-texto" required>
+              <option value="">Selecione uma categoria</option>
+              <option value="Vestidos">Vestidos</option>
+              <option value="Macacões">Macacões</option>
+              <option value="Saias">Saias</option>
+              <option value="Calçados">Calçados</option>
+              <option value="Acessórios">Acessórios</option>
+            </select>
+            <span class="msg-campo-erro" id="erro-prod-categoria"></span>
+          </div>
+
+          <div class="campo-grupo">
+            <label for="prod-preco">Preço em R$ *</label>
+            <input type="text" id="prod-preco" class="input-texto" placeholder="Ex.: 289,90" required>
+            <span class="msg-campo-erro" id="erro-prod-preco"></span>
+          </div>
+
+          <div class="campo-grupo">
+            <label>Disponibilidade imediata</label>
+            <div style="padding-top: 0.65rem; font-size: 0.875rem; color: var(--text-muted);">Pronta entrega</div>
+          </div>
+        </div>
+
+        <div class="campo-grupo">
+          <label for="prod-descricao">Descrição do produto (opcional)</label>
+          <textarea id="prod-descricao" class="input-texto" rows="3" maxlength="300" placeholder="Detalhes de caimento, tecido, acabamentos e ocasião de uso..."></textarea>
+          <span class="contador-caracteres"><span id="contador-desc">0</span> / 300 caracteres</span>
+        </div>
+
+        <!-- Grade de Cores -->
+        <div class="campo-grupo" style="border-top: 1px solid var(--cor-borda); padding-top: 1.25rem;">
+          <label>Cores disponíveis * (ao menos uma)</label>
+          <div id="container-linhas-cores" class="lista-cores-container">
+            <!-- Linhas de cores geradas dinamicamente via JS mantendo o mínimo de uma -->
+          </div>
+          <button type="button" id="btn-adicionar-cor" class="btn-outline" style="margin-top: 0.75rem; font-size: 0.85rem; padding: 0.4rem 0.9rem;">
+            + Adicionar outra cor
+          </button>
+          <span class="msg-campo-erro" id="erro-prod-cores"></span>
+        </div>
+
+        <!-- Grade de Tamanhos -->
+        <div class="campo-grupo" style="border-top: 1px solid var(--cor-borda); padding-top: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: baseline;">
+            <label>Grade de tamanhos * (selecione ao menos um)</label>
+            <div class="tipo-grade-toggle">
+              <label style="cursor: pointer; margin-right: 0.75rem;">
+                <input type="radio" name="tipo-grade" value="letras" checked id="radio-grade-letras"> Letras (PP a XG)
+              </label>
+              <label style="cursor: pointer;">
+                <input type="radio" name="tipo-grade" value="numeros" id="radio-grade-numeros"> Numérica (34 a 52)
+              </label>
+            </div>
+          </div>
+
+          <div id="grade-letras-box" class="grade-tamanhos-seletor">
+            <label class="chip-tamanho"><input type="checkbox" name="tam-opcao" value="PP"><span>PP</span></label>
+            <label class="chip-tamanho"><input type="checkbox" name="tam-opcao" value="P"><span>P</span></label>
+            <label class="chip-tamanho"><input type="checkbox" name="tam-opcao" value="M"><span>M</span></label>
+            <label class="chip-tamanho"><input type="checkbox" name="tam-opcao" value="G"><span>G</span></label>
+            <label class="chip-tamanho"><input type="checkbox" name="tam-opcao" value="GG"><span>GG</span></label>
+            <label class="chip-tamanho"><input type="checkbox" name="tam-opcao" value="XG"><span>XG</span></label>
+          </div>
+
+          <div id="grade-numeros-box" class="grade-tamanhos-seletor" style="display: none;">
+            <label class="chip-tamanho"><input type="checkbox" name="tam-opcao" value="34"><span>34</span></label>
+            <label class="chip-tamanho"><input type="checkbox" name="tam-opcao" value="36"><span>36</span></label>
+            <label class="chip-tamanho"><input type="checkbox" name="tam-opcao" value="38"><span>38</span></label>
+            <label class="chip-tamanho"><input type="checkbox" name="tam-opcao" value="40"><span>40</span></label>
+            <label class="chip-tamanho"><input type="checkbox" name="tam-opcao" value="42"><span>42</span></label>
+            <label class="chip-tamanho"><input type="checkbox" name="tam-opcao" value="44"><span>44</span></label>
+            <label class="chip-tamanho"><input type="checkbox" name="tam-opcao" value="46"><span>46</span></label>
+            <label class="chip-tamanho"><input type="checkbox" name="tam-opcao" value="48"><span>48</span></label>
+            <label class="chip-tamanho"><input type="checkbox" name="tam-opcao" value="50"><span>50</span></label>
+            <label class="chip-tamanho"><input type="checkbox" name="tam-opcao" value="52"><span>52</span></label>
+          </div>
+          <span class="msg-campo-erro" id="erro-prod-tamanhos"></span>
+        </div>
+
+        <!-- Seção de Fotos -->
+        <div class="campo-grupo" style="border-top: 1px solid var(--cor-borda); padding-top: 1.25rem;">
+          <label>Fotos do produto * (uma ou mais; selecione a capa)</label>
+          
+          <div id="dropzone-fotos" class="dropzone-fotos" tabindex="0" role="button" aria-label="Área para envio de fotos: clique ou arraste arquivos">
+            <p style="margin: 0; font-weight: 600; color: var(--cor-texto);">Clique aqui ou arraste arquivos de fotos</p>
+            <p style="margin: 0.25rem 0 0; font-size: 0.8125rem; color: var(--text-muted);">Formatos aceitos: JPG, PNG e WEBP. Otimizadas para até 900px automaticamente.</p>
+            <input type="file" id="input-arquivo-fotos" multiple accept="image/jpeg,image/png,image/webp" style="display: none;">
+          </div>
+
+          <div id="preview-fotos-grade" class="grade-miniaturas" aria-live="polite">
+            <!-- Miniaturas aparecem aqui -->
+          </div>
+          <span class="msg-campo-erro" id="erro-prod-fotos"></span>
+        </div>
+
+        <!-- Opções Extras -->
+        <div class="bloco-opcoes-extras">
+          <label class="checkbox-rotulo">
+            <input type="checkbox" id="check-novidade">
+            <span>Marcar como novidade</span>
+          </label>
+          <label class="checkbox-rotulo">
+            <input type="checkbox" id="check-destaque">
+            <span>Destaque no carrossel da página inicial</span>
+          </label>
+        </div>
+
+        <!-- Ações do Formulário -->
+        <div class="rodape-formulario">
+          <button type="button" id="btn-limpar-form" class="btn-outline">Limpar campos</button>
+          <button type="submit" id="btn-salvar-produto" class="btn-lolita">Salvar produto</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ABA B: PRODUTOS CADASTRADOS -->
+    <section id="painel-lista-produtos" role="tabpanel" aria-labelledby="tab-btn-lista" class="card-painel" style="display: none;">
+      <div class="filtros-topo-lista">
+        <div class="barra-busca-filtros">
+          <label for="filtro-busca" class="sr-only">Buscar por nome ou código</label>
+          <input type="search" id="filtro-busca" class="input-texto" style="max-width: 260px;" placeholder="Buscar por nome ou código" aria-label="Buscar por nome ou código">
+          
+          <label for="filtro-categoria" class="sr-only">Filtrar por categoria</label>
+          <select id="filtro-categoria" class="input-texto" style="max-width: 200px;" aria-label="Filtrar por categoria">
+            <option value="">Todas as categorias</option>
+            <option value="Vestidos">Vestidos</option>
+            <option value="Macacões">Macacões</option>
+            <option value="Saias">Saias</option>
+            <option value="Calçados">Calçados</option>
+            <option value="Acessórios">Acessórios</option>
+          </select>
+
+          <select id="filtro-ordem" class="input-texto" style="max-width: 200px;">
+            <option value="recente">Mais recentes primeiro</option>
+            <option value="nome-asc">Nome (A - Z)</option>
+            <option value="preco-asc">Menor preço</option>
+            <option value="preco-desc">Maior preço</option>
+          </select>
+        </div>
+
+        <div style="font-size: 0.875rem; color: var(--text-muted);">
+          Total listado: <strong id="contador-lista-total">0</strong> itens
+        </div>
+      </div>
+
+      <div style="overflow-x: auto;">
+        <table class="tabela-responsiva">
+          <thead>
+            <tr>
+              <th scope="col" style="width: 70px;">Capa</th>
+              <th scope="col">Produto</th>
+              <th scope="col">Código</th>
+              <th scope="col">Categoria</th>
+              <th scope="col">Preço</th>
+              <th scope="col">Cores</th>
+              <th scope="col">Tamanhos</th>
+              <th scope="col">Status</th>
+              <th scope="col" style="text-align: right;">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tabela-produtos-corpo">
+            <!-- Linhas montadas por script -->
+          </tbody>
+        </table>
+      </div>
+
+      <div id="lista-vazia-aviso" class="estado-vazio" role="status" aria-live="polite" style="display: none;">
+        <p style="margin: 0; font-size: 1rem;">Nenhum produto encontrado para essa busca</p>
+      </div>
+    </section>
+
+    <!-- ABA C: FERRAMENTAS -->
+    <section id="painel-ferramentas" role="tabpanel" aria-labelledby="tab-btn-ferramentas" class="card-painel" style="display: none;">
+      <h2 style="font-size: 1.35rem; margin-bottom: 1.25rem;">Resumo do Catálogo</h2>
+      
+      <div class="card-kpis-resumo">
+        <div class="caixa-kpi-item">
+          <span class="kpi-rotulo">Total de Peças</span>
+          <span class="kpi-num" id="kpi-total-itens">0</span>
+        </div>
+        <div class="caixa-kpi-item">
+          <span class="kpi-rotulo">Novidades</span>
+          <span class="kpi-num" id="kpi-total-novidades">0</span>
+        </div>
+        <div class="caixa-kpi-item">
+          <span class="kpi-rotulo">Em Destaque</span>
+          <span class="kpi-num" id="kpi-total-destaques">0</span>
+        </div>
+        <div class="caixa-kpi-item">
+          <span class="kpi-rotulo">Categorias Ativas</span>
+          <span class="kpi-num" id="kpi-total-categorias">0</span>
+        </div>
+      </div>
+
+      <div class="grid-ferramentas">
+        <!-- Exportação e Importação JSON -->
+        <div style="background: var(--cor-creme); padding: 1.25rem; border-radius: 10px; border: 1px solid var(--cor-borda);">
+          <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Exportar e Importar Dados</h3>
+          <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1rem;">
+            Faça download do catálogo no formato JSON compatível com a vitrine pública ou restaure um backup anterior.
+          </p>
+
+          <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <button type="button" id="btn-exportar-json" class="btn-lolita" style="width: 100%;">
+              Exportar produtos (JSON)
+            </button>
+
+            <label class="btn-outline" style="text-align: center; cursor: pointer; display: block;">
+              Importar produtos (JSON)
+              <input type="file" id="input-importar-json" accept=".json,application/json" style="display: none;">
+            </label>
+          </div>
+        </div>
+
+        <!-- Gerador de Mensagem WhatsApp -->
+        <div style="background: var(--cor-creme); padding: 1.25rem; border-radius: 10px; border: 1px solid var(--cor-borda);">
+          <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Gerador de Mensagem WhatsApp</h3>
+          <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+            Selecione uma peça para gerar um texto formatado pronto para envio a clientes.
+          </p>
+
+          <div class="campo-grupo">
+            <label for="select-prod-whatsapp" style="font-size: 0.8rem;">Selecione o produto</label>
+            <select id="select-prod-whatsapp" class="input-texto" style="font-size: 0.85rem;">
+              <option value="">Selecione para gerar o texto...</option>
+            </select>
+          </div>
+
+          <textarea id="texto-whatsapp-preview" class="input-texto" rows="4" readonly style="font-size: 0.85rem; background: #FFFFFF;" placeholder="A mensagem gerada aparecerá aqui..."></textarea>
+          
+          <button type="button" id="btn-copiar-whatsapp" class="btn-outline" style="margin-top: 0.5rem; width: 100%;">
+            Copiar texto para área de transferência
+          </button>
+        </div>
+
+        <!-- Zona de Perigo / Limpar Catálogo -->
+        <div style="background: #FFFBFB; padding: 1.25rem; border-radius: 10px; border: 1px solid #F5C6CB;">
+          <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--cor-erro);">Área Crítica</h3>
+          <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1rem;">
+            A remoção de todos os produtos do navegador não poderá ser desfeita. Recomendamos exportar um backup antes.
+          </p>
+          <button type="button" id="btn-abrir-limpeza-geral" class="btn-perigo" style="width: 100%; padding: 0.65rem;">
+            Limpar todos os produtos
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Diálogo Modal: Confirmação de Exclusão Individual -->
+  <div id="modal-confirmar-exclusao" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-exclusao">
+    <div class="modal-dialogo">
+      <h3 id="titulo-modal-exclusao" style="font-size: 1.25rem; margin-bottom: 0.5rem;">Confirmar exclusão</h3>
+      <p id="texto-modal-exclusao" style="color: var(--text-muted); font-size: 0.9375rem; margin: 0;">Tem certeza que deseja excluir este produto do catálogo?</p>
+      <div class="modal-acoes">
+        <button type="button" id="btn-cancelar-exclusao" class="btn-outline">Cancelar</button>
+        <button type="button" id="btn-confirmar-exclusao" class="btn-perigo">Excluir produto</button>
+      </div>
     </div>
-    <div class="campo-grupo"><label>Descrição</label><textarea id="f-descricao"></textarea></div>
-    <div class="campo-grupo"><label>Fotos</label><input type="file" id="f-fotos" accept="image/*" multiple>
-      <div id="fotos-preview" class="fotos-preview"></div>
-    </div>
-    <button id="btn-salvar" class="btn-lolita">Salvar produto</button>
-    <button id="btn-cancelar" class="btn-secundario" style="display:none;">Cancelar edição</button>
   </div>
 
-  <div class="card">
-    <h3>Produtos cadastrados</h3>
-    <div id="lista-produtos"></div>
+  <!-- Diálogo Modal: Limpeza Geral com Digitação de Confirmação -->
+  <div id="modal-confirmar-limpeza" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-limpeza">
+    <div class="modal-dialogo">
+      <h3 id="titulo-modal-limpeza" style="font-size: 1.25rem; margin-bottom: 0.5rem; color: var(--cor-erro);">Limpar todos os produtos</h3>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
+        Esta ação apagará permanentemente todos os produtos salvos neste navegador. Para continuar, digite <strong>CONFIRMAR</strong> abaixo:
+      </p>
+      <div class="campo-grupo">
+        <input type="text" id="input-confirma-palavra" class="input-texto" placeholder="Digite CONFIRMAR" autocomplete="off">
+      </div>
+      <div class="modal-acoes">
+        <button type="button" id="btn-cancelar-limpeza" class="btn-outline">Cancelar</button>
+        <button type="button" id="btn-executar-limpeza" class="btn-perigo" disabled>Apagar tudo</button>
+      </div>
+    </div>
   </div>
-</main>
 
-<div id="toast"></div>
+  <!-- Toast Notificação Acessível -->
+  <div id="toast-notificacao" role="status" aria-live="polite">Ação realizada com sucesso</div>
 
-<script>
-const SENHA_SESSAO = 'lolita_senha';
+  <script>
+    /*
+      ==========================================================================
+      LOLITA BOUTIQUE - PAINEL ADMINISTRATIVO
+      Armazenamento:
+      Os dados são mantidos em localStorage sob a chave 'lolita_produtos'.
+      Este armazenamento fica apenas neste navegador. Para que o site público
+      possa exibir estes produtos em múltiplos aparelhos, é necessário sincronizar
+      com um banco de dados ou carregar o arquivo JSON exportado.
+      ==========================================================================
+    */
 
-let produtos = [];
-let fotosNovas = [];   // arquivos escolhidos (File)
-let fotosAtuais = [];  // URLs já salvas no produto em edição
+    const CHAVE_SESSAO = 'lolita_admin_sessao';
+    const CHAVE_STORAGE = 'lolita_produtos';
 
-function mostrarToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.style.display = 'block';
-  setTimeout(() => t.style.display = 'none', 3000);
+
+    // Estado da Aplicação
+    let produtos = [];
+    let fotosCarregadas = []; // Array de strings DataURL
+    let indiceFotoCapa = 0;
+    let idProdutoExclusaoAlvo = null;
+    let tentativasLoginErradas = 0;
+    let bloqueioTemporizador = null;
+
+    // Dados Iniciais Realistas para Primeiro Acesso
+    const PRODUTOS_PADRAO = [
+      {
+        id: "prod-1",
+        codigo: "VES-001",
+        nome: "Vestido Midi Alfaiataria Aurora",
+        categoria: "Vestidos",
+        preco: 389.90,
+        tamanhos: ["P", "M", "G"],
+        cores: [
+          { nome: "Rosa Antigo", hex: "#E8B7B0" },
+          { nome: "Off White", hex: "#FAF7F2" }
+        ],
+        descricao: "Vestido com corte impecável de alfaiataria em linho misto, fechamento posterior por zíper invisível e fenda sutil.",
+        imagem: "https://img.usecurling.com/p/400/500?q=linen%20dress&color=pink",
+        destaque: true,
+        novo: true,
+        criadoEm: "2026-03-20T10:00:00.000Z"
+      },
+      {
+        id: "prod-2",
+        codigo: "MAC-014",
+        nome: "Macacão Pantalona Terracota",
+        categoria: "Macacões",
+        preco: 429.00,
+        tamanhos: ["38", "40", "42"],
+        cores: [
+          { nome: "Terracota Ocre", hex: "#F4C189" },
+          { nome: "Preto Clássico", hex: "#1A1A1A" }
+        ],
+        descricao: "Macacão longo com decote em V estruturado, cinto no mesmo tecido e caimento fluido sofisticado.",
+        imagem: "https://img.usecurling.com/p/400/500?q=elegant%20jumpsuit&color=orange",
+        destaque: true,
+        novo: false,
+        criadoEm: "2026-03-21T14:30:00.000Z"
+      },
+      {
+        id: "prod-3",
+        codigo: "SAI-033",
+        nome: "Saia Plissada Soleil",
+        categoria: "Saias",
+        preco: 259.90,
+        tamanhos: ["P", "M", "G", "GG"],
+        cores: [
+          { nome: "Ocre Dourado", hex: "#F4C189" }
+        ],
+        descricao: "Saia evasê midi plissada com elástico no cós, perfeita para combinações diurnas ou produções noturnas.",
+        imagem: "https://img.usecurling.com/p/400/500?q=pleated%20skirt&color=yellow",
+        destaque: false,
+        novo: true,
+        criadoEm: "2026-03-22T09:15:00.000Z"
+      }
+    ];
+
+    /* -------------------------------------------------------------------------
+       Inicialização ao carregar a página
+    ------------------------------------------------------------------------- */
+    document.addEventListener('DOMContentLoaded', () => {
+      carregarProdutosDoArmazenamento();
+      configurarEventosAutenticacao();
+      configurarEventosAbas();
+      configurarFormularioProduto();
+      configurarEventosLista();
+      configurarEventosFerramentas();
+      configurarModais();
+
+      // Verificar sessão prévia
+      const sessaoAtiva = sessionStorage.getItem(CHAVE_SESSAO);
+      if (sessaoAtiva === 'true') {
+        exibirPainel();
+      }
+    });
+
+    /* -------------------------------------------------------------------------
+       Armazenamento e Estado
+    ------------------------------------------------------------------------- */
+
+async function carregarProdutosDoArmazenamento() {
+  try {
+    const resposta = await fetch('/api/produtos');
+    if (resposta.ok) {
+      produtos = await resposta.json();
+    } else {
+      produtos = [...PRODUTOS_PADRAO];
+    }
+  } catch (e) {
+    console.error('Falha ao carregar produtos', e);
+    produtos = [...PRODUTOS_PADRAO];
+  }
+  atualizarContadoresEListas();
 }
 
-function authHeaders(extra) {
-  const h = extra || {};
-  h['Authorization'] = 'Bearer ' + sessionStorage.getItem(SENHA_SESSAO);
-  return h;
-}
+    function salvarProdutosNoArmazenamento() {
+      try {
+        localStorage.POST(CHAVE_STORAGE, JSON.stringify(produtos));
+      } catch (e) {
+        mostrarToast('Erro ao salvar no navegador: limite de espaço atingido.');
+      }
+      atualizarContadoresEListas();
+    }
 
-/* ---------------- LOGIN ---------------- */
-document.getElementById('btn-mostrar-senha').addEventListener('click', () => {
-  const campo = document.getElementById('senha-acesso');
-  const ehSenha = campo.type === 'password';
-  campo.type = ehSenha ? 'text' : 'password';
-  document.getElementById('btn-mostrar-senha').textContent = ehSenha ? 'Ocultar' : 'Mostrar';
-});
+    function atualizarContadoresEListas() {
+      document.getElementById('contagem-aba-produtos').textContent = produtos.length;
+      document.getElementById('contador-lista-total').textContent = produtos.length;
+      renderizarTabelaProdutos();
+      atualizarKPIs();
+      preencherSelectWhatsApp();
+    }
 
-document.getElementById('form-login').addEventListener('submit', async (e) => {
+    /* -------------------------------------------------------------------------
+       Autenticação e Sessão
+    ------------------------------------------------------------------------- */
+    function configurarEventosAutenticacao() {
+      const formLogin = document.getElementById('form-login');
+      const campoSenha = document.getElementById('senha-acesso');
+      const btnMostrarSenha = document.getElementById('btn-mostrar-senha');
+      const msgErro = document.getElementById('msg-erro-login');
+      const btnEntrar = document.getElementById('btn-entrar');
+      const btnSair = document.getElementById('btn-sair-sessao');
+
+      btnMostrarSenha.addEventListener('click', () => {
+        const ehSenha = campoSenha.getAttribute('type') === 'password';
+        campoSenha.setAttribute('type', ehSenha ? 'text' : 'password');
+        btnMostrarSenha.textContent = ehSenha ? 'Ocultar' : 'Mostrar';
+      });
+
+formLogin.addEventListener('submit', async (e) => {
   e.preventDefault();
-  const msgErro = document.getElementById('msg-erro-login');
-  const btn = document.getElementById('btn-entrar');
   msgErro.textContent = '';
-  btn.disabled = true;
-  btn.textContent = 'Verificando...';
+
+  if (tentativasLoginErradas >= 5) {
+    bloquearTentativasLogin(btnEntrar, msgErro);
+    return;
+  }
+
+  const valor = campoSenha.value;
 
   try {
-    const resposta = await fetch('/api/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ senha: document.getElementById('senha-acesso').value })
+    const resposta = await fetch("/api/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ senha: valor })
     });
 
     if (!resposta.ok) {
-      msgErro.textContent = 'Senha incorreta. Verifique as maiúsculas e caracteres.';
+      tentativasLoginErradas++;
+      if (tentativasLoginErradas >= 5) {
+        bloquearTentativasLogin(btnEntrar, msgErro);
+      } else {
+        msgErro.textContent = 'Senha incorreta. Verifique as maiúsculas e caracteres.';
+      }
       return;
     }
 
-    sessionStorage.setItem(SENHA_SESSAO, document.getElementById('senha-acesso').value);
-    abrirPainel();
+    tentativasLoginErradas = 0;
+    sessionStorage.setItem(CHAVE_SESSAO, 'ok');
+    sessionStorage.setItem('lolita_senha', valor);
+    document.getElementById('secao-login').style.display = 'none';
+    // mostra a área do painel — ajuste o ID se o seu for outro:
+    const painel = document.getElementById('secao-admin');
+    if (painel) painel.style.display = 'block';
   } catch (err) {
     msgErro.textContent = 'Erro de conexão. Tente novamente.';
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Entrar no sistema';
   }
 });
+          /*
+            Nota de arquitetura:
+            O bloqueio por tentativas e contagem regressiva abaixo atua apenas
+            como uma barreira visual e de desaceleração direta no navegador do operador,
+            uma vez que este painel roda como aplicação client-side estática.
+          */
+          if (tentativasLoginErradas >= 5) {
+            bloquearTentativasLogin(btnEntrar, msgErro);
+          } else {
+            msgErro.textContent = 'Senha incorreta. Verifique as maiúsculas e caracteres.';
+          }
+        }
+      });
 
-function abrirPainel() {
-  document.getElementById('secao-login').style.display = 'none';
-  document.getElementById('topo-admin').classList.add('visivel');
-  document.getElementById('secao-painel').style.display = 'block';
-  carregarProdutos();
-}
-
-document.getElementById('btn-sair').addEventListener('click', () => {
-  sessionStorage.removeItem(SENHA_SESSAO);
-  location.reload();
-});
-
-/* ---------------- FOTOS ---------------- */
-document.getElementById('f-fotos').addEventListener('change', (e) => {
-  fotosNovas = Array.from(e.target.files);
-  renderizarFotosPreview();
-});
-
-function renderizarFotosPreview() {
-  const div = document.getElementById('fotos-preview');
-  div.innerHTML = '';
-  fotosAtuais.forEach(url => {
-    const img = document.createElement('img');
-    img.src = url;
-    div.appendChild(img);
-  });
-  fotosNovas.forEach(arquivo => {
-    const img = document.createElement('img');
-    img.src = URL.createObjectURL(arquivo);
-    div.appendChild(img);
-  });
-}
-
-async function enviarFotos(codigoProduto) {
-  const urls = [];
-  for (const arquivo of fotosNovas) {
-    const fd = new FormData();
-    fd.append('arquivo', arquivo);
-    fd.append('codigo', codigoProduto);
-    const resposta = await fetch('/api/upload', { method: 'POST', headers: authHeaders(), body: fd });
-    if (!resposta.ok) throw new Error('Falha no upload de foto');
-    const dados = await resposta.json();
-    urls.push(dados.url);
-  }
-  return urls;
-}
-
-/* ---------------- PRODUTOS ---------------- */
-async function carregarProdutos() {
-  try {
-    const resposta = await fetch('/api/produtos');
-    produtos = resposta.ok ? await resposta.json() : [];
-  } catch (e) {
-    mostrarToast('Erro ao carregar produtos.');
-    produtos = [];
-  }
-  renderizarLista();
-}
-
-function renderizarLista() {
-  const div = document.getElementById('lista-produtos');
-  div.innerHTML = '';
-  if (produtos.length === 0) {
-    div.innerHTML = '<p style="color:#999;">Nenhum produto cadastrado ainda.</p>';
-    return;
-  }
-  produtos.forEach(p => {
-    const linha = document.createElement('div');
-    linha.className = 'lista-produto';
-    const foto = (p.imagens && p.imagens[0]) || p.imagem || '';
-    linha.innerHTML =
-      '<div class="prod-info">' +
-        (foto ? '<img src="' + foto + '">' : '') +
-        '<div><div class="prod-nome">' + (p.nome || '') + '</div>' +
-        '<div class="prod-detalhe">' + (p.codigo || '') + ' — R$ ' + (p.preco || '0.00') + '</div></div>' +
-      '</div>' +
-      '<div>' +
-        '<button class="btn-secundario" data-editar="' + p.id + '">Editar</button> ' +
-        '<button class="btn-excluir" data-excluir="' + p.id + '">Excluir</button>' +
-      '</div>';
-    div.appendChild(linha);
-  });
-
-  div.querySelectorAll('[data-editar]').forEach(b => b.addEventListener('click', () => editarProduto(b.dataset.editar)));
-  div.querySelectorAll('[data-excluir]').forEach(b => b.addEventListener('click', () => excluirProduto(b.dataset.excluir)));
-}
-
-document.getElementById('btn-salvar').addEventListener('click', async () => {
-  const btn = document.getElementById('btn-salvar');
-  const nome = document.getElementById('f-nome').value.trim();
-  if (!nome) { mostrarToast('O nome do produto é obrigatório.'); return; }
-
-  btn.disabled = true;
-  btn.textContent = 'Salvando...';
-
-  try {
-    const idEdicao = document.getElementById('produto-id').value;
-    const codigo = document.getElementById('f-codigo').value.trim() || ('PRD-' + Date.now());
-
-    const urlsNovas = await enviarFotos(codigo);
-    const imagens = fotosAtuais.concat(urlsNovas);
-
-    const corpo = {
-      id: idEdicao || undefined,
-      codigo: codigo,
-      nome: nome,
-      categoria: document.getElementById('f-categoria').value.trim(),
-      preco: parseFloat(document.getElementById('f-preco').value) || 0,
-      tamanhos: document.getElementById('f-tamanhos').value.trim(),
-      cores: document.getElementById('f-cores').value.trim(),
-      descricao: document.getElementById('f-descricao').value.trim(),
-      imagens: imagens
-    };
-
-    const resposta = await fetch('/api/produtos', {
-      method: idEdicao ? 'PUT' : 'POST',
-      headers: authHeaders({ 'Content-Type': 'application/json' }),
-      body: JSON.stringify(corpo)
-    });
-
-    if (!resposta.ok) {
-      const erro = await resposta.text();
-      throw new Error(erro);
+      btnSair.addEventListener('click', () => {
+        sessionStorage.removeItem(CHAVE_SESSAO);
+        document.getElementById('secao-painel').style.display = 'none';
+        document.getElementById('topo-acoes-autenticado').style.display = 'none';
+        document.getElementById('secao-login').style.display = 'flex';
+        mostrarToast('Sessão encerrada com sucesso.');
+      });
     }
 
-    mostrarToast('Produto salvo com sucesso.');
-    limparFormulario();
-    await carregarProdutos();
-  } catch (err) {
-    mostrarToast('Erro ao salvar: ' + err.message);
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Salvar produto';
+    function bloquearTentativasLogin(botao, elMensagem) {
+      botao.disabled = true;
+      let segundosRestantes = 30;
+
+      elMensagem.textContent = `Muitas tentativas sem sucesso. Aguarde ${segundosRestantes} segundos.`;
+
+      bloqueioTemporizador = setInterval(() => {
+        segundosRestantes--;
+        if (segundosRestantes <= 0) {
+          clearInterval(bloqueioTemporizador);
+          botao.disabled = false;
+          tentativasLoginErradas = 0;
+          elMensagem.textContent = '';
+        } else {
+          elMensagem.textContent = `Muitas tentativas sem sucesso. Aguarde ${segundosRestantes} segundos.`;
+        }
+      }, 1000);
+    }
+
+    function exibirPainel() {
+      document.getElementById('secao-login').style.display = 'none';
+      document.getElementById('secao-painel').style.display = 'block';
+      document.getElementById('topo-acoes-autenticado').style.display = 'flex';
+      alternarAba('tab-btn-novo');
+    }
+
+    /* -------------------------------------------------------------------------
+       Navegação por Abas
+    ------------------------------------------------------------------------- */
+    function configurarEventosAbas() {
+      const botoes = document.querySelectorAll('.aba-botao');
+      botoes.forEach(btn => {
+        btn.addEventListener('click', () => {
+          alternarAba(btn.id);
+        });
+      });
+    }
+
+    function alternarAba(idBotaoAba) {
+      const abas = [
+        { btn: 'tab-btn-novo', painel: 'painel-novo-produto' },
+        { btn: 'tab-btn-lista', painel: 'painel-lista-produtos' },
+        { btn: 'tab-btn-ferramentas', painel: 'painel-ferramentas' }
+      ];
+
+      abas.forEach(aba => {
+        const elBtn = document.getElementById(aba.btn);
+        const elPainel = document.getElementById(aba.painel);
+        const ativo = aba.btn === idBotaoAba;
+
+        elBtn.classList.toggle('ativa', ativo);
+        elBtn.setAttribute('aria-selected', ativo ? 'true' : 'false');
+        elPainel.style.display = ativo ? 'block' : 'none';
+      });
+    }
+
+    /* -------------------------------------------------------------------------
+       Formulário de Produto: Cores, Tamanhos, Fotos, Validação e Envio
+    ------------------------------------------------------------------------- */
+    function configurarFormularioProduto() {
+      const form = document.getElementById('form-produto');
+      const descInput = document.getElementById('prod-descricao');
+      const contadorDesc = document.getElementById('contador-desc');
+      const btnAddCor = document.getElementById('btn-adicionar-cor');
+      const btnLimpar = document.getElementById('btn-limpar-form');
+      const btnCancelarEdicao = document.getElementById('btn-cancelar-edicao');
+
+      // Contador de caracteres na descrição
+      descInput.addEventListener('input', () => {
+        contadorDesc.textContent = descInput.value.length;
+      });
+
+      // Alternância entre grades de tamanho (letras vs números)
+      const radioLetras = document.getElementById('radio-grade-letras');
+      const radioNumeros = document.getElementById('radio-grade-numeros');
+      const gradeLetras = document.getElementById('grade-letras-box');
+      const gradeNumeros = document.getElementById('grade-numeros-box');
+
+      radioLetras.addEventListener('change', () => {
+        gradeLetras.style.display = 'flex';
+        gradeNumeros.style.display = 'none';
+      });
+
+      radioNumeros.addEventListener('change', () => {
+        gradeLetras.style.display = 'none';
+        gradeNumeros.style.display = 'flex';
+      });
+
+      // Cores dinâmicas
+      btnAddCor.addEventListener('click', () => {
+        adicionarLinhaCor('', '#FAF7F2');
+      });
+
+      // Inicializar com uma cor padrão
+      adicionarLinhaCor('Rosa Antigo', '#E8B7B0');
+
+      // Dropzone e Upload de Fotos
+      configurarUploadFotos();
+
+      // Botão Limpar Campos
+      btnLimpar.addEventListener('click', () => {
+        limparFormularioProduto();
+      });
+
+      // Botão Cancelar Edição
+      btnCancelarEdicao.addEventListener('click', () => {
+        limparFormularioProduto();
+        alternarAba('tab-btn-lista');
+      });
+
+      // Submissão do Formulário
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        processarSalvarProduto();
+      });
+    }
+
+    function adicionarLinhaCor(nomeInicial = '', hexInicial = '#FAF7F2') {
+      const container = document.getElementById('container-linhas-cores');
+      const idLinha = 'cor-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4);
+
+      const linha = document.createElement('div');
+      linha.className = 'linha-cor';
+      linha.id = idLinha;
+
+      linha.innerHTML = `
+        <input type="color" class="input-cor-preview" value="${hexInicial}" aria-label="Seletor de cor">
+        <input type="text" class="input-texto campo-nome-cor" placeholder="Nome da cor (ex: Areia, Vinho, Off-white)" value="${escapeHtml(nomeInicial)}" style="max-width: 320px;">
+        <button type="button" class="btn-perigo btn-remover-cor" aria-label="Remover esta cor" style="padding: 0.45rem 0.75rem;">Remover</button>
+      `;
+
+      const btnRemover = linha.querySelector('.btn-remover-cor');
+      btnRemover.addEventListener('click', () => {
+        const totalLinhas = container.querySelectorAll('.linha-cor').length;
+        if (totalLinhas > 1) {
+          linha.remove();
+        } else {
+          mostrarToast('O produto precisa ter ao menos uma cor cadastrada.');
+        }
+      });
+
+      container.appendChild(linha);
+    }
+
+    function obterCoresFormulario() {
+      const linhas = document.querySelectorAll('#container-linhas-cores .linha-cor');
+      const resultado = [];
+      linhas.forEach(linha => {
+        const corHex = linha.querySelector('.input-cor-preview').value;
+        const nomeCor = linha.querySelector('.campo-nome-cor').value.trim();
+        if (nomeCor) {
+          resultado.push({ nome: nomeCor, hex: corHex });
+        }
+      });
+      return resultado;
+    }
+
+    function obterTamanhosSelecionados() {
+      const checkboxes = document.querySelectorAll('input[name="tam-opcao"]:checked');
+      return Array.from(checkboxes).map(cb => cb.value);
+    }
+
+    function configurarUploadFotos() {
+      const dropzone = document.getElementById('dropzone-fotos');
+      const inputArquivo = document.getElementById('input-arquivo-fotos');
+
+      dropzone.addEventListener('click', () => inputArquivo.click());
+
+      dropzone.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          inputArquivo.click();
+        }
+      });
+
+      dropzone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropzone.classList.add('arrastando');
+      });
+
+      dropzone.addEventListener('dragleave', () => {
+        dropzone.classList.remove('arrastando');
+      });
+
+      dropzone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropzone.classList.remove('arrastando');
+        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+          processarArquivosFotos(e.dataTransfer.files);
+        }
+      });
+
+      inputArquivo.addEventListener('change', (e) => {
+        if (e.target.files && e.target.files.length > 0) {
+          processarArquivosFotos(e.target.files);
+        }
+      });
+    }
+
+    /*
+      Redimensionamento em Canvas:
+      As imagens são limitadas a no máximo 900px de largura ou altura,
+      gerando dados comprimidos em JPEG (qualidade 0.85) para armazenamento no localStorage.
+    */
+    function redimensionarImagemCanvas(file) {
+      return new Promise((resolve, reject) => {
+        const leitor = new FileReader();
+        leitor.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const limite = 900;
+            let largura = img.width;
+            let altura = img.height;
+
+            if (largura > limite || altura > limite) {
+              if (largura > altura) {
+                altura = Math.round((altura * limite) / largura);
+                largura = limite;
+              } else {
+                largura = Math.round((largura * limite) / altura);
+                altura = limite;
+              }
+            }
+
+            const canvas = document.createElement('canvas');
+            canvas.width = largura;
+            canvas.height = altura;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, largura, altura);
+            ctx.drawImage(img, 0, 0, largura, altura);
+
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+            resolve(dataUrl);
+          };
+          img.onerror = reject;
+          img.src = e.target.result;
+        };
+        leitor.onerror = reject;
+        leitor.POST /api/upload(file);
+      });
+    }
+
+    async function processarArquivosFotos(listaArquivos) {
+      mostrarToast('Otimizando fotos selecionadas...');
+      for (const arquivo of Array.from(listaArquivos)) {
+        if (arquivo.type.startsWith('image/')) {
+          try {
+            const fotoComprimida = await redimensionarImagemCanvas(arquivo);
+            fotosCarregadas.push(fotoComprimida);
+          } catch (err) {
+            console.error('Falha ao processar arquivo de foto', err);
+          }
+        }
+      }
+      renderizarMiniaturasFotos();
+    }
+
+    function renderizarMiniaturasFotos() {
+      const grade = document.getElementById('preview-fotos-grade');
+      grade.innerHTML = '';
+
+      if (indiceFotoCapa >= fotosCarregadas.length) {
+        indiceFotoCapa = 0;
+      }
+
+      fotosCarregadas.forEach((fotoDataUrl, index) => {
+        const card = document.createElement('div');
+        const ehCapa = index === indiceFotoCapa;
+        card.className = `card-miniatura ${ehCapa ? 'is-capa' : ''}`;
+
+        card.innerHTML = `
+          ${ehCapa ? '<span class="selo-capa">Foto de Capa</span>' : ''}
+          <img src="${fotoDataUrl}" alt="Miniatura ${index + 1}">
+          <div class="miniatura-acoes">
+            ${!ehCapa ? `<button type="button" class="btn-mini btn-definir-capa" data-idx="${index}">Usar como capa</button>` : ''}
+            <button type="button" class="btn-mini btn-perigo btn-remover-foto" data-idx="${index}" style="width: 100%;">Remover</button>
+          </div>
+        `;
+
+        const btnCapa = card.querySelector('.btn-definir-capa');
+        if (btnCapa) {
+          btnCapa.addEventListener('click', () => {
+            indiceFotoCapa = index;
+            renderizarMiniaturasFotos();
+          });
+        }
+
+        const btnRemover = card.querySelector('.btn-remover-foto');
+        btnRemover.addEventListener('click', () => {
+          fotosCarregadas.splice(index, 1);
+          if (indiceFotoCapa >= fotosCarregadas.length) {
+            indiceFotoCapa = Math.max(0, fotosCarregadas.length - 1);
+          }
+          renderizarMiniaturasFotos();
+        });
+
+        grade.appendChild(card);
+      });
+    }
+
+    /*
+      Validação Completa de Campos
+    */
+    function processarSalvarProduto() {
+      limparErrosVisuais();
+
+      const campoNome = document.getElementById('prod-nome');
+      const campoCodigo = document.getElementById('prod-codigo');
+      const campoCategoria = document.getElementById('prod-categoria');
+      const campoPreco = document.getElementById('prod-preco');
+      const campoDescricao = document.getElementById('prod-descricao');
+      const checkNovidade = document.getElementById('check-novidade');
+      const checkDestaque = document.getElementById('check-destaque');
+      const idEmEdicao = document.getElementById('produto-id-edicao').value;
+
+      let valido = true;
+      let primeiroInvalido = null;
+
+      // 1. Nome do produto
+      const nomeVal = campoNome.value.trim();
+      if (!nomeVal) {
+        marcarErro('prod-nome', 'Informe o nome do produto.');
+        valido = false;
+        if (!primeiroInvalido) primeiroInvalido = campoNome;
+      } else if (nomeVal.length > 80) {
+        marcarErro('prod-nome', 'O nome deve ter até 80 caracteres.');
+        valido = false;
+        if (!primeiroInvalido) primeiroInvalido = campoNome;
+      }
+
+      // 2. Código do produto
+      const codigoVal = campoCodigo.value.trim().toUpperCase();
+      const regexCodigo = /^[A-Z0-9-]+$/i;
+      if (!codigoVal) {
+        marcarErro('prod-codigo', 'Informe o código do produto.');
+        valido = false;
+        if (!primeiroInvalido) primeiroInvalido = campoCodigo;
+      } else if (!regexCodigo.test(codigoVal)) {
+        marcarErro('prod-codigo', 'Código aceita apenas letras, números e hífen (ex: CAM-001).');
+        valido = false;
+        if (!primeiroInvalido) primeiroInvalido = campoCodigo;
+      } else {
+        // Verificar duplicidade de código
+        const codigoExiste = produtos.some(p => p.codigo.toUpperCase() === codigoVal && p.id !== idEmEdicao);
+        if (codigoExiste) {
+          marcarErro('prod-codigo', 'Este código já está em uso em outro produto cadastrado.');
+          valido = false;
+          if (!primeiroInvalido) primeiroInvalido = campoCodigo;
+        }
+      }
+
+      // 3. Categoria
+      const catVal = campoCategoria.value;
+      if (!catVal) {
+        marcarErro('prod-categoria', 'Selecione uma categoria.');
+        valido = false;
+        if (!primeiroInvalido) primeiroInvalido = campoCategoria;
+      }
+
+      // 4. Preço
+      let precoNumerico = 0;
+      const precoTexto = campoPreco.value.trim().replace('R$', '').replace(/\s/g, '').replace('.', '').replace(',', '.');
+      const parsePreco = parseFloat(precoTexto);
+      if (!campoPreco.value.trim() || isNaN(parsePreco) || parsePreco <= 0) {
+        marcarErro('prod-preco', 'Informe um valor numérico válido maior que zero.');
+        valido = false;
+        if (!primeiroInvalido) primeiroInvalido = campoPreco;
+      } else {
+        precoNumerico = parsePreco;
+      }
+
+      // 5. Cores disponíveis
+      const coresSelecionadas = obterCoresFormulario();
+      if (coresSelecionadas.length === 0) {
+        document.getElementById('erro-prod-cores').textContent = 'Defina e informe o nome de ao menos uma cor.';
+        valido = false;
+        if (!primeiroInvalido) primeiroInvalido = document.querySelector('.campo-nome-cor');
+      }
+
+      // 6. Tamanhos
+      const tamanhosSelecionados = obterTamanhosSelecionados();
+      if (tamanhosSelecionados.length === 0) {
+        document.getElementById('erro-prod-tamanhos').textContent = 'Selecione ao menos um tamanho na grade.';
+        valido = false;
+        if (!primeiroInvalido) primeiroInvalido = document.getElementById('grade-letras-box');
+      }
+
+      // 7. Fotos
+      if (fotosCarregadas.length === 0) {
+        document.getElementById('erro-prod-fotos').textContent = 'Carregue ao menos uma foto do produto.';
+        valido = false;
+        if (!primeiroInvalido) primeiroInvalido = document.getElementById('dropzone-fotos');
+      }
+
+      if (!valido) {
+        if (primeiroInvalido) {
+          primeiroInvalido.focus();
+        }
+        return;
+      }
+
+      // Foto de capa selecionada
+      const fotoCapaFinal = fotosCarregadas[indiceFotoCapa] || fotosCarregadas[0];
+
+      if (idEmEdicao) {
+        // Atualizar produto existente
+        const index = produtos.findIndex(p => p.id === idEmEdicao);
+        if (index !== -1) {
+          produtos[index] = {
+            ...produtos[index],
+            nome: nomeVal,
+            codigo: codigoVal,
+            categoria: catVal,
+            preco: precoNumerico,
+            descricao: campoDescricao.value.trim(),
+            cores: coresSelecionadas,
+            tamanhos: tamanhosSelecionados,
+            imagem: fotoCapaFinal,
+            novo: checkNovidade.checked,
+            destaque: checkDestaque.checked
+          };
+          mostrarToast('Alterações salvas com sucesso.');
+        }
+      } else {
+        // Criar novo produto
+        const novoItem = {
+          id: 'prod-' + Date.now(),
+          codigo: codigoVal,
+          nome: nomeVal,
+          categoria: catVal,
+          preco: precoNumerico,
+          descricao: campoDescricao.value.trim(),
+          cores: coresSelecionadas,
+          tamanhos: tamanhosSelecionados,
+          imagem: fotoCapaFinal,
+          novo: checkNovidade.checked,
+          destaque: checkDestaque.checked,
+          criadoEm: new Date().toISOString()
+        };
+        produtos.unshift(novoItem);
+        mostrarToast('Produto cadastrado com sucesso no catálogo.');
+      }
+
+      salvarProdutosNoArmazenamento();
+      limparFormularioProduto();
+      alternarAba('tab-btn-lista');
+    }
+
+    function marcarErro(idCampo, mensagem) {
+      const input = document.getElementById(idCampo);
+      const span = document.getElementById('erro-' + idCampo);
+      if (input) input.classList.add('com-erro');
+      if (span) span.textContent = mensagem;
+    }
+
+    function limparErrosVisuais() {
+      document.querySelectorAll('.input-texto').forEach(el => el.classList.remove('com-erro'));
+      document.querySelectorAll('.msg-campo-erro').forEach(el => el.textContent = '');
+    }
+
+    function limparFormularioProduto() {
+      limparErrosVisuais();
+      document.getElementById('form-produto').reset();
+      document.getElementById('produto-id-edicao').value = '';
+      document.getElementById('contador-desc').textContent = '0';
+      document.getElementById('titulo-form-produto').textContent = 'Cadastrar novo produto';
+      document.getElementById('btn-salvar-produto').textContent = 'Salvar produto';
+      document.getElementById('btn-cancelar-edicao').style.display = 'none';
+
+      // Resetar cores
+      const containerCores = document.getElementById('container-linhas-cores');
+      containerCores.innerHTML = '';
+      adicionarLinhaCor('Rosa Antigo', '#E8B7B0');
+
+      // Resetar fotos
+      fotosCarregadas = [];
+      indiceFotoCapa = 0;
+      renderizarMiniaturasFotos();
+
+      // Resetar tamanhos
+      document.querySelectorAll('input[name="tam-opcao"]').forEach(cb => cb.checked = false);
+      document.getElementById('radio-grade-letras').checked = true;
+      document.getElementById('grade-letras-box').style.display = 'flex';
+      document.getElementById('grade-numeros-box').style.display = 'none';
+    }
+
+    /* -------------------------------------------------------------------------
+       Lista de Produtos: Tabela, Busca, Ordenação e Ações
+    ------------------------------------------------------------------------- */
+    function configurarEventosLista() {
+      const campoBusca = document.getElementById('filtro-busca');
+      const campoCategoria = document.getElementById('filtro-categoria');
+      const campoOrdem = document.getElementById('filtro-ordem');
+
+      campoBusca.addEventListener('input', () => renderizarTabelaProdutos());
+
+      campoBusca.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          if (campoBusca.value !== '') {
+            campoBusca.value = '';
+            renderizarTabelaProdutos();
+          }
+        }
+      });
+
+      campoCategoria.addEventListener('change', () => renderizarTabelaProdutos());
+      campoOrdem.addEventListener('change', () => renderizarTabelaProdutos());
+    }
+
+    function renderizarTabelaProdutos() {
+      const corpo = document.getElementById('tabela-produtos-corpo');
+      const avisoVazio = document.getElementById('lista-vazia-aviso');
+      const termoBusca = (document.getElementById('filtro-busca').value || '').trim().toLowerCase();
+      const catFiltro = document.getElementById('filtro-categoria').value;
+      const ordemFiltro = document.getElementById('filtro-ordem').value;
+
+      corpo.innerHTML = '';
+
+      // Filtros em tempo real por nome e codigo (insensivel a maiusculas/minusculas e espacos)
+      let filtrados = produtos.filter(p => {
+        const nomeAlvo = (p.nome || '').toLowerCase();
+        const codigoAlvo = (p.codigo || '').trim().toLowerCase();
+        const bateTermo = !termoBusca || nomeAlvo.includes(termoBusca) || codigoAlvo.includes(termoBusca);
+        const bateCat = !catFiltro || p.categoria === catFiltro;
+        return bateTermo && bateCat;
+      });
+
+      // Ordenação
+      filtrados.sort((a, b) => {
+        if (ordemFiltro === 'nome-asc') return a.nome.localeCompare(b.nome);
+        if (ordemFiltro === 'preco-asc') return a.preco - b.preco;
+        if (ordemFiltro === 'preco-desc') return b.preco - a.preco;
+        // Padrão recente
+        return new Date(b.criadoEm || 0) - new Date(a.criadoEm || 0);
+      });
+
+      document.getElementById('contador-lista-total').textContent = filtrados.length;
+
+      if (filtrados.length === 0) {
+        avisoVazio.style.display = 'block';
+        return;
+      }
+      avisoVazio.style.display = 'none';
+
+      filtrados.forEach(prod => {
+        const tr = document.createElement('tr');
+
+        // Bolinhas de cor
+        const coresHtml = (prod.cores || []).map(c => 
+          `<span class="bolinha-cor-lista" style="background-color: ${c.hex};" title="${escapeHtml(c.nome)}"></span>`
+        ).join('');
+
+        // Tamanhos
+        const tamanhosTexto = (prod.tamanhos || []).join(', ');
+
+        // Badges de Status
+        let badgesHtml = '';
+        if (prod.novo) badgesHtml += '<span class="badge-status badge-novidade">Novidade</span>';
+        if (prod.destaque) badgesHtml += '<span class="badge-status badge-destaque">Destaque</span>';
+        if (!badgesHtml) badgesHtml = '<span style="color: var(--text-muted); font-size: 0.8125rem;">Normal</span>';
+
+        const precoFormatado = prod.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+        tr.innerHTML = `
+          <td class="td-capa">
+            <img src="${prod.imagem || 'https://img.usecurling.com/p/80/100?q=fashion%20dress'}" alt="" class="capa-tabela">
+          </td>
+          <td>
+            <strong>${escapeHtml(prod.nome)}</strong>
+            ${prod.descricao ? `<div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem;">${escapeHtml(prod.descricao.substring(0, 60))}${prod.descricao.length > 60 ? '...' : ''}</div>` : ''}
+          </td>
+          <td><code>${escapeHtml(prod.codigo)}</code></td>
+          <td>${escapeHtml(prod.categoria)}</td>
+          <td><strong>${precoFormatado}</strong></td>
+          <td>${coresHtml}</td>
+          <td><span style="font-size: 0.85rem;">${tamanhosTexto}</span></td>
+          <td>${badgesHtml}</td>
+          <td style="text-align: right;">
+            <div class="acoes-celula" style="justify-content: flex-end;">
+              <button type="button" class="btn-outline btn-editar-prod" data-id="${prod.id}" style="font-size: 0.8rem; padding: 0.35rem 0.65rem;">Editar</button>
+              <button type="button" class="btn-outline btn-duplicar-prod" data-id="${prod.id}" style="font-size: 0.8rem; padding: 0.35rem 0.65rem;">Duplicar</button>
+              <button type="button" class="btn-perigo btn-excluir-prod" data-id="${prod.id}">Excluir</button>
+            </div>
+          </td>
+        `;
+
+        tr.querySelector('.btn-editar-prod').addEventListener('click', () => carregarProdutoParaEdicao(prod.id));
+        tr.querySelector('.btn-duplicar-prod').addEventListener('click', () => duplicarProduto(prod.id));
+        tr.querySelector('.btn-excluir-prod').addEventListener('click', () => abrirModalExclusao(prod.id, prod.nome));
+
+        corpo.appendChild(tr);
+      });
+    }
+
+    function carregarProdutoParaEdicao(idProduto) {
+      const prod = produtos.find(p => p.id === idProduto);
+      if (!prod) return;
+
+      limparFormularioProduto();
+
+      document.getElementById('produto-id-edicao').value = prod.id;
+      document.getElementById('titulo-form-produto').textContent = 'Editar produto: ' + prod.nome;
+      document.getElementById('btn-salvar-produto').textContent = 'Salvar alterações';
+      document.getElementById('btn-cancelar-edicao').style.display = 'inline-block';
+
+      document.getElementById('prod-nome').value = prod.nome;
+      document.getElementById('prod-codigo').value = prod.codigo;
+      document.getElementById('prod-categoria').value = prod.categoria;
+      document.getElementById('prod-preco').value = prod.preco.toFixed(2).replace('.', ',');
+      document.getElementById('prod-descricao').value = prod.descricao || '';
+      document.getElementById('contador-desc').textContent = (prod.descricao || '').length;
+
+      document.getElementById('check-novidade').checked = !!prod.novo;
+      document.getElementById('check-destaque').checked = !!prod.destaque;
+
+      // Cores
+      const containerCores = document.getElementById('container-linhas-cores');
+      containerCores.innerHTML = '';
+      if (prod.cores && prod.cores.length > 0) {
+        prod.cores.forEach(c => adicionarLinhaCor(c.nome, c.hex));
+      } else {
+        adicionarLinhaCor('', '#FAF7F2');
+      }
+
+      // Tamanhos
+      const usaNumeros = (prod.tamanhos || []).some(t => /^\d+$/.test(t));
+      if (usaNumeros) {
+        document.getElementById('radio-grade-numeros').checked = true;
+        document.getElementById('grade-letras-box').style.display = 'none';
+        document.getElementById('grade-numeros-box').style.display = 'flex';
+      } else {
+        document.getElementById('radio-grade-letras').checked = true;
+        document.getElementById('grade-letras-box').style.display = 'flex';
+        document.getElementById('grade-numeros-box').style.display = 'none';
+      }
+
+      (prod.tamanhos || []).forEach(tam => {
+        const cb = document.querySelector(`input[name="tam-opcao"][value="${tam}"]`);
+        if (cb) cb.checked = true;
+      });
+
+      // Foto
+      if (prod.imagem) {
+        fotosCarregadas = [prod.imagem];
+        indiceFotoCapa = 0;
+        renderizarMiniaturasFotos();
+      }
+
+      alternarAba('tab-btn-novo');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function duplicarProduto(idProduto) {
+      const original = produtos.find(p => p.id === idProduto);
+      if (!original) return;
+
+      let novoCodigo = original.codigo + '-COP';
+      let contador = 1;
+      while (produtos.some(p => p.codigo === novoCodigo)) {
+        contador++;
+        novoCodigo = `${original.codigo}-COP${contador}`;
+      }
+
+      const copia = {
+        ...JSON.parse(JSON.stringify(original)),
+        id: 'prod-' + Date.now(),
+        codigo: novoCodigo,
+        nome: original.nome + ' (Cópia)',
+        criadoEm: new Date().toISOString()
+      };
+
+      produtos.unshift(copia);
+      salvarProdutosNoArmazenamento();
+      mostrarToast(`Produto duplicado com código ${novoCodigo}`);
+    }
+
+    /* -------------------------------------------------------------------------
+       Ferramentas: Exportar/Importar, KPIs e WhatsApp
+    ------------------------------------------------------------------------- */
+    function configurarEventosFerramentas() {
+      // Exportar JSON
+      document.getElementById('btn-exportar-json').addEventListener('click', () => {
+        const dadosExport = produtos.map(p => ({
+          id: p.id,
+          nome: p.nome,
+          codigo: p.codigo,
+          categoria: p.categoria,
+          preco: p.preco,
+          tamanhos: p.tamanhos,
+          cores: p.cores,
+          descricao: p.descricao,
+          imagem: p.imagem,
+          destaque: !!p.destaque,
+          novo: !!p.novo
+        }));
+
+        const jsonStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dadosExport, null, 2));
+        const downloadAnchor = document.createElement('a');
+        downloadAnchor.setAttribute("href", jsonStr);
+        downloadAnchor.setAttribute("download", `lolita_catalogo_${new Date().toISOString().slice(0,10)}.json`);
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
+
+        mostrarToast('Arquivo JSON exportado com sucesso.');
+      });
+
+      // Importar JSON
+      const inputImport = document.getElementById('input-importar-json');
+      inputImport.addEventListener('change', (e) => {
+        const arquivo = e.target.files[0];
+        if (!arquivo) return;
+
+        const leitor = new FileReader();
+        leitor.onload = (evento) => {
+          try {
+            const importados = JSON.parse(evento.target.result);
+            if (!Array.isArray(importados)) {
+              throw new Error('O arquivo não contém uma lista de produtos válida.');
+            }
+
+            // Validar itens mínimos
+            let adicionados = 0;
+            importados.forEach(item => {
+              if (item.nome && item.preco && item.categoria) {
+                // Ajustar se código já existir
+                let cod = item.codigo || 'IMP-' + Math.floor(Math.random() * 900);
+                if (produtos.some(p => p.codigo === cod)) {
+                  cod += '-IMP';
+                }
+
+                produtos.unshift({
+                  id: item.id || 'prod-' + Date.now() + Math.random().toString(36).substr(2, 4),
+                  codigo: cod,
+                  nome: item.nome,
+                  categoria: item.categoria,
+                  preco: Number(item.preco) || 0,
+                  tamanhos: Array.isArray(item.tamanhos) ? item.tamanhos : ["U"],
+                  cores: Array.isArray(item.cores) ? item.cores : [{ nome: "Padrão", hex: "#1A1A1A" }],
+                  descricao: item.descricao || "",
+                  imagem: item.imagem || "",
+                  destaque: !!item.destaque,
+                  novo: !!item.novo,
+                  criadoEm: new Date().toISOString()
+                });
+                adicionados++;
+              }
+            });
+
+            salvarProdutosNoArmazenamento();
+            mostrarToast(`${adicionados} produtos importados com sucesso.`);
+            inputImport.value = '';
+          } catch (erro) {
+            mostrarToast('Erro ao importar JSON: formato de arquivo inválido.');
+            inputImport.value = '';
+          }
+        };
+        leitor.readAsText(arquivo);
+      });
+
+      // Gerador WhatsApp
+      const selectWhats = document.getElementById('select-prod-whatsapp');
+      const areaWhats = document.getElementById('texto-whatsapp-preview');
+      const btnCopiarWhats = document.getElementById('btn-copiar-whatsapp');
+
+      selectWhats.addEventListener('change', () => {
+        const idProd = selectWhats.value;
+        if (!idProd) {
+          areaWhats.value = '';
+          return;
+        }
+
+        const p = produtos.find(item => item.id === idProd);
+        if (p) {
+          const valorFmt = p.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+          const coresNomes = (p.cores || []).map(c => c.nome).join(', ');
+          const tamanhosTxt = (p.tamanhos || []).join(', ');
+
+          const mensagem = `Olá! Tudo bem? Seguem os detalhes da peça solicitada na Lolita Boutique:\n\n*${p.nome}*\nRef: ${p.codigo}\nValor: ${valorFmt}\nTamanhos disponíveis: ${tamanhosTxt}\nCores: ${coresNomes}\n\nPosso reservar uma para você experimentar?`;
+          areaWhats.value = mensagem;
+        }
+      });
+
+      btnCopiarWhats.addEventListener('click', () => {
+        if (!areaWhats.value.trim()) {
+          mostrarToast('Selecione um produto para gerar a mensagem antes de copiar.');
+          return;
+        }
+        navigator.clipboard.writeText(areaWhats.value).then(() => {
+          mostrarToast('Mensagem copiada para a área de transferência.');
+        }).catch(() => {
+          mostrarToast('Não foi possível copiar automaticamente.');
+        });
+      });
+    }
+
+    function atualizarKPIs() {
+      document.getElementById('kpi-total-itens').textContent = produtos.length;
+      document.getElementById('kpi-total-novidades').textContent = produtos.filter(p => p.novo).length;
+      document.getElementById('kpi-total-destaques').textContent = produtos.filter(p => p.destaque).length;
+
+      const categoriasUnicas = new Set(produtos.map(p => p.categoria));
+      document.getElementById('kpi-total-categorias').textContent = categoriasUnicas.size;
+    }
+
+    function preencherSelectWhatsApp() {
+      const select = document.getElementById('select-prod-whatsapp');
+      select.innerHTML = '<option value="">Selecione um produto...</option>';
+      produtos.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p.id;
+        opt.textContent = `${p.codigo} - ${p.nome}`;
+        select.appendChild(opt);
+      });
+    }
+
+    /* -------------------------------------------------------------------------
+       Diálogos Modais (Exclusão Individual e Limpeza Geral)
+    ------------------------------------------------------------------------- */
+    function configurarModais() {
+      const modalExclusao = document.getElementById('modal-confirmar-exclusao');
+      const btnCancExclusao = document.getElementById('btn-cancelar-exclusao');
+      const btnConfExclusao = document.getElementById('btn-confirmar-exclusao');
+
+      btnCancExclusao.addEventListener('click', () => fecharModal(modalExclusao));
+      btnConfExclusao.addEventListener('click', () => {
+        if (idProdutoExclusaoAlvo) {
+          produtos = produtos.filter(p => p.id !== idProdutoExclusaoAlvo);
+          salvarProdutosNoArmazenamento();
+          mostrarToast('Produto removido do catálogo com sucesso.');
+          fecharModal(modalExclusao);
+          idProdutoExclusaoAlvo = null;
+        }
+      });
+
+      // Limpeza Geral
+      const modalLimpeza = document.getElementById('modal-confirmar-limpeza');
+      const btnAbrirLimpeza = document.getElementById('btn-abrir-limpeza-geral');
+      const btnCancLimpeza = document.getElementById('btn-cancelar-limpeza');
+      const btnExecLimpeza = document.getElementById('btn-executar-limpeza');
+      const inputConfirma = document.getElementById('input-confirma-palavra');
+
+      btnAbrirLimpeza.addEventListener('click', () => {
+        inputConfirma.value = '';
+        btnExecLimpeza.disabled = true;
+        abrirModal(modalLimpeza);
+      });
+
+      inputConfirma.addEventListener('input', () => {
+        btnExecLimpeza.disabled = inputConfirma.value.trim() !== 'CONFIRMAR';
+      });
+
+      btnCancLimpeza.addEventListener('click', () => fecharModal(modalLimpeza));
+
+      btnExecLimpeza.addEventListener('click', () => {
+        produtos = [];
+        salvarProdutosNoArmazenamento();
+        fecharModal(modalLimpeza);
+        mostrarToast('Todos os produtos foram removidos do catálogo.');
+      });
+
+      // Fechar modais ao pressionar ESC
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          fecharModal(modalExclusao);
+          fecharModal(modalLimpeza);
+        }
+      });
+    }
+
+    function abrirModalExclusao(id, nome) {
+      idProdutoExclusaoAlvo = id;
+      document.getElementById('texto-modal-exclusao').textContent = `Deseja realmente remover a peça "${nome}"? Esta ação não poderá ser desfeita.`;
+      abrirModal(document.getElementById('modal-confirmar-exclusao'));
+    }
+
+    function abrirModal(elModal) {
+      elModal.classList.add('visivel');
+      const primeiroInterativo = elModal.querySelector('button, input');
+      if (primeiroInterativo) primeiroInterativo.focus();
+    }
+
+    function fecharModal(elModal) {
+      elModal.classList.remove('visivel');
+    }
+
+    /* -------------------------------------------------------------------------
+       Utilitários: Toast e Escape
+    ------------------------------------------------------------------------- */
+    let timerToast = null;
+    function mostrarToast(mensagem) {
+      const toast = document.getElementById('toast-notificacao');
+      toast.textContent = mensagem;
+      toast.classList.add('ativo');
+
+      clearTimeout(timerToast);
+      timerToast = setTimeout(() => {
+        toast.classList.remove('ativo');
+      }, 3500);
+    }
+
+    function escapeHtml(texto) {
+      if (!texto) return '';
+      return String(texto)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+  </script>
+<script>
+/* Skip artifact shell — fixed helpers served beside every artifact. */
+(function () {
+  "use strict";
+
+  var fmt = {
+    num: function (v, opts) { return new Intl.NumberFormat("pt-BR", opts || {}).format(v); },
+    brl: function (v) { return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v); },
+    pct: function (v) { return new Intl.NumberFormat("pt-BR", { style: "percent", maximumFractionDigits: 1 }).format(v); }
+  };
+
+  // axisFmt keeps axis tick labels short (compact notation) so long values
+  // (e.g. full BRL amounts) never clip against the plot edge.
+  function axisFmt(v) {
+    return fmt.num(v, { notation: "compact", maximumFractionDigits: 1 });
   }
-});
 
-function editarProduto(id) {
-  const p = produtos.find(x => x.id === id);
-  if (!p) return;
-  document.getElementById('produto-id').value = p.id;
-  document.getElementById('f-codigo').value = p.codigo || '';
-  document.getElementById('f-nome').value = p.nome || '';
-  document.getElementById('f-categoria').value = p.categoria || '';
-  document.getElementById('f-preco').value = p.preco || '';
-  document.getElementById('f-tamanhos').value = p.tamanhos || '';
-  document.getElementById('f-cores').value = p.cores || '';
-  document.getElementById('f-descricao').value = p.descricao || '';
-  fotosAtuais = (p.imagens && p.imagens.slice()) || (p.imagem ? [p.imagem] : []);
-  fotosNovas = [];
-  renderizarFotosPreview();
-  document.getElementById('titulo-formulario').textContent = 'Editando: ' + (p.nome || '');
-  document.getElementById('btn-cancelar').style.display = 'inline-block';
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
+  // format accepts a function OR one of the fmt names ("num" | "brl" | "pct").
+  function coerceFormat(spec) {
+    if (typeof spec === "function") return spec;
+    if (typeof spec === "string" && fmt[spec]) return fmt[spec];
+    return function (v) { return fmt.num(v); };
+  }
 
-document.getElementById('btn-cancelar').addEventListener('click', limparFormulario);
+  function accent() {
+    return getComputedStyle(document.documentElement).getPropertyValue("--accent").trim() || "#2563eb";
+  }
+  function mutedColor() {
+    return getComputedStyle(document.documentElement).getPropertyValue("--text-muted").trim() || "#5b6472";
+  }
+  function svgEl(tag, attrs) {
+    var el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+    for (var k in attrs) el.setAttribute(k, attrs[k]);
+    return el;
+  }
+  function frame(el, w, h) {
+    var svg = svgEl("svg", { viewBox: "0 0 " + w + " " + h, role: "img" });
+    el.innerHTML = "";
+    el.appendChild(svg);
+    return svg;
+  }
 
-function limparFormulario() {
-  document.getElementById('produto-id').value = '';
-  document.getElementById('form-login').reset;
-  ['f-codigo','f-nome','f-categoria','f-preco','f-tamanhos','f-cores','f-descricao'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('f-fotos').value = '';
-  fotosNovas = [];
-  fotosAtuais = [];
-  renderizarFotosPreview();
-  document.getElementById('titulo-formulario').textContent = 'Cadastrar novo produto';
-  document.getElementById('btn-cancelar').style.display = 'none';
-}
+  // maxOf guards the axis scale: empty values would give -Infinity (truthy,
+  // so "|| 1" can't catch it) and a non-positive max would flip the chart.
+  function maxOf(values) {
+    var m = values.length ? Math.max.apply(null, values) : 0;
+    return m > 0 ? m : 1;
+  }
 
-async function excluirProduto(id) {
-  if (!confirm('Excluir este produto? Esta ação não pode ser desfeita.')) return;
-  try {
-    const resposta = await fetch('/api/produtos?id=' + encodeURIComponent(id), {
-      method: 'DELETE',
-      headers: authHeaders()
+  // bar(el, {labels:[], values:[], color?, format?}) — vertical bar chart.
+  function bar(el, cfg) {
+    var W = 640, H = 280, padL = 46, padB = 30, padT = 12;
+    var svg = frame(el, W, H);
+    var max = maxOf(cfg.values);
+    var n = cfg.values.length;
+    var plotW = W - padL - 12, plotH = H - padT - padB;
+    var step = plotW / n, bw = Math.min(step * 0.62, 64);
+    var color = cfg.color || accent();
+    var f = coerceFormat(cfg.format);
+    for (var g = 0; g <= 4; g++) {
+      var gy = padT + plotH - (plotH * g) / 4;
+      svg.appendChild(svgEl("line", { x1: padL, y1: gy, x2: W - 12, y2: gy, stroke: "currentColor", "stroke-opacity": 0.08 }));
+      var lbl = svgEl("text", { x: padL - 8, y: gy + 4, "text-anchor": "end", "font-size": 10, fill: mutedColor() });
+      lbl.textContent = axisFmt((max * g) / 4);
+      svg.appendChild(lbl);
+    }
+    cfg.values.forEach(function (v, i) {
+      var bh = Math.max(0, (v / max) * plotH);
+      var x = padL + i * step + (step - bw) / 2;
+      var y = padT + plotH - bh;
+      var r = svgEl("rect", { x: x, y: y, width: bw, height: bh, rx: 4, fill: color });
+      var t = svgEl("title", {});
+      t.textContent = cfg.labels[i] + ": " + f(v);
+      r.appendChild(t);
+      svg.appendChild(r);
+      var tx = svgEl("text", { x: x + bw / 2, y: H - 10, "text-anchor": "middle", "font-size": 11, fill: mutedColor() });
+      tx.textContent = cfg.labels[i];
+      svg.appendChild(tx);
     });
-    if (!resposta.ok) throw new Error(await resposta.text());
-    mostrarToast('Produto excluído.');
-    await carregarProdutos();
-  } catch (err) {
-    mostrarToast('Erro ao excluir: ' + err.message);
   }
-}
 
-/* ---------------- INICIALIZAÇÃO ---------------- */
-if (sessionStorage.getItem(SENHA_SESSAO)) {
-  abrirPainel();
-}
+  // line(el, {labels:[], values:[], color?, format?}) — single-series line.
+  function line(el, cfg) {
+    var W = 640, H = 280, padL = 46, padB = 30, padT = 12;
+    var svg = frame(el, W, H);
+    var max = maxOf(cfg.values);
+    var n = cfg.values.length;
+    var plotW = W - padL - 16, plotH = H - padT - padB;
+    var color = cfg.color || accent();
+    var f = coerceFormat(cfg.format);
+    for (var g = 0; g <= 4; g++) {
+      var gy = padT + plotH - (plotH * g) / 4;
+      svg.appendChild(svgEl("line", { x1: padL, y1: gy, x2: W - 16, y2: gy, stroke: "currentColor", "stroke-opacity": 0.08 }));
+      var lbl = svgEl("text", { x: padL - 8, y: gy + 4, "text-anchor": "end", "font-size": 10, fill: mutedColor() });
+      lbl.textContent = axisFmt((max * g) / 4);
+      svg.appendChild(lbl);
+    }
+    var pts = cfg.values.map(function (v, i) {
+      var x = padL + (n === 1 ? plotW / 2 : (plotW * i) / (n - 1));
+      var y = padT + plotH - (v / max) * plotH;
+      return [x, y];
+    });
+    var d = pts.map(function (p, i) { return (i ? "L" : "M") + p[0].toFixed(1) + " " + p[1].toFixed(1); }).join(" ");
+    svg.appendChild(svgEl("path", { d: d, fill: "none", stroke: color, "stroke-width": 2, "stroke-linejoin": "round" }));
+    pts.forEach(function (p, i) {
+      var c = svgEl("circle", { cx: p[0], cy: p[1], r: 3.5, fill: color });
+      var t = svgEl("title", {});
+      t.textContent = cfg.labels[i] + ": " + f(cfg.values[i]);
+      c.appendChild(t);
+      svg.appendChild(c);
+      var tx = svgEl("text", { x: p[0], y: H - 10, "text-anchor": "middle", "font-size": 11, fill: mutedColor() });
+      tx.textContent = cfg.labels[i];
+      svg.appendChild(tx);
+    });
+  }
+
+  // donut(el, {labels:[], values:[], colors?}) — donut with center total.
+  function donut(el, cfg) {
+    var W = 320, H = 280, cx = W / 2, cy = H / 2, R = 92, r = 58;
+    var svg = frame(el, W, H);
+    var total = cfg.values.reduce(function (a, b) { return a + b; }, 0) || 1;
+    var palette = cfg.colors || [accent(), "#1baf7a", "#eda100", "#e34948", "#4a3aa7", "#e87ba4"];
+    var a0 = -Math.PI / 2;
+    cfg.values.forEach(function (v, i) {
+      var a1 = a0 + (v / total) * Math.PI * 2;
+      var large = a1 - a0 > Math.PI ? 1 : 0;
+      var p = ["M", cx + R * Math.cos(a0), cy + R * Math.sin(a0),
+        "A", R, R, 0, large, 1, cx + R * Math.cos(a1), cy + R * Math.sin(a1),
+        "L", cx + r * Math.cos(a1), cy + r * Math.sin(a1),
+        "A", r, r, 0, large, 0, cx + r * Math.cos(a0), cy + r * Math.sin(a0), "Z"].join(" ");
+      var path = svgEl("path", { d: p, fill: palette[i % palette.length] });
+      var t = svgEl("title", {});
+      t.textContent = cfg.labels[i] + ": " + fmt.num(v) + " (" + fmt.pct(v / total) + ")";
+      path.appendChild(t);
+      svg.appendChild(path);
+      a0 = a1;
+    });
+    var center = svgEl("text", { x: cx, y: cy + 5, "text-anchor": "middle", "font-size": 20, "font-weight": 650, fill: "currentColor" });
+    center.textContent = fmt.num(total);
+    svg.appendChild(center);
+  }
+
+  window.skipShell = { fmt: fmt };
+  window.skipChart = { bar: bar, line: line, donut: donut };
+})();
+
 </script>
 </body>
 </html>
