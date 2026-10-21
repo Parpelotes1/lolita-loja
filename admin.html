@@ -1471,21 +1471,21 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
     /* -------------------------------------------------------------------------
        Armazenamento e Estado
     ------------------------------------------------------------------------- */
-    function carregarProdutosDoArmazenamento() {
-      try {
-        const salvos = fetch('/api/produtos')(CHAVE_STORAGE);
-        if (salvos) {
-          produtos = JSON.parse(salvos);
-        } else {
-          produtos = [...PRODUTOS_PADRAO];
-          salvarProdutosNoArmazenamento();
-        }
-      } catch (e) {
-        console.error('Falha ao acessar o armazenamento local', e);
-        produtos = [...PRODUTOS_PADRAO];
-      }
-      atualizarContadoresEListas();
+
+async function carregarProdutosDoArmazenamento() {
+  try {
+    const resposta = await fetch('/api/produtos');
+    if (resposta.ok) {
+      produtos = await resposta.json();
+    } else {
+      produtos = [...PRODUTOS_PADRAO];
     }
+  } catch (e) {
+    console.error('Falha ao carregar produtos', e);
+    produtos = [...PRODUTOS_PADRAO];
+  }
+  atualizarContadoresEListas();
+}
 
     function salvarProdutosNoArmazenamento() {
       try {
@@ -1521,24 +1521,45 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
         btnMostrarSenha.textContent = ehSenha ? 'Ocultar' : 'Mostrar';
       });
 
-      formLogin.addEventListener('submit', (e) => {
-        e.preventDefault();
-        msgErro.textContent = '';
+formLogin.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  msgErro.textContent = '';
 
-        const valor = campoSenha.value;
-       async function fazerLogin(senhaDigitada) {
-  const resposta = await fetch("/api/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ senha: senhaDigitada })
-  });
-  if (!resposta.ok) {
-    alert("Senha incorreta");
-    return false;
+  if (tentativasLoginErradas >= 5) {
+    bloquearTentativasLogin(btnEntrar, msgErro);
+    return;
   }
-  sessionStorage.setItem(CHAVE_SESSAO, "ok");
-  return true;
-}
+
+  const valor = campoSenha.value;
+
+  try {
+    const resposta = await fetch("/api/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ senha: valor })
+    });
+
+    if (!resposta.ok) {
+      tentativasLoginErradas++;
+      if (tentativasLoginErradas >= 5) {
+        bloquearTentativasLogin(btnEntrar, msgErro);
+      } else {
+        msgErro.textContent = 'Senha incorreta. Verifique as maiúsculas e caracteres.';
+      }
+      return;
+    }
+
+    tentativasLoginErradas = 0;
+    sessionStorage.setItem(CHAVE_SESSAO, 'ok');
+    sessionStorage.setItem('lolita_senha', valor);
+    document.getElementById('secao-login').style.display = 'none';
+    // mostra a área do painel — ajuste o ID se o seu for outro:
+    const painel = document.getElementById('secao-admin');
+    if (painel) painel.style.display = 'block';
+  } catch (err) {
+    msgErro.textContent = 'Erro de conexão. Tente novamente.';
+  }
+});
           /*
             Nota de arquitetura:
             O bloqueio por tentativas e contagem regressiva abaixo atua apenas
