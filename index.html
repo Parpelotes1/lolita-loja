@@ -2176,105 +2176,33 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
       Array principal de produtos da Lolita boutique.
       Preços de exemplo: trocar pelos valores reais conforme tabela vigente.
     */
-    const PRODUTOS_LOJA = [
-      {
-        id: 1,
-        nome: "Vestido Midi Linho Puro",
-        categoria: "Vestidos",
-        preco: 299.90, // Trocar pelo preço real
-        tamanhos: ["36", "40", "44", "48", "52"],
-        cores: ["#E8B7B0", "#FAF7F2", "#2F3E46"],
-        descricao: "Fibra 100% natural com caimento fluido, decote estruturado e faixa para amarração na cintura.",
-        imagem: "vestido-midi",
-        destaque: true,
-        novo: true
-      },
-      {
-        id: 2,
-        nome: "Macacão Pantalona Alfaiataria",
-        categoria: "Macacões",
-        preco: 349.90, // Trocar pelo preço real
-        tamanhos: ["38", "42", "46", "50"],
-        cores: ["#F4C189", "#1A1A1A"],
-        descricao: "Corte reto impecável com bolsos laterais faca, decote em V sutil e fechamento invisível.",
-        imagem: "macacao-pantalona",
-        destaque: true,
-        novo: false
-      },
-      {
-        id: 3,
-        nome: "Vestido Envelope Terracota",
-        categoria: "Vestidos",
-        preco: 279.90, // Trocar pelo preço real
-        tamanhos: ["34", "38", "42", "46", "50"],
-        cores: ["#B25D4C", "#4A5859"],
-        descricao: "Design transpassado que se ajusta com precisão ao busto e à cintura, com manga flare leve.",
-        imagem: "vestido-envelope",
-        destaque: true,
-        novo: true
-      },
-      {
-        id: 4,
-        nome: "Saia Evasê Botões Frontais",
-        categoria: "Saias",
-        preco: 199.90, // Trocar pelo preço real
-        tamanhos: ["38", "40", "44", "48"],
-        cores: ["#F4C189", "#E8B7B0"],
-        descricao: "Cintura alta com passantes, abotoamento forrado e comprimento midi clássico em sarja leve.",
-        imagem: "saia-evase",
-        destaque: true,
-        novo: false
-      },
-      {
-        id: 5,
-        nome: "Scarpin Salto Bloco Couro",
-        categoria: "Calçados",
-        preco: 259.90, // Trocar pelo preço real
-        tamanhos: ["35", "36", "37", "38", "39"],
-        cores: ["#D4A373", "#1A1A1A"],
-        descricao: "Salto estável de 6cm com palmilha acolchoada desenvolvida para rotinas longas sem fadiga.",
-        imagem: "scarpin-couro",
-        destaque: true,
-        novo: false
-      },
-      {
-        id: 6,
-        nome: "Saia Plissada Toque Seda",
-        categoria: "Saias",
-        preco: 229.90, // Trocar pelo preço real
-        tamanhos: ["P", "M", "G", "GG"],
-        cores: ["#E8B7B0", "#A3B18A"],
-        descricao: "Caimento etéreo com elástico embutido no cós, perfeita tanto com t-shirt quanto com alfaiataria.",
-        imagem: "saia-plissada",
-        destaque: false,
-        novo: true
-      },
-      {
-        id: 7,
-        nome: "Macacão Utilitário em Sarja",
-        categoria: "Macacões",
-        preco: 319.90, // Trocar pelo preço real
-        tamanhos: ["36", "40", "44", "48"],
-        cores: ["#588157", "#FAF7F2"],
-        descricao: "Design prático com bolsos cargo sutis, zíper tratorado de metal e punhos ajustáveis.",
-        imagem: "macacao-utilitario",
-        destaque: false,
-        novo: false
-      },
-      {
-        id: 8,
-        nome: "Cinto Fivela Orgânica",
-        categoria: "Acessórios",
-        preco: 139.90, // Trocar pelo preço real
-        tamanhos: ["P/M", "G/GG", "Plus"],
-        cores: ["#1A1A1A", "#7F4F24"],
-        descricao: "Couro legítimo com acabamento acetinado e metal martelado que valoriza o visual instantaneamente.",
-        imagem: "cinto-organico",
-        destaque: false,
-        novo: false
-      }
-    ];
+   let PRODUTOS_LOJA = [];
 
+async function carregarProdutosIndex() {
+  try {
+    const resposta = await fetch("/api/produtos");
+    if (!resposta.ok) throw new Error("API indisponível");
+    const lista = await resposta.json();
+    PRODUTOS_LOJA = lista.map(p => ({
+      ...p,
+      preco: Number(p.preco),
+      tamanhos: p.tamanhos ? JSON.parse(p.tamanhos) : [],
+      cores: p.cores ? JSON.parse(p.cores) : [],
+      destaque: p.destaque === 1 || p.destaque === true,
+      novo: p.novo === 1 || p.novo === true,
+      imagem: p.imagem && p.imagem.startsWith("data:image")
+        ? p.imagem
+        : (p.imagem ? "/fotos/" + p.imagem : p.categoria)
+    }));
+  } catch (e) {
+    console.warn("Falha ao buscar produtos na index:", e);
+    PRODUTOS_LOJA = [];
+  }
+  // chama aqui a função que desenha os cards de destaque
+  if (typeof renderizarDestaques === "function") renderizarDestaques();
+}
+
+carregarProdutosIndex();
     document.addEventListener("DOMContentLoaded", () => {
       // Fallback de garantia: revela todos os elementos caso haja demora ou bloqueio
       setTimeout(() => {
