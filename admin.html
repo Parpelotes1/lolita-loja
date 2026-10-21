@@ -1385,7 +1385,7 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
 
     const CHAVE_SESSAO = 'lolita_admin_sessao';
     const CHAVE_STORAGE = 'lolita_produtos';
-    const SENHA_MESTRA = 'Moda@Adm2026';
+
 
     // Estado da Aplicação
     let produtos = [];
@@ -1526,17 +1526,19 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
         msgErro.textContent = '';
 
         const valor = campoSenha.value;
-        if (valor === SENHA_MESTRA) {
-          sessionStorage.setItem(CHAVE_SESSAO, 'true');
-          tentativasLoginErradas = 0;
-          campoSenha.value = '';
-          exibirPainel();
-          mostrarToast('Acesso autorizado ao painel administrativo.');
-        } else {
-          tentativasLoginErradas++;
-          campoSenha.value = '';
-          campoSenha.focus();
-
+       async function fazerLogin(senhaDigitada) {
+  const resposta = await fetch("/api/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ senha: senhaDigitada })
+  });
+  if (!resposta.ok) {
+    alert("Senha incorreta");
+    return false;
+  }
+  sessionStorage.setItem(CHAVE_SESSAO, "ok");
+  return true;
+}
           /*
             Nota de arquitetura:
             O bloqueio por tentativas e contagem regressiva abaixo atua apenas
