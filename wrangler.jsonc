@@ -1,0 +1,26 @@
+{
+  "name": "lolita-loja",
+  "main": "worker.js",
+  "compatibility_date": "2026-01-01",
+  "assets": {
+    "directory": "./",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*", "/fotos/*"]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "loja-db",
+      "database_id": "COLE_AQUI_O_ID_DO_BANCO"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "FOTOS",
+      "bucket_name": "fotos-loja"
+    }
+  ],
+  "vars": {
+    "ADMIN_PASSWORD": "Moda@Adm2026"
+  }
+}
