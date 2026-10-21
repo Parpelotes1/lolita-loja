@@ -20,9 +20,7 @@
       "bucket_name": "fotos-loja"
     }
   ],
-  "vars": {
-    "ADMIN_PASSWORD": "Moda@Adm2026"
-  }
+ 
 }
 "assets": {
   "directory": "./",
