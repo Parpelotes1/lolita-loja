@@ -24,3 +24,9 @@
     "ADMIN_PASSWORD": "Moda@Adm2026"
   }
 }
+"assets": {
+  "directory": "./",
+  "binding": "ASSETS",
+  "run_worker_first": ["/api/*", "/fotos/*"],
+  "exclude": [".git"]
+}
