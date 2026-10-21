@@ -1473,7 +1473,7 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
     ------------------------------------------------------------------------- */
 
 
-         async function carregarProdutosDoArmazenamento() {
+     async function carregarProdutosDoArmazenamento() {
       try {
         const resposta = await fetch('/api/produtos');
         produtos = resposta.ok ? await resposta.json() : [];
@@ -1483,18 +1483,7 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
       }
       atualizarContadoresEListas();
     }
-    if (resposta.ok) {
-      produtos = await resposta.json();
-    } else {
-      produtos = [...PRODUTOS_PADRAO];
-    }
-  } catch (e) {
-    console.error('Falha ao carregar produtos', e);
-    produtos = [...PRODUTOS_PADRAO];
-  }
-  atualizarContadoresEListas();
-}
-
+    
        function authHeaders(extra) {
       const h = extra || {};
       h['Authorization'] = 'Bearer ' + sessionStorage.getItem('lolita_senha');
