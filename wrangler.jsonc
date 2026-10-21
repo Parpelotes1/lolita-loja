@@ -13,7 +13,9 @@
       "database_name": "loja-db",
       "database_id": "2c8dff86-c953-436a-bb6e-13d4bdea9882"
     }
-  ],
+  ]
+}
+    
   "r2_buckets": [
     {
       "binding": "FOTOS",
