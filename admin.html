@@ -1473,7 +1473,7 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
     ------------------------------------------------------------------------- */
 
 
-       async function carregarProdutosDoArmazenamento() {
+         async function carregarProdutosDoArmazenamento() {
       try {
         const resposta = await fetch('/api/produtos');
         produtos = resposta.ok ? await resposta.json() : [];
@@ -1482,7 +1482,6 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
         produtos = [];
       }
       atualizarContadoresEListas();
-       
     }
     if (resposta.ok) {
       produtos = await resposta.json();
@@ -1495,6 +1494,37 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
   }
   atualizarContadoresEListas();
 }
+
+       function authHeaders(extra) {
+      const h = extra || {};
+      h['Authorization'] = 'Bearer ' + sessionStorage.getItem('lolita_senha');
+      return h;
+    }
+
+    async function enviarFotoDataUrl(dataUrl) {
+      const blob = await (await fetch(dataUrl)).blob();
+      const fd = new FormData();
+      fd.append('arquivo', blob, 'foto.jpg');
+      const resposta = await fetch('/api/upload', { method: 'POST', headers: authHeaders(), body: fd });
+      if (!resposta.ok) throw new Error('Falha no envio da foto');
+      const dados = await resposta.json();
+      return '/fotos/' + dados.chave;
+    }
+
+    async function enviarProdutoParaServidor(produto, fotoParaEnviar) {
+      if (fotoParaEnviar && fotoParaEnviar.startsWith('data:')) {
+        produto.imagem = await enviarFotoDataUrl(fotoParaEnviar);
+      }
+      await fetch('/api/produtos', {
+        method: 'POST',
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify(produto)
+      });
+    }
+
+    async function excluirProdutoNoServidor(id) {
+      await fetch('/api/produtos/' + encodeURIComponent(id), { method: 'DELETE', headers: authHeaders() });
+    }
 
        function authHeaders(extra) {
       const h = extra || {};
@@ -1555,7 +1585,7 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
         btnMostrarSenha.textContent = ehSenha ? 'Ocultar' : 'Mostrar';
       });
 
-            formLogin.addEventListener('submit', async (e) => {
+           formLogin.addEventListener('submit', async (e) => {
         e.preventDefault();
         msgErro.textContent = '';
 
@@ -1590,7 +1620,6 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
           msgErro.textContent = 'Erro de conexão. Tente novamente.';
         }
       });
-
 
       
           /*
@@ -1729,7 +1758,7 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
       // Submissão do Formulário
       form.addEventListener('submit', (e) => {
         e.preventDefault();
-       async function processarSalvarProduto() {};
+       a async function processarSalvarProduto() {;
       });
     }
 
