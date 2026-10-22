@@ -1542,19 +1542,7 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
         btnMostrarSenha.textContent = ehSenha ? 'Ocultar' : 'Mostrar';
       });
 
-           formLogin.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        msgErro.textContent = '';
-
-        const valor = campoSenha.value;
-
-        try {
-          const resposta = await fetch('/api/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ senha: valor })
-          });
-
+       
           if (!resposta.ok) {
             tentativasLoginErradas++;
             campoSenha.value = '';
@@ -1579,19 +1567,6 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
       });
 
       
-          /*
-            Nota de arquitetura:
-            O bloqueio por tentativas e contagem regressiva abaixo atua apenas
-            como uma barreira visual e de desaceleração direta no navegador do operador,
-            uma vez que este painel roda como aplicação client-side estática.
-          */
-          if (tentativasLoginErradas >= 5) {
-            bloquearTentativasLogin(btnEntrar, msgErro);
-          } else {
-            msgErro.textContent = 'Senha incorreta. Verifique as maiúsculas e caracteres.';
-          }
-        }
-      });
 
       btnSair.addEventListener('click', () => {
         sessionStorage.removeItem(CHAVE_SESSAO);
@@ -1841,7 +1816,7 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
           img.src = e.target.result;
         };
         leitor.onerror = reject;
-        leitor.POST /api/upload(file);       
+        leitor.readAsDataURL(file);      
       });
     }
 
@@ -2009,9 +1984,7 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
 
       if (idEmEdicao) {
         // Atualizar produto existente
-        const index = produtos.findIndex(p => p.id === idEmEdicao);
-        if (index !== -1) {
-          produtos[index] = {
+            const produtoAtualizado = {
             ...produtos[index],
             nome: nomeVal,
             codigo: codigoVal,
@@ -2024,9 +1997,12 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
             novo: checkNovidade.checked,
             destaque: checkDestaque.checked
           };
+          await enviarProdutoParaServidor(produtoAtualizado, fotoCapaFinal);
+          produtos[index] = produtoAtualizado;
           mostrarToast('Alterações salvas com sucesso.');
-        }
-      } else {
+        
+       }
+      else {
         // Criar novo produto
         const novoItem = {
           id: 'prod-' + Date.now(),
