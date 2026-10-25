@@ -1,5 +1,5 @@
 // Loja Lolita — Worker Cloudflare
-// Versão com correções de upload, edição (PUT) e cache
+// Alinhado com a tabela produtos: id INTEGER, fotos TEXT, foto_principal INTEGER
 
 export default {
   async fetch(request, env) {
@@ -8,7 +8,7 @@ export default {
 
     // Servir fotos do R2
     if (path.startsWith("/fotos/")) {
-      const chave = path.replace("/fotos/", "");
+      const chave = decodeURIComponent(path.replace("/fotos/", ""));
       const objeto = await env.FOTOS.get(chave);
       if (!objeto) return new Response("Não encontrado", { status: 404 });
       return new Response(objeto.body, {
@@ -40,13 +40,7 @@ export default {
         const { results } = await env.DB.prepare(
           "SELECT * FROM produtos ORDER BY criado_em DESC"
         ).all();
-        const lista = (results || []).map((p) => ({
-          ...p,
-          tamanhos: tentarJson(p.tamanhos, []),
-          cores: tentarJson(p.cores, []),
-          novo: !!p.novo,
-          destaque: !!p.destaque
-        }));
+        const lista = (results || []).map(normalizarProduto);
         return Response.json(lista);
       } catch (e) {
         return Response.json({ erro: String(e) }, { status: 500 });
@@ -58,17 +52,28 @@ export default {
       if (!(await autorizar(request, env))) return new Response("Não autorizado", { status: 401 });
       try {
         const p = await request.json();
-        if (!p.id) p.id = crypto.randomUUID();
-        const agora = new Date().toISOString();
+        // O id é INTEGER PRIMARY KEY: deixamos o SQLite gerar
         await env.DB.prepare(
-          `INSERT INTO produtos (id, codigo, nome, categoria, preco, tamanhos, cores, descricao, imagem, novo, destaque, criado_em)
+          `INSERT INTO produtos (codigo, nome, categoria, preco, tamanhos, cores, fotos, foto_principal, descricao, novo, destaque, criado_em)
            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
         ).bind(
-          p.id, p.codigo, p.nome, p.categoria, p.preco,
-          JSON.stringify(p.tamanhos || []), JSON.stringify(p.cores || []),
-          p.descricao || "", p.imagem || "", p.novo ? 1 : 0, p.destaque ? 1 : 0, agora
+          p.codigo || "",
+          p.nome || "",
+          p.categoria || "",
+          Number(p.preco) || 0,
+          JSON.stringify(p.tamanhos || []),
+          JSON.stringify(p.cores || []),
+          JSON.stringify(p.fotos || []),
+          Number(p.foto_principal) || 0,
+          p.descricao || "",
+          p.novo ? 1 : 0,
+          p.destaque ? 1 : 0,
+          new Date().toISOString()
         ).run();
-        return Response.json({ ok: true, id: p.id });
+        const novoId = await env.DB.prepare(
+          "SELECT id FROM produtos WHERE codigo = ? ORDER BY id DESC LIMIT 1"
+        ).bind(p.codigo || "").first();
+        return Response.json({ ok: true, id: novoId ? novoId.id : null });
       } catch (e) {
         return Response.json({ ok: false, erro: String(e) }, { status: 500 });
       }
@@ -77,15 +82,25 @@ export default {
     // Editar produto
     if (path.startsWith("/api/produtos/") && request.method === "PUT") {
       if (!(await autorizar(request, env))) return new Response("Não autorizado", { status: 401 });
-      const id = decodeURIComponent(path.split("/").pop());
+      const id = Number(decodeURIComponent(path.split("/").pop()));
+      if (!id) return Response.json({ ok: false, erro: "id invalido" }, { status: 400 });
       try {
         const p = await request.json();
         await env.DB.prepare(
-          `UPDATE produtos SET codigo=?, nome=?, categoria=?, preco=?, tamanhos=?, cores=?, descricao=?, imagem=?, novo=?, destaque=? WHERE id=?`
+          `UPDATE produtos SET codigo=?, nome=?, categoria=?, preco=?, tamanhos=?, cores=?, fotos=?, foto_principal=?, descricao=?, novo=?, destaque=? WHERE id=?`
         ).bind(
-          p.codigo, p.nome, p.categoria, p.preco,
-          JSON.stringify(p.tamanhos || []), JSON.stringify(p.cores || []),
-          p.descricao || "", p.imagem || "", p.novo ? 1 : 0, p.destaque ? 1 : 0, id
+          p.codigo || "",
+          p.nome || "",
+          p.categoria || "",
+          Number(p.preco) || 0,
+          JSON.stringify(p.tamanhos || []),
+          JSON.stringify(p.cores || []),
+          JSON.stringify(p.fotos || []),
+          Number(p.foto_principal) || 0,
+          p.descricao || "",
+          p.novo ? 1 : 0,
+          p.destaque ? 1 : 0,
+          id
         ).run();
         return Response.json({ ok: true, id });
       } catch (e) {
@@ -96,7 +111,8 @@ export default {
     // Excluir produto
     if (path.startsWith("/api/produtos/") && request.method === "DELETE") {
       if (!(await autorizar(request, env))) return new Response("Não autorizado", { status: 401 });
-      const id = decodeURIComponent(path.split("/").pop());
+      const id = Number(decodeURIComponent(path.split("/").pop()));
+      if (!id) return Response.json({ ok: false, erro: "id invalido" }, { status: 400 });
       try {
         await env.DB.prepare("DELETE FROM produtos WHERE id = ?").bind(id).run();
         return Response.json({ ok: true, id });
@@ -129,7 +145,8 @@ export default {
         await env.FOTOS.put(chave, arquivo.stream(), {
           httpMetadata: { contentType: arquivo.type || "image/jpeg" }
         });
-        return Response.json({ ok: true, chave, url: "/fotos/" + chave });
+        const caminho = "/fotos/" + chave;
+        return Response.json({ ok: true, chave, url: caminho });
       } catch (e) {
         return Response.json({ ok: false, erro: String(e) }, { status: 500 });
       }
@@ -147,8 +164,27 @@ export default {
   }
 };
 
+// Converte as colunas de texto do banco em arrays reais
+function normalizarProduto(p) {
+  return {
+    id: p.id,
+    codigo: p.codigo,
+    nome: p.nome,
+    categoria: p.categoria,
+    preco: p.preco,
+    descricao: p.descricao || "",
+    tamanhos: tentarJson(p.tamanhos, []),
+    cores: tentarJson(p.cores, []),
+    fotos: tentarJson(p.fotos, []),
+    foto_principal: p.foto_principal || 0,
+    novo: !!p.novo,
+    destaque: !!p.destaque,
+    criado_em: p.criado_em
+  };
+}
+
 function tentarJson(valor, padrao) {
-  if (valor === null || valor === undefined) return padrao;
+  if (valor === null || valor === undefined || valor === "") return padrao;
   if (typeof valor !== "string") return valor;
   try {
     const r = JSON.parse(valor);
@@ -163,4 +199,4 @@ async function autorizar(request, env) {
   return token === "Bearer " + env.ADMIN_PASSWORD;
 }
 
-// /atualizado
+// /atualizado-v2
