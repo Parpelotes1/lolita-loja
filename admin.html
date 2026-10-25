@@ -11,7 +11,8 @@
   <!-- Shell CSS do sistema -->
   <style>
 /* Skip artifact shell — fixed styles served beside every artifact.
-   Complements basecoat; artifacts override --accent for their own identity. */
+   Tokens, utilities and components (basecoat 1.0 markup, no CDN); artifacts
+   override --accent for their own identity. */
 :root {
   color-scheme: light dark;
   --accent: #2563eb;
@@ -25,6 +26,9 @@
   --radius: 10px;
   --shadow: 0 1px 3px rgba(20, 23, 31, 0.08);
   --space: 16px;
+  --success: #0a7a35;
+  --danger: #c0262d;
+  --warning: #8a5300;
 }
 /* Theme resolution. Without data-theme the viewer's system preference decides,
    as it always did. With it, the artifact's own choice wins in BOTH directions:
@@ -43,6 +47,9 @@
     --text-muted: #9aa4b2;
     --border: rgba(238, 241, 246, 0.12);
     --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    --success: #4ade80;
+    --danger: #f87171;
+    --warning: #fbbf24;
   }
 }
 :root:where([data-theme="dark"]) {
@@ -54,9 +61,48 @@
   --text-muted: #9aa4b2;
   --border: rgba(238, 241, 246, 0.12);
   --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --success: #4ade80;
+  --danger: #f87171;
+  --warning: #fbbf24;
 }
 :root:where([data-theme="light"]) { color-scheme: light; }
+/* Pages generated before the shell had its own components still link the
+   basecoat CDN, which reads its own tokens and switches theme only on a
+   .dark class. Bridged to the shell's, whatever of it those pages use takes
+   the page's accent and follows the declared theme. Its --accent token is a
+   hover tint, renamed in its theme as --color-accent; the shell's --accent is
+   the brand colour, so the tint is derived from it here. */
+:root {
+  --background: var(--bg);
+  --foreground: var(--text);
+  --card: var(--surface);
+  --card-foreground: var(--text);
+  --popover: var(--surface);
+  --popover-foreground: var(--text);
+  --primary: var(--accent);
+  --primary-foreground: var(--accent-contrast);
+  --secondary: color-mix(in srgb, var(--text) 7%, var(--surface));
+  --secondary-foreground: var(--text);
+  --muted: color-mix(in srgb, var(--text) 5%, var(--surface));
+  --muted-foreground: var(--text-muted);
+  --color-accent: color-mix(in srgb, var(--accent) 12%, var(--surface));
+  --color-accent-foreground: var(--text);
+  --destructive: var(--danger);
+  --input: var(--border);
+  --ring: var(--accent);
+}
 * { box-sizing: border-box; }
+/* The reset the pages were written against: they all linked basecoat, which
+   ships Tailwind's. Its components now live here, so the reset does too. */
+*, ::before, ::after, ::backdrop { margin: 0; padding: 0; border: 0 solid; }
+h1, h2, h3, h4, h5, h6 { font-size: inherit; font-weight: inherit; }
+a { color: inherit; text-decoration: inherit; }
+b, strong { font-weight: bolder; }
+ol, ul, menu { list-style: none; }
+svg, video, canvas, iframe { display: block; vertical-align: middle; }
+button, input, select, textarea { color: inherit; background-color: transparent; border-radius: 0; }
+table { border-collapse: collapse; }
+hr { height: 0; color: inherit; border-top-width: 1px; }
 html, body { margin: 0; padding: 0; }
 body {
   background: var(--bg);
@@ -89,8 +135,8 @@ img { max-width: 100%; display: block; }
 .kpi .kpi-value { font-size: 28px; font-weight: 650; line-height: 1.1; }
 .kpi .kpi-label { font-size: 13px; color: var(--text-muted); }
 .kpi .kpi-delta { font-size: 12.5px; font-weight: 600; }
-.kpi .kpi-delta.up { color: #0a8f3c; }
-.kpi .kpi-delta.down { color: #cf3131; }
+.kpi .kpi-delta.up { color: var(--success); }
+.kpi .kpi-delta.down { color: var(--danger); }
 
 table.shell-table { border-collapse: collapse; width: 100%; font-size: 14px; }
 table.shell-table th {
@@ -116,6 +162,160 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
   .shell-fade { animation: shell-fade 400ms ease both; }
   @keyframes shell-fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 }
+
+/* Layout and type utilities: what the pages kept spelling in style="".
+   Spacing and type sizes follow Tailwind's scale; there is no Tailwind. */
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.stack { display: flex; flex-direction: column; gap: var(--space); }
+.between { justify-content: space-between; }
+.grow { flex: 1 1 0; min-width: 0; }
+.cols-2, .cols-3, .cols-4 { display: grid; gap: var(--space); grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 720px) {
+  .cols-2, .cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (min-width: 1000px) { .cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.gap-1 { gap: 4px; } .gap-2 { gap: 8px; } .gap-3 { gap: 12px; } .gap-4 { gap: 16px; } .gap-6 { gap: 24px; }
+.m-0 { margin: 0; }
+.mt-1 { margin-top: 4px; } .mt-2 { margin-top: 8px; } .mt-3 { margin-top: 12px; } .mt-4 { margin-top: 16px; } .mt-6 { margin-top: 24px; }
+.mb-1 { margin-bottom: 4px; } .mb-2 { margin-bottom: 8px; } .mb-3 { margin-bottom: 12px; } .mb-4 { margin-bottom: 16px; } .mb-6 { margin-bottom: 24px; }
+.p-2 { padding: 8px; } .p-3 { padding: 12px; } .p-4 { padding: 16px; } .p-6 { padding: 24px; }
+.text-xs { font-size: 12px; } .text-sm { font-size: 14px; } .text-base { font-size: 16px; }
+.text-lg { font-size: 18px; } .text-xl { font-size: 20px; line-height: 1.35; }
+.text-2xl { font-size: 24px; line-height: 1.25; } .text-3xl { font-size: 30px; line-height: 1.2; }
+.font-medium { font-weight: 500; } .font-semibold { font-weight: 600; } .font-bold { font-weight: 700; }
+.text-right { text-align: right; } .text-center { text-align: center; }
+.nowrap { white-space: nowrap; }
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-variant-numeric: tabular-nums; }
+.w-full { width: 100%; }
+.text-success { color: var(--success); } .text-danger { color: var(--danger); } .text-warning { color: var(--warning); }
+
+/* Components, with basecoat 1.0 markup (variants and sizes are data
+   attributes) and the shell tokens, so a page needs neither component CSS
+   nor a CSS framework. An older page that also links basecoat gets these
+   rules after it, over the same properties. */
+button, input, select, textarea { font: inherit; }
+input[type="checkbox"], input[type="radio"] { accent-color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  height: 36px; padding: 0 14px; border: 1px solid transparent; border-radius: calc(var(--radius) - 2px);
+  background: var(--accent); color: var(--accent-contrast);
+  font-size: 14px; font-weight: 500; line-height: 1; white-space: nowrap; text-decoration: none; cursor: pointer;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+.btn:hover { background: color-mix(in srgb, var(--accent) 86%, #000); }
+.btn:disabled, .btn[aria-disabled="true"] { opacity: 0.5; pointer-events: none; }
+.btn[data-variant="secondary"] { background: color-mix(in srgb, var(--text) 8%, var(--surface)); color: var(--text); }
+.btn[data-variant="secondary"]:hover { background: color-mix(in srgb, var(--text) 14%, var(--surface)); }
+.btn[data-variant="outline"] { background: var(--surface); color: var(--text); border-color: var(--border); }
+.btn[data-variant="ghost"] { background: transparent; color: var(--text); }
+.btn[data-variant="outline"]:hover, .btn[data-variant="ghost"]:hover { background: color-mix(in srgb, var(--accent) 10%, var(--surface)); }
+.btn[data-variant="destructive"] { background: var(--danger); color: var(--bg); }
+.btn[data-variant="destructive"]:hover { background: color-mix(in srgb, var(--danger) 86%, var(--text)); }
+.btn[data-variant="link"] { height: auto; padding: 0; background: none; color: var(--accent-text); text-decoration: underline; text-underline-offset: 3px; }
+.btn[data-size="sm"] { height: 30px; padding: 0 10px; font-size: 13px; }
+.btn[data-size="lg"] { height: 42px; padding: 0 20px; font-size: 15px; }
+.btn[data-size="icon"] { width: 36px; padding: 0; }
+
+.badge {
+  display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px;
+  border: 1px solid transparent; border-radius: 999px; background: var(--accent); color: var(--accent-contrast);
+  font-size: 12px; font-weight: 600; line-height: 1.5; white-space: nowrap;
+}
+.badge[data-variant="secondary"] { background: color-mix(in srgb, var(--text) 8%, var(--surface)); color: var(--text); }
+.badge[data-variant="outline"] { background: transparent; color: var(--text); border-color: var(--border); }
+.badge[data-variant="destructive"] { background: color-mix(in srgb, var(--danger) 14%, var(--surface)); color: var(--danger); }
+
+.alert {
+  display: grid; gap: 4px; padding: 12px 16px; border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--surface); color: var(--text); font-size: 14px;
+}
+.alert h2, .alert h3 { margin: 0; font-size: 14px; font-weight: 600; }
+.alert p, .alert section { margin: 0; color: var(--text-muted); }
+.alert[data-variant="destructive"] { border-color: color-mix(in srgb, var(--danger) 45%, var(--border)); background: color-mix(in srgb, var(--danger) 7%, var(--surface)); color: var(--danger); }
+
+.card {
+  display: flex; flex-direction: column; gap: 16px; padding: 20px 0;
+  border: 1px solid var(--border); border-radius: calc(var(--radius) + 2px);
+  background: var(--surface); color: var(--text); box-shadow: var(--shadow);
+}
+.card > header, .card > section, .card > footer { padding: 0 20px; }
+.card > header { display: grid; gap: 4px; }
+.card > header h2, .card > header h3 { margin: 0; font-size: 16px; font-weight: 600; line-height: 1.3; }
+.card > header p { margin: 0; color: var(--text-muted); font-size: 14px; }
+.card > footer { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+
+.input {
+  width: 100%; min-height: 36px; padding: 6px 12px; border: 1px solid var(--border); border-radius: calc(var(--radius) - 2px);
+  background: var(--surface); color: var(--text); font-size: 14px;
+}
+textarea.input { min-height: 84px; resize: vertical; }
+.input::placeholder { color: var(--text-muted); }
+.input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent); }
+.field { display: grid; gap: 6px; }
+.field label { font-size: 14px; font-weight: 500; }
+.field [role="alert"] { color: var(--danger); font-size: 13px; }
+
+dialog.dialog {
+  width: min(520px, calc(100vw - 32px)); max-height: calc(100vh - 32px); margin: auto; padding: 0;
+  border: 1px solid var(--border); border-radius: calc(var(--radius) + 4px);
+  background: var(--surface); color: var(--text); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+}
+dialog.dialog::backdrop { background: rgba(0, 0, 0, 0.5); }
+dialog.dialog > div { display: grid; gap: 16px; padding: 24px; }
+dialog.dialog header { display: grid; gap: 4px; }
+dialog.dialog header h2 { margin: 0; font-size: 18px; font-weight: 600; }
+dialog.dialog header p { margin: 0; color: var(--text-muted); font-size: 14px; }
+dialog.dialog footer { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+
+.tabs { display: grid; gap: 12px; }
+.tabs > [role="tablist"] {
+  display: inline-flex; gap: 4px; width: fit-content; max-width: 100%; padding: 4px; overflow-x: auto;
+  border-radius: var(--radius); background: color-mix(in srgb, var(--text) 6%, var(--surface));
+}
+.tabs [role="tab"] {
+  padding: 6px 12px; border: 0; border-radius: calc(var(--radius) - 4px); background: transparent;
+  color: var(--text-muted); font-size: 14px; font-weight: 500; white-space: nowrap; cursor: pointer;
+}
+.tabs [role="tab"][aria-selected="true"] { background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
+.tabs [role="tabpanel"][hidden] { display: none; }
+
+.accordion > details { border-bottom: 1px solid var(--border); }
+.accordion > details > summary {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 14px 0; font-weight: 500; list-style: none; cursor: pointer;
+}
+.accordion > details > summary::-webkit-details-marker { display: none; }
+.accordion > details > summary::after { content: "+"; color: var(--text-muted); font-size: 18px; line-height: 1; }
+.accordion > details[open] > summary::after { content: "\2212"; }
+.accordion > details > :not(summary) { margin: 0 0 14px; color: var(--text-muted); }
+
+.toaster {
+  position: fixed; right: 16px; bottom: 16px; z-index: 50; display: flex; flex-direction: column-reverse; gap: 8px;
+  width: min(360px, calc(100vw - 32px)); pointer-events: none;
+}
+.toaster .toast { pointer-events: auto; transition: opacity 200ms ease, transform 200ms ease; }
+.toaster .toast[aria-hidden="true"] { opacity: 0; transform: translateY(8px); }
+.toaster .toast-content {
+  padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--surface); color: var(--text); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12); font-size: 13px;
+}
+.toaster .toast-content h2 { margin: 0 0 2px; font-size: 14px; font-weight: 600; }
+.toaster .toast-content p { margin: 0; color: var(--text-muted); }
+
+/* skipUI building blocks. */
+.skip-table-search { max-width: 320px; margin-bottom: 12px; }
+.skip-table-wrap { overflow-x: auto; }
+table.shell-table th[data-sort] { cursor: pointer; user-select: none; }
+table.shell-table th[aria-sort="ascending"]::after { content: " \25B2"; font-size: 9px; }
+table.shell-table th[aria-sort="descending"]::after { content: " \25BC"; font-size: 9px; }
+table.shell-table td.skip-table-empty { color: var(--text-muted); text-align: center; padding: 24px 0; }
+.skip-pager { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-top: 12px; font-size: 13px; color: var(--text-muted); }
+.toaster .toast[data-type="success"] .toast-content { border-left: 3px solid var(--success); }
+.toaster .toast[data-type="error"] .toast-content { border-left: 3px solid var(--danger); }
 
 </style>
   
@@ -1041,7 +1241,9 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
         </button>
       </form>
 
-
+      <p class="dica-senha">
+        Credencial autorizada de acesso: Moda@Adm2026
+      </p>
     </section>
   </main>
 
@@ -1329,7 +1531,7 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
         <div style="background: #FFFBFB; padding: 1.25rem; border-radius: 10px; border: 1px solid #F5C6CB;">
           <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--cor-erro);">Área Crítica</h3>
           <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1rem;">
-            A remoção de todos os produtos do navegador não poderá ser desfeita. Recomendamos exportar um backup antes.
+            A remoção de todos os produtos do catálogo não poderá ser desfeita. Recomendamos exportar um backup antes.
           </p>
           <button type="button" id="btn-abrir-limpeza-geral" class="btn-perigo" style="width: 100%; padding: 0.65rem;">
             Limpar todos os produtos
@@ -1356,7 +1558,7 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
     <div class="modal-dialogo">
       <h3 id="titulo-modal-limpeza" style="font-size: 1.25rem; margin-bottom: 0.5rem; color: var(--cor-erro);">Limpar todos os produtos</h3>
       <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
-        Esta ação apagará permanentemente todos os produtos salvos neste navegador. Para continuar, digite <strong>CONFIRMAR</strong> abaixo:
+        Esta ação apagará permanentemente todos os produtos salvos no catálogo. Para continuar, digite <strong>CONFIRMAR</strong> abaixo:
       </p>
       <div class="campo-grupo">
         <input type="text" id="input-confirma-palavra" class="input-texto" placeholder="Digite CONFIRMAR" autocomplete="off">
@@ -1375,85 +1577,324 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
     /*
       ==========================================================================
       LOLITA BOUTIQUE - PAINEL ADMINISTRATIVO
-      Armazenamento:
-      Os dados são mantidos em localStorage sob a chave 'lolita_produtos'.
-      Este armazenamento fica apenas neste navegador. Para que o site público
-      possa exibir estes produtos em múltiplos aparelhos, é necessário sincronizar
-      com um banco de dados ou carregar o arquivo JSON exportado.
+      Persistência via API Cloudflare Workers (/api/produtos, /api/login, /api/upload)
       ==========================================================================
     */
 
-    const CHAVE_SESSAO = 'lolita_admin_sessao';
-    const CHAVE_STORAGE = 'lolita_produtos';
-
-
-    // Estado da Aplicação
+    // Constantes e Variáveis Globais de Estado
+    const CHAVE_SESSAO = 'lolita_admin_token';
     let produtos = [];
-    let fotosCarregadas = []; // Array de strings DataURL
+    let fotosCarregadas = [];
     let indiceFotoCapa = 0;
-    let idProdutoExclusaoAlvo = null;
     let tentativasLoginErradas = 0;
     let bloqueioTemporizador = null;
-
-    // Dados Iniciais Realistas para Primeiro Acesso
-    const PRODUTOS_PADRAO = [
-      {
-        id: "prod-1",
-        codigo: "VES-001",
-        nome: "Vestido Midi Alfaiataria Aurora",
-        categoria: "Vestidos",
-        preco: 389.90,
-        tamanhos: ["P", "M", "G"],
-        cores: [
-          { nome: "Rosa Antigo", hex: "#E8B7B0" },
-          { nome: "Off White", hex: "#FAF7F2" }
-        ],
-        descricao: "Vestido com corte impecável de alfaiataria em linho misto, fechamento posterior por zíper invisível e fenda sutil.",
-        imagem: "https://img.usecurling.com/p/400/500?q=linen%20dress&color=pink",
-        destaque: true,
-        novo: true,
-        criadoEm: "2026-03-20T10:00:00.000Z"
-      },
-      {
-        id: "prod-2",
-        codigo: "MAC-014",
-        nome: "Macacão Pantalona Terracota",
-        categoria: "Macacões",
-        preco: 429.00,
-        tamanhos: ["38", "40", "42"],
-        cores: [
-          { nome: "Terracota Ocre", hex: "#F4C189" },
-          { nome: "Preto Clássico", hex: "#1A1A1A" }
-        ],
-        descricao: "Macacão longo com decote em V estruturado, cinto no mesmo tecido e caimento fluido sofisticado.",
-        imagem: "https://img.usecurling.com/p/400/500?q=elegant%20jumpsuit&color=orange",
-        destaque: true,
-        novo: false,
-        criadoEm: "2026-03-21T14:30:00.000Z"
-      },
-      {
-        id: "prod-3",
-        codigo: "SAI-033",
-        nome: "Saia Plissada Soleil",
-        categoria: "Saias",
-        preco: 259.90,
-        tamanhos: ["P", "M", "G", "GG"],
-        cores: [
-          { nome: "Ocre Dourado", hex: "#F4C189" }
-        ],
-        descricao: "Saia evasê midi plissada com elástico no cós, perfeita para combinações diurnas ou produções noturnas.",
-        imagem: "https://img.usecurling.com/p/400/500?q=pleated%20skirt&color=yellow",
-        destaque: false,
-        novo: true,
-        criadoEm: "2026-03-22T09:15:00.000Z"
-      }
-    ];
+    let idProdutoExclusaoAlvo = null;
+    let timerToast = null;
 
     /* -------------------------------------------------------------------------
-       Inicialização ao carregar a página
+       Camada Única de Dados via API
     ------------------------------------------------------------------------- */
-    document.addEventListener('DOMContentLoaded', () => {
-      carregarProdutosDoArmazenamento();
+    function authHeaders() {
+      const token = sessionStorage.getItem(CHAVE_SESSAO);
+      const headers = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+        headers['X-Session-Token'] = token;
+      }
+      return headers;
+    }
+
+    async function request(caminho, opcoes = {}) {
+      const headersPadrao = authHeaders();
+      const headersCombinados = { ...headersPadrao, ...(opcoes.headers || {}) };
+      const config = { ...opcoes, headers: headersCombinados };
+
+      let resposta;
+      try {
+        resposta = await fetch(caminho, config);
+      } catch (erroRede) {
+        throw new Error(`Falha de conexão com o servidor: ${erroRede.message || 'rede inacessível'}`);
+      }
+
+      if (resposta.status === 401) {
+        sessionStorage.removeItem(CHAVE_SESSAO);
+        encerrarSessaoVisual('Sessão expirada ou não autorizada. Faça login novamente.');
+        throw new Error('Sessão expirada (401).');
+      }
+
+      if (!resposta.ok) {
+        let detalhe = '';
+        try {
+          const dadosErro = await resposta.json();
+          detalhe = dadosErro.mensagem || dadosErro.error || JSON.stringify(dadosErro);
+        } catch (_) {
+          detalhe = await resposta.text().catch(() => '');
+        }
+        throw new Error(`Erro HTTP ${resposta.status}: ${detalhe || resposta.statusText || 'Falha na requisição'}`);
+      }
+
+      const tipoConteudo = resposta.headers.get('content-type') || '';
+      if (tipoConteudo.includes('application/json')) {
+        return await resposta.json();
+      }
+      return await resposta.text();
+    }
+
+    async function carregarProdutos() {
+      const corpo = document.getElementById('tabela-produtos-corpo');
+      const avisoVazio = document.getElementById('lista-vazia-aviso');
+
+      try {
+        const dados = await request('/api/produtos', { method: 'GET' });
+        if (!Array.isArray(dados)) {
+          throw new Error('O formato retornado pelo servidor não é uma lista de produtos válida.');
+        }
+        produtos = dados;
+        avisoVazio.style.display = 'none';
+        atualizarContadoresEListas();
+      } catch (erro) {
+        produtos = [];
+        atualizarContadoresEListas();
+        corpo.innerHTML = '';
+        avisoVazio.style.display = 'block';
+        avisoVazio.textContent = `Erro ao carregar produtos do servidor: ${erro.message}`;
+        mostrarToast(`Erro ao carregar produtos: ${erro.message}`);
+      }
+    }
+
+    async function criarProduto(dados) {
+      return await request('/api/produtos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dados)
+      });
+    }
+
+    // Se o Worker não tiver a rota PUT, basta ajustar esta função para POST
+    async function atualizarProduto(id, dados) {
+      return await request(`/api/produtos/${encodeURIComponent(id)}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dados)
+      });
+    }
+
+    async function excluirProduto(id) {
+      return await request(`/api/produtos/${encodeURIComponent(id)}`, {
+        method: 'DELETE'
+      });
+    }
+
+    async function enviarProdutoParaServidor(dados, idExistente = null) {
+      if (idExistente) {
+        return await atualizarProduto(idExistente, dados);
+      }
+      return await criarProduto(dados);
+    }
+
+    async function excluirProdutoNoServidor(id) {
+      return await excluirProduto(id);
+    }
+
+    /* -------------------------------------------------------------------------
+       Upload de Fotos em FormData Binário
+    ------------------------------------------------------------------------- */
+    async function enviarFotoDataUrl(dataUrlOuArquivo, nomeArquivo = 'foto.jpg') {
+      let arquivoEnvio;
+
+      if (typeof dataUrlOuArquivo === 'string' && dataUrlOuArquivo.startsWith('data:')) {
+        const partes = dataUrlOuArquivo.split(',');
+        const mimeMatch = partes[0].match(/:(.*?);/);
+        const mime = mimeMatch ? mimeMatch[1] : 'image/jpeg';
+        const binario = atob(partes[1]);
+        let tamanho = binario.length;
+        const u8arr = new Uint8Array(tamanho);
+        while (tamanho--) {
+          u8arr[tamanho] = binario.charCodeAt(tamanho);
+        }
+        arquivoEnvio = new Blob([u8arr], { type: mime });
+      } else {
+        arquivoEnvio = dataUrlOuArquivo;
+      }
+
+      const formData = new FormData();
+      formData.append('file', arquivoEnvio, nomeArquivo);
+
+      const headers = authHeaders(); // fetch gerencia o multipart boundary sem Content-Type manual
+      let resposta;
+      try {
+        resposta = await fetch('/api/upload', {
+          method: 'POST',
+          headers,
+          body: formData
+        });
+      } catch (err) {
+        throw new Error(`Falha de conexão no upload: ${err.message || 'servidor inacessível'}`);
+      }
+
+      if (resposta.status === 401) {
+        sessionStorage.removeItem(CHAVE_SESSAO);
+        encerrarSessaoVisual('Sessão expirada durante o upload. Faça login novamente.');
+        throw new Error('Sessão expirada (401).');
+      }
+
+      if (!resposta.ok) {
+        let detalhe = '';
+        try {
+          const jsonErr = await resposta.json();
+          detalhe = jsonErr.mensagem || jsonErr.error || '';
+        } catch (_) {
+          detalhe = await resposta.text().catch(() => '');
+        }
+        throw new Error(`Erro HTTP ${resposta.status}: ${detalhe || 'Falha no envio da imagem'}`);
+      }
+
+      const resultado = await resposta.json();
+      return resultado.url || resultado.imagem || resultado.link || resultado;
+    }
+
+    function redimensionarImagemCanvas(file) {
+      return new Promise((resolve, reject) => {
+        try {
+          const leitor = new FileReader();
+          leitor.onload = (e) => {
+            try {
+              const img = new Image();
+              img.onload = () => {
+                try {
+                  const limite = 900;
+                  let largura = img.width;
+                  let altura = img.height;
+
+                  if (largura > limite || altura > limite) {
+                    if (largura > altura) {
+                      altura = Math.round((altura * limite) / largura);
+                      largura = limite;
+                    } else {
+                      largura = Math.round((largura * limite) / altura);
+                      altura = limite;
+                    }
+                  }
+
+                  const canvas = document.createElement('canvas');
+                  canvas.width = largura;
+                  canvas.height = altura;
+                  const ctx = canvas.getContext('2d');
+                  ctx.fillStyle = '#FFFFFF';
+                  ctx.fillRect(0, 0, largura, altura);
+                  ctx.drawImage(img, 0, 0, largura, altura);
+
+                  const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+                  resolve(dataUrl);
+                } catch (canvasErr) {
+                  reject(canvasErr);
+                }
+              };
+              img.onerror = () => reject(new Error('Falha ao decodificar arquivo de imagem.'));
+              img.src = e.target.result;
+            } catch (imgErr) {
+              reject(imgErr);
+            }
+          };
+          leitor.onerror = () => reject(new Error('Falha na leitura do arquivo de imagem.'));
+          leitor.readAsDataURL(file);
+        } catch (leitorErr) {
+          reject(leitorErr);
+        }
+      });
+    }
+
+    async function processarArquivosFotos(listaArquivos) {
+      mostrarToast('Otimizando e enviando fotos...');
+      for (const arquivo of Array.from(listaArquivos)) {
+        if (arquivo.type.startsWith('image/')) {
+          const itemFoto = {
+            preview: '',
+            url: '',
+            status: 'enviando',
+            nome: arquivo.name,
+            erro: null
+          };
+          fotosCarregadas.push(itemFoto);
+          renderizarMiniaturasFotos();
+
+          try {
+            const fotoComprimida = await redimensionarImagemCanvas(arquivo);
+            itemFoto.preview = fotoComprimida;
+            renderizarMiniaturasFotos();
+
+            const urlRemota = await enviarFotoDataUrl(fotoComprimida, arquivo.name);
+            itemFoto.url = urlRemota;
+            itemFoto.status = 'sucesso';
+          } catch (err) {
+            itemFoto.status = 'erro';
+            itemFoto.erro = err.message || 'Falha no envio';
+            mostrarToast(`Falha no envio de ${arquivo.name}: ${err.message}`);
+          }
+          renderizarMiniaturasFotos();
+        }
+      }
+    }
+
+    function renderizarMiniaturasFotos() {
+      const grade = document.getElementById('preview-fotos-grade');
+      grade.innerHTML = '';
+
+      if (indiceFotoCapa >= fotosCarregadas.length) {
+        indiceFotoCapa = 0;
+      }
+
+      fotosCarregadas.forEach((foto, index) => {
+        const card = document.createElement('div');
+        const ehCapa = index === indiceFotoCapa;
+        const urlVisual = typeof foto === 'string' ? foto : (foto.url || foto.preview);
+        const status = typeof foto === 'object' ? foto.status : 'sucesso';
+        const erroMsg = typeof foto === 'object' ? foto.erro : null;
+
+        card.className = `card-miniatura ${ehCapa ? 'is-capa' : ''}`;
+
+        let faixaStatus = '';
+        if (status === 'enviando') {
+          faixaStatus = '<div style="background: rgba(26,26,26,0.85); color: #FFFFFF; font-size: 0.75rem; padding: 0.25rem; text-align: center;">Enviando foto...</div>';
+        } else if (status === 'erro') {
+          faixaStatus = `<div style="background: var(--cor-erro); color: #FFFFFF; font-size: 0.7rem; padding: 0.25rem; text-align: center;">Falha: ${escapeHtml(erroMsg || 'Erro no envio')}</div>`;
+        }
+
+        card.innerHTML = `
+          ${ehCapa ? '<span class="selo-capa">Foto de Capa</span>' : ''}
+          <img src="${urlVisual || 'https://img.usecurling.com/p/130/130?q=fashion%20item'}" alt="Foto ${index + 1}">
+          ${faixaStatus}
+          <div class="miniatura-acoes">
+            ${!ehCapa && status === 'sucesso' ? `<button type="button" class="btn-mini btn-definir-capa" data-idx="${index}">Usar como capa</button>` : ''}
+            <button type="button" class="btn-mini btn-perigo btn-remover-foto" data-idx="${index}" style="width: 100%;">Remover</button>
+          </div>
+        `;
+
+        const btnCapa = card.querySelector('.btn-definir-capa');
+        if (btnCapa) {
+          btnCapa.addEventListener('click', () => {
+            indiceFotoCapa = index;
+            renderizarMiniaturasFotos();
+          });
+        }
+
+        const btnRemover = card.querySelector('.btn-remover-foto');
+        btnRemover.addEventListener('click', () => {
+          fotosCarregadas.splice(index, 1);
+          if (indiceFotoCapa >= fotosCarregadas.length) {
+            indiceFotoCapa = Math.max(0, fotosCarregadas.length - 1);
+          }
+          renderizarMiniaturasFotos();
+        });
+
+        grade.appendChild(card);
+      });
+    }
+
+    /* -------------------------------------------------------------------------
+       Inicialização da Interface
+    ------------------------------------------------------------------------- */
+    document.addEventListener('DOMContentLoaded', async () => {
       configurarEventosAutenticacao();
       configurarEventosAbas();
       configurarFormularioProduto();
@@ -1461,62 +1902,13 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
       configurarEventosFerramentas();
       configurarModais();
 
-      // Verificar sessão prévia
-      const sessaoAtiva = sessionStorage.getItem(CHAVE_SESSAO);
-      if (sessaoAtiva === 'true') {
+      const tokenExistente = sessionStorage.getItem(CHAVE_SESSAO);
+      if (tokenExistente) {
         exibirPainel();
+        await carregarProdutos();
       }
     });
 
-    /* -------------------------------------------------------------------------
-       Armazenamento e Estado
-    ------------------------------------------------------------------------- */
-
-
-    async function carregarProdutosDoArmazenamento() {
-      try {
-        const resposta = await fetch('/api/produtos');
-        produtos = resposta.ok ? await resposta.json() : [];
-      } catch (e) {
-        console.error('Falha ao carregar produtos', e);
-        produtos = [];
-      }
-      atualizarContadoresEListas();
-    }
-
-    function authHeaders(extra) {
-      const h = extra || {};
-      h['Authorization'] = 'Bearer ' + sessionStorage.getItem('lolita_senha');
-      return h;
-    }
-
-    async function enviarFotoDataUrl(dataUrl) {
-      const blob = await (await fetch(dataUrl)).blob();
-      const fd = new FormData();
-      fd.append('arquivo', blob, 'foto.jpg');
-      const resposta = await fetch('/api/upload', { method: 'POST', headers: authHeaders(), body: fd });
-      if (!resposta.ok) throw new Error('Falha no envio da foto');
-      const dados = await resposta.json();
-      return '/fotos/' + dados.chave;
-    }
-
-    async function enviarProdutoParaServidor(produto, fotoParaEnviar) {
-      if (fotoParaEnviar && fotoParaEnviar.startsWith('data:')) {
-        produto.imagem = await enviarFotoDataUrl(fotoParaEnviar);
-      }
-      await fetch('/api/produtos', {
-        method: 'POST',
-        headers: authHeaders({ 'Content-Type': 'application/json' }),
-        body: JSON.stringify(produto)
-      });
-    }
-
-    async function excluirProdutoNoServidor(id) {
-      await fetch('/api/produtos/' + encodeURIComponent(id), { method: 'DELETE', headers: authHeaders() });
-    }
-    function salvarProdutosNoArmazenamento() {
-      atualizarContadoresEListas();
-    }
     function atualizarContadoresEListas() {
       document.getElementById('contagem-aba-produtos').textContent = produtos.length;
       document.getElementById('contador-lista-total').textContent = produtos.length;
@@ -1542,52 +1934,87 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
         btnMostrarSenha.textContent = ehSenha ? 'Ocultar' : 'Mostrar';
       });
 
-       
-          if (!resposta.ok) {
+      formLogin.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        msgErro.textContent = '';
+
+        const valor = campoSenha.value.trim();
+        if (!valor) {
+          msgErro.textContent = 'Informe a senha de acesso.';
+          return;
+        }
+
+        btnEntrar.disabled = true;
+        btnEntrar.textContent = 'Validando credencial...';
+
+        try {
+          const resposta = await fetch('/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ senha: valor })
+          });
+
+          if (resposta.ok) {
+            let dados = {};
+            try {
+              dados = await resposta.json();
+            } catch (_) {}
+
+            const token = dados.token || dados.sessao || valor;
+            sessionStorage.setItem(CHAVE_SESSAO, token);
+            tentativasLoginErradas = 0;
+            campoSenha.value = '';
+            exibirPainel();
+            await carregarProdutos();
+            mostrarToast('Acesso autorizado ao painel administrativo.');
+          } else {
             tentativasLoginErradas++;
             campoSenha.value = '';
             campoSenha.focus();
+
+            let mensagemFalha = 'Senha incorreta. Verifique as maiúsculas e caracteres.';
+            try {
+              const dadosErr = await resposta.json();
+              mensagemFalha = dadosErr.mensagem || dadosErr.error || mensagemFalha;
+            } catch (_) {}
+
             if (tentativasLoginErradas >= 5) {
               bloquearTentativasLogin(btnEntrar, msgErro);
             } else {
-              msgErro.textContent = 'Senha incorreta. Verifique as maiúsculas e caracteres.';
+              msgErro.textContent = mensagemFalha;
             }
-            return;
           }
-
-          tentativasLoginErradas = 0;
-          sessionStorage.setItem(CHAVE_SESSAO, 'true');
-          sessionStorage.setItem('lolita_senha', valor);
-          campoSenha.value = '';
-          exibirPainel();
-          mostrarToast('Acesso autorizado ao painel administrativo.');
-        } catch (erro) {
-          msgErro.textContent = 'Erro de conexão. Tente novamente.';
+        } catch (erroConexao) {
+          msgErro.textContent = `Falha de conexão com o servidor de login: ${erroConexao.message}`;
+        } finally {
+          if (tentativasLoginErradas < 5) {
+            btnEntrar.disabled = false;
+            btnEntrar.textContent = 'Entrar no sistema';
+          }
         }
       });
 
-      
-
       btnSair.addEventListener('click', () => {
-        sessionStorage.removeItem(CHAVE_SESSAO);
-        document.getElementById('secao-painel').style.display = 'none';
-        document.getElementById('topo-acoes-autenticado').style.display = 'none';
-        document.getElementById('secao-login').style.display = 'flex';
-        mostrarToast('Sessão encerrada com sucesso.');
+        encerrarSessaoVisual('Sessão encerrada com sucesso.');
       });
     }
 
     function bloquearTentativasLogin(botao, elMensagem) {
       botao.disabled = true;
       let segundosRestantes = 30;
-
       elMensagem.textContent = `Muitas tentativas sem sucesso. Aguarde ${segundosRestantes} segundos.`;
+
+      if (bloqueioTemporizador) {
+        clearInterval(bloqueioTemporizador);
+      }
 
       bloqueioTemporizador = setInterval(() => {
         segundosRestantes--;
         if (segundosRestantes <= 0) {
           clearInterval(bloqueioTemporizador);
+          bloqueioTemporizador = null;
           botao.disabled = false;
+          botao.textContent = 'Entrar no sistema';
           tentativasLoginErradas = 0;
           elMensagem.textContent = '';
         } else {
@@ -1601,6 +2028,16 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
       document.getElementById('secao-painel').style.display = 'block';
       document.getElementById('topo-acoes-autenticado').style.display = 'flex';
       alternarAba('tab-btn-novo');
+    }
+
+    function encerrarSessaoVisual(mensagem = 'Sessão encerrada.') {
+      sessionStorage.removeItem(CHAVE_SESSAO);
+      document.getElementById('secao-painel').style.display = 'none';
+      document.getElementById('topo-acoes-autenticado').style.display = 'none';
+      document.getElementById('secao-login').style.display = 'flex';
+      if (mensagem) {
+        mostrarToast(mensagem);
+      }
     }
 
     /* -------------------------------------------------------------------------
@@ -1634,7 +2071,7 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
     }
 
     /* -------------------------------------------------------------------------
-       Formulário de Produto: Cores, Tamanhos, Fotos, Validação e Envio
+       Formulário de Produto: Validação e Envio
     ------------------------------------------------------------------------- */
     function configurarFormularioProduto() {
       const form = document.getElementById('form-produto');
@@ -1644,12 +2081,10 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
       const btnLimpar = document.getElementById('btn-limpar-form');
       const btnCancelarEdicao = document.getElementById('btn-cancelar-edicao');
 
-      // Contador de caracteres na descrição
       descInput.addEventListener('input', () => {
         contadorDesc.textContent = descInput.value.length;
       });
 
-      // Alternância entre grades de tamanho (letras vs números)
       const radioLetras = document.getElementById('radio-grade-letras');
       const radioNumeros = document.getElementById('radio-grade-numeros');
       const gradeLetras = document.getElementById('grade-letras-box');
@@ -1665,32 +2100,25 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
         gradeNumeros.style.display = 'flex';
       });
 
-      // Cores dinâmicas
       btnAddCor.addEventListener('click', () => {
         adicionarLinhaCor('', '#FAF7F2');
       });
 
-      // Inicializar com uma cor padrão
       adicionarLinhaCor('Rosa Antigo', '#E8B7B0');
-
-      // Dropzone e Upload de Fotos
       configurarUploadFotos();
 
-      // Botão Limpar Campos
       btnLimpar.addEventListener('click', () => {
         limparFormularioProduto();
       });
 
-      // Botão Cancelar Edição
       btnCancelarEdicao.addEventListener('click', () => {
         limparFormularioProduto();
         alternarAba('tab-btn-lista');
       });
 
-      // Submissão do Formulário
-      form.addEventListener('submit', (e) => {
+      form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        processarSalvarProduto() {;
+        await processarSalvarProduto();
       });
     }
 
@@ -1776,112 +2204,7 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
       });
     }
 
-    /*
-      Redimensionamento em Canvas:
-      As imagens são limitadas a no máximo 900px de largura ou altura,
-      gerando dados comprimidos em JPEG (qualidade 0.85) para armazenamento no localStorage.
-    */
-    function redimensionarImagemCanvas(file) {
-      return new Promise((resolve, reject) => {
-        const leitor = new FileReader();
-        leitor.onload = (e) => {
-          const img = new Image();
-          img.onload = () => {
-            const limite = 900;
-            let largura = img.width;
-            let altura = img.height;
-
-            if (largura > limite || altura > limite) {
-              if (largura > altura) {
-                altura = Math.round((altura * limite) / largura);
-                largura = limite;
-              } else {
-                largura = Math.round((largura * limite) / altura);
-                altura = limite;
-              }
-            }
-
-            const canvas = document.createElement('canvas');
-            canvas.width = largura;
-            canvas.height = altura;
-            const ctx = canvas.getContext('2d');
-            ctx.fillStyle = '#FFFFFF';
-            ctx.fillRect(0, 0, largura, altura);
-            ctx.drawImage(img, 0, 0, largura, altura);
-
-            const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-            resolve(dataUrl);
-          };
-          img.onerror = reject;
-          img.src = e.target.result;
-        };
-        leitor.onerror = reject;
-        leitor.readAsDataURL(file);      
-      });
-    }
-
-    async function processarArquivosFotos(listaArquivos) {
-      mostrarToast('Otimizando fotos selecionadas...');
-      for (const arquivo of Array.from(listaArquivos)) {
-        if (arquivo.type.startsWith('image/')) {
-          try {
-            const fotoComprimida = await redimensionarImagemCanvas(arquivo);
-            fotosCarregadas.push(fotoComprimida);
-          } catch (err) {
-            console.error('Falha ao processar arquivo de foto', err);
-          }
-        }
-      }
-      renderizarMiniaturasFotos();
-    }
-
-    function renderizarMiniaturasFotos() {
-      const grade = document.getElementById('preview-fotos-grade');
-      grade.innerHTML = '';
-
-      if (indiceFotoCapa >= fotosCarregadas.length) {
-        indiceFotoCapa = 0;
-      }
-
-      fotosCarregadas.forEach((fotoDataUrl, index) => {
-        const card = document.createElement('div');
-        const ehCapa = index === indiceFotoCapa;
-        card.className = `card-miniatura ${ehCapa ? 'is-capa' : ''}`;
-
-        card.innerHTML = `
-          ${ehCapa ? '<span class="selo-capa">Foto de Capa</span>' : ''}
-          <img src="${fotoDataUrl}" alt="Miniatura ${index + 1}">
-          <div class="miniatura-acoes">
-            ${!ehCapa ? `<button type="button" class="btn-mini btn-definir-capa" data-idx="${index}">Usar como capa</button>` : ''}
-            <button type="button" class="btn-mini btn-perigo btn-remover-foto" data-idx="${index}" style="width: 100%;">Remover</button>
-          </div>
-        `;
-
-        const btnCapa = card.querySelector('.btn-definir-capa');
-        if (btnCapa) {
-          btnCapa.addEventListener('click', () => {
-            indiceFotoCapa = index;
-            renderizarMiniaturasFotos();
-          });
-        }
-
-        const btnRemover = card.querySelector('.btn-remover-foto');
-        btnRemover.addEventListener('click', () => {
-          fotosCarregadas.splice(index, 1);
-          if (indiceFotoCapa >= fotosCarregadas.length) {
-            indiceFotoCapa = Math.max(0, fotosCarregadas.length - 1);
-          }
-          renderizarMiniaturasFotos();
-        });
-
-        grade.appendChild(card);
-      });
-    }
-
-    /*
-      Validação Completa de Campos
-    */
-   async function processarSalvarProduto() {
+    async function processarSalvarProduto() {
       limparErrosVisuais();
 
       const campoNome = document.getElementById('prod-nome');
@@ -1892,11 +2215,11 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
       const checkNovidade = document.getElementById('check-novidade');
       const checkDestaque = document.getElementById('check-destaque');
       const idEmEdicao = document.getElementById('produto-id-edicao').value;
+      const btnSalvar = document.getElementById('btn-salvar-produto');
 
       let valido = true;
       let primeiroInvalido = null;
 
-      // 1. Nome do produto
       const nomeVal = campoNome.value.trim();
       if (!nomeVal) {
         marcarErro('prod-nome', 'Informe o nome do produto.');
@@ -1908,7 +2231,6 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
         if (!primeiroInvalido) primeiroInvalido = campoNome;
       }
 
-      // 2. Código do produto
       const codigoVal = campoCodigo.value.trim().toUpperCase();
       const regexCodigo = /^[A-Z0-9-]+$/i;
       if (!codigoVal) {
@@ -1920,8 +2242,7 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
         valido = false;
         if (!primeiroInvalido) primeiroInvalido = campoCodigo;
       } else {
-        // Verificar duplicidade de código
-        const codigoExiste = produtos.some(p => p.codigo.toUpperCase() === codigoVal && p.id !== idEmEdicao);
+        const codigoExiste = produtos.some(p => p.codigo && p.codigo.toUpperCase() === codigoVal && p.id !== idEmEdicao);
         if (codigoExiste) {
           marcarErro('prod-codigo', 'Este código já está em uso em outro produto cadastrado.');
           valido = false;
@@ -1929,7 +2250,6 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
         }
       }
 
-      // 3. Categoria
       const catVal = campoCategoria.value;
       if (!catVal) {
         marcarErro('prod-categoria', 'Selecione uma categoria.');
@@ -1937,7 +2257,6 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
         if (!primeiroInvalido) primeiroInvalido = campoCategoria;
       }
 
-      // 4. Preço
       let precoNumerico = 0;
       const precoTexto = campoPreco.value.trim().replace('R$', '').replace(/\s/g, '').replace('.', '').replace(',', '.');
       const parsePreco = parseFloat(precoTexto);
@@ -1949,7 +2268,6 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
         precoNumerico = parsePreco;
       }
 
-      // 5. Cores disponíveis
       const coresSelecionadas = obterCoresFormulario();
       if (coresSelecionadas.length === 0) {
         document.getElementById('erro-prod-cores').textContent = 'Defina e informe o nome de ao menos uma cor.';
@@ -1957,7 +2275,6 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
         if (!primeiroInvalido) primeiroInvalido = document.querySelector('.campo-nome-cor');
       }
 
-      // 6. Tamanhos
       const tamanhosSelecionados = obterTamanhosSelecionados();
       if (tamanhosSelecionados.length === 0) {
         document.getElementById('erro-prod-tamanhos').textContent = 'Selecione ao menos um tamanho na grade.';
@@ -1965,9 +2282,14 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
         if (!primeiroInvalido) primeiroInvalido = document.getElementById('grade-letras-box');
       }
 
-      // 7. Fotos
-      if (fotosCarregadas.length === 0) {
-        document.getElementById('erro-prod-fotos').textContent = 'Carregue ao menos uma foto do produto.';
+      // Fotos válidas disponíveis
+      const fotosValidas = fotosCarregadas.filter(f => {
+        if (typeof f === 'string') return Boolean(f);
+        return f.status === 'sucesso' && Boolean(f.url);
+      });
+
+      if (fotosValidas.length === 0) {
+        document.getElementById('erro-prod-fotos').textContent = 'Carregue ao menos uma foto do produto já enviada com sucesso.';
         valido = false;
         if (!primeiroInvalido) primeiroInvalido = document.getElementById('dropzone-fotos');
       }
@@ -1979,53 +2301,38 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
         return;
       }
 
-      // Foto de capa selecionada
-      const fotoCapaFinal = fotosCarregadas[indiceFotoCapa] || fotosCarregadas[0];
+      const fotoEscolhida = fotosValidas[indiceFotoCapa] || fotosValidas[0];
+      const urlFotoCapa = typeof fotoEscolhida === 'string' ? fotoEscolhida : fotoEscolhida.url;
 
-      if (idEmEdicao) {
-        // Atualizar produto existente
-            const produtoAtualizado = {
-            ...produtos[index],
-            nome: nomeVal,
-            codigo: codigoVal,
-            categoria: catVal,
-            preco: precoNumerico,
-            descricao: campoDescricao.value.trim(),
-            cores: coresSelecionadas,
-            tamanhos: tamanhosSelecionados,
-            imagem: fotoCapaFinal,
-            novo: checkNovidade.checked,
-            destaque: checkDestaque.checked
-          };
-          await enviarProdutoParaServidor(produtoAtualizado, fotoCapaFinal);
-          produtos[index] = produtoAtualizado;
-          mostrarToast('Alterações salvas com sucesso.');
-        
-       }
-      else {
-        // Criar novo produto
-        const novoItem = {
-          id: 'prod-' + Date.now(),
-          codigo: codigoVal,
-          nome: nomeVal,
-          categoria: catVal,
-          preco: precoNumerico,
-          descricao: campoDescricao.value.trim(),
-          cores: coresSelecionadas,
-          tamanhos: tamanhosSelecionados,
-          imagem: fotoCapaFinal,
-          novo: checkNovidade.checked,
-          destaque: checkDestaque.checked,
-          criadoEm: new Date().toISOString()
-        };
-        await enviarProdutoParaServidor(novoItem, fotoCapaFinal);
-        produtos.unshift(novoItem);
-        mostrarToast('Produto cadastrado com sucesso no catálogo.');
+      const payloadProduto = {
+        nome: nomeVal,
+        codigo: codigoVal,
+        categoria: catVal,
+        preco: precoNumerico,
+        descricao: campoDescricao.value.trim(),
+        cores: coresSelecionadas,
+        tamanhos: tamanhosSelecionados,
+        imagem: urlFotoCapa,
+        novo: checkNovidade.checked,
+        destaque: checkDestaque.checked
+      };
+
+      const textoBotaoOriginal = btnSalvar.textContent;
+      btnSalvar.disabled = true;
+      btnSalvar.textContent = 'Salvando no servidor...';
+
+      try {
+        await enviarProdutoParaServidor(payloadProduto, idEmEdicao || null);
+        mostrarToast(idEmEdicao ? 'Produto atualizado com sucesso no catálogo.' : 'Produto cadastrado com sucesso no catálogo.');
+        limparFormularioProduto();
+        await carregarProdutos();
+        alternarAba('tab-btn-lista');
+      } catch (erroSalvar) {
+        mostrarToast(`Erro ao salvar produto: ${erroSalvar.message}`);
+      } finally {
+        btnSalvar.disabled = false;
+        btnSalvar.textContent = textoBotaoOriginal;
       }
-
-      salvarProdutosNoArmazenamento();
-      limparFormularioProduto();
-      alternarAba('tab-btn-lista');
     }
 
     function marcarErro(idCampo, mensagem) {
@@ -2049,17 +2356,14 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
       document.getElementById('btn-salvar-produto').textContent = 'Salvar produto';
       document.getElementById('btn-cancelar-edicao').style.display = 'none';
 
-      // Resetar cores
       const containerCores = document.getElementById('container-linhas-cores');
       containerCores.innerHTML = '';
       adicionarLinhaCor('Rosa Antigo', '#E8B7B0');
 
-      // Resetar fotos
       fotosCarregadas = [];
       indiceFotoCapa = 0;
       renderizarMiniaturasFotos();
 
-      // Resetar tamanhos
       document.querySelectorAll('input[name="tam-opcao"]').forEach(cb => cb.checked = false);
       document.getElementById('radio-grade-letras').checked = true;
       document.getElementById('grade-letras-box').style.display = 'flex';
@@ -2101,7 +2405,6 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
 
       corpo.innerHTML = '';
 
-      // Filtros em tempo real por nome e codigo (insensivel a maiusculas/minusculas e espacos)
       let filtrados = produtos.filter(p => {
         const nomeAlvo = (p.nome || '').toLowerCase();
         const codigoAlvo = (p.codigo || '').trim().toLowerCase();
@@ -2110,12 +2413,10 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
         return bateTermo && bateCat;
       });
 
-      // Ordenação
       filtrados.sort((a, b) => {
-        if (ordemFiltro === 'nome-asc') return a.nome.localeCompare(b.nome);
-        if (ordemFiltro === 'preco-asc') return a.preco - b.preco;
-        if (ordemFiltro === 'preco-desc') return b.preco - a.preco;
-        // Padrão recente
+        if (ordemFiltro === 'nome-asc') return (a.nome || '').localeCompare(b.nome || '');
+        if (ordemFiltro === 'preco-asc') return (a.preco || 0) - (b.preco || 0);
+        if (ordemFiltro === 'preco-desc') return (b.preco || 0) - (a.preco || 0);
         return new Date(b.criadoEm || 0) - new Date(a.criadoEm || 0);
       });
 
@@ -2123,6 +2424,7 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
 
       if (filtrados.length === 0) {
         avisoVazio.style.display = 'block';
+        avisoVazio.textContent = 'Nenhum produto encontrado para essa busca';
         return;
       }
       avisoVazio.style.display = 'none';
@@ -2130,21 +2432,19 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
       filtrados.forEach(prod => {
         const tr = document.createElement('tr');
 
-        // Bolinhas de cor
         const coresHtml = (prod.cores || []).map(c => 
           `<span class="bolinha-cor-lista" style="background-color: ${c.hex};" title="${escapeHtml(c.nome)}"></span>`
         ).join('');
 
-        // Tamanhos
         const tamanhosTexto = (prod.tamanhos || []).join(', ');
 
-        // Badges de Status
         let badgesHtml = '';
         if (prod.novo) badgesHtml += '<span class="badge-status badge-novidade">Novidade</span>';
         if (prod.destaque) badgesHtml += '<span class="badge-status badge-destaque">Destaque</span>';
         if (!badgesHtml) badgesHtml = '<span style="color: var(--text-muted); font-size: 0.8125rem;">Normal</span>';
 
-        const precoFormatado = prod.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        const valorNumerico = typeof prod.preco === 'number' ? prod.preco : parseFloat(prod.preco) || 0;
+        const precoFormatado = valorNumerico.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
         tr.innerHTML = `
           <td class="td-capa">
@@ -2154,8 +2454,8 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
             <strong>${escapeHtml(prod.nome)}</strong>
             ${prod.descricao ? `<div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem;">${escapeHtml(prod.descricao.substring(0, 60))}${prod.descricao.length > 60 ? '...' : ''}</div>` : ''}
           </td>
-          <td><code>${escapeHtml(prod.codigo)}</code></td>
-          <td>${escapeHtml(prod.categoria)}</td>
+          <td><code>${escapeHtml(prod.codigo || '-')}</code></td>
+          <td>${escapeHtml(prod.categoria || '-')}</td>
           <td><strong>${precoFormatado}</strong></td>
           <td>${coresHtml}</td>
           <td><span style="font-size: 0.85rem;">${tamanhosTexto}</span></td>
@@ -2188,17 +2488,17 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
       document.getElementById('btn-salvar-produto').textContent = 'Salvar alterações';
       document.getElementById('btn-cancelar-edicao').style.display = 'inline-block';
 
-      document.getElementById('prod-nome').value = prod.nome;
-      document.getElementById('prod-codigo').value = prod.codigo;
-      document.getElementById('prod-categoria').value = prod.categoria;
-      document.getElementById('prod-preco').value = prod.preco.toFixed(2).replace('.', ',');
+      document.getElementById('prod-nome').value = prod.nome || '';
+      document.getElementById('prod-codigo').value = prod.codigo || '';
+      document.getElementById('prod-categoria').value = prod.categoria || '';
+      const precoNum = typeof prod.preco === 'number' ? prod.preco : parseFloat(prod.preco) || 0;
+      document.getElementById('prod-preco').value = precoNum.toFixed(2).replace('.', ',');
       document.getElementById('prod-descricao').value = prod.descricao || '';
       document.getElementById('contador-desc').textContent = (prod.descricao || '').length;
 
-      document.getElementById('check-novidade').checked = !!prod.novo;
-      document.getElementById('check-destaque').checked = !!prod.destaque;
+      document.getElementById('check-novidade').checked = Boolean(prod.novo);
+      document.getElementById('check-destaque').checked = Boolean(prod.destaque);
 
-      // Cores
       const containerCores = document.getElementById('container-linhas-cores');
       containerCores.innerHTML = '';
       if (prod.cores && prod.cores.length > 0) {
@@ -2207,7 +2507,6 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
         adicionarLinhaCor('', '#FAF7F2');
       }
 
-      // Tamanhos
       const usaNumeros = (prod.tamanhos || []).some(t => /^\d+$/.test(t));
       if (usaNumeros) {
         document.getElementById('radio-grade-numeros').checked = true;
@@ -2224,9 +2523,13 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
         if (cb) cb.checked = true;
       });
 
-      // Foto
       if (prod.imagem) {
-        fotosCarregadas = [prod.imagem];
+        fotosCarregadas = [{
+          url: prod.imagem,
+          preview: prod.imagem,
+          status: 'sucesso',
+          nome: 'Capa atual'
+        }];
         indiceFotoCapa = 0;
         renderizarMiniaturasFotos();
       }
@@ -2235,35 +2538,43 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    function duplicarProduto(idProduto) {
+    async function duplicarProduto(idProduto) {
       const original = produtos.find(p => p.id === idProduto);
       if (!original) return;
 
-      let novoCodigo = original.codigo + '-COP';
+      let novoCodigo = (original.codigo || 'COD') + '-COP';
       let contador = 1;
       while (produtos.some(p => p.codigo === novoCodigo)) {
         contador++;
-        novoCodigo = `${original.codigo}-COP${contador}`;
+        novoCodigo = `${original.codigo || 'COD'}-COP${contador}`;
       }
 
       const copia = {
-        ...JSON.parse(JSON.stringify(original)),
-        id: 'prod-' + Date.now(),
-        codigo: novoCodigo,
         nome: original.nome + ' (Cópia)',
-        criadoEm: new Date().toISOString()
+        codigo: novoCodigo,
+        categoria: original.categoria,
+        preco: Number(original.preco) || 0,
+        tamanhos: original.tamanhos || [],
+        cores: original.cores || [],
+        descricao: original.descricao || '',
+        imagem: original.imagem || '',
+        novo: Boolean(original.novo),
+        destaque: Boolean(original.destaque)
       };
 
-      produtos.unshift(copia);
-      salvarProdutosNoArmazenamento();
-      mostrarToast(`Produto duplicado com código ${novoCodigo}`);
+      try {
+        await criarProduto(copia);
+        mostrarToast(`Produto duplicado no servidor: ${novoCodigo}`);
+        await carregarProdutos();
+      } catch (erro) {
+        mostrarToast(`Erro ao duplicar produto: ${erro.message}`);
+      }
     }
 
     /* -------------------------------------------------------------------------
        Ferramentas: Exportar/Importar, KPIs e WhatsApp
     ------------------------------------------------------------------------- */
     function configurarEventosFerramentas() {
-      // Exportar JSON
       document.getElementById('btn-exportar-json').addEventListener('click', () => {
         const dadosExport = produtos.map(p => ({
           id: p.id,
@@ -2275,8 +2586,8 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
           cores: p.cores,
           descricao: p.descricao,
           imagem: p.imagem,
-          destaque: !!p.destaque,
-          novo: !!p.novo
+          destaque: Boolean(p.destaque),
+          novo: Boolean(p.novo)
         }));
 
         const jsonStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dadosExport, null, 2));
@@ -2290,32 +2601,30 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
         mostrarToast('Arquivo JSON exportado com sucesso.');
       });
 
-      // Importar JSON
       const inputImport = document.getElementById('input-importar-json');
       inputImport.addEventListener('change', (e) => {
         const arquivo = e.target.files[0];
         if (!arquivo) return;
 
         const leitor = new FileReader();
-        leitor.onload = (evento) => {
+        leitor.onload = async (evento) => {
           try {
             const importados = JSON.parse(evento.target.result);
             if (!Array.isArray(importados)) {
-              throw new Error('O arquivo não contém uma lista de produtos válida.');
+              throw new Error('O arquivo não contém uma lista válida de produtos.');
             }
 
-            // Validar itens mínimos
+            mostrarToast('Importando produtos para o servidor...');
             let adicionados = 0;
-            importados.forEach(item => {
+
+            for (const item of importados) {
               if (item.nome && item.preco && item.categoria) {
-                // Ajustar se código já existir
                 let cod = item.codigo || 'IMP-' + Math.floor(Math.random() * 900);
                 if (produtos.some(p => p.codigo === cod)) {
                   cod += '-IMP';
                 }
 
-                produtos.unshift({
-                  id: item.id || 'prod-' + Date.now() + Math.random().toString(36).substr(2, 4),
+                await criarProduto({
                   codigo: cod,
                   nome: item.nome,
                   categoria: item.categoria,
@@ -2324,26 +2633,24 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
                   cores: Array.isArray(item.cores) ? item.cores : [{ nome: "Padrão", hex: "#1A1A1A" }],
                   descricao: item.descricao || "",
                   imagem: item.imagem || "",
-                  destaque: !!item.destaque,
-                  novo: !!item.novo,
-                  criadoEm: new Date().toISOString()
+                  destaque: Boolean(item.destaque),
+                  novo: Boolean(item.novo)
                 });
                 adicionados++;
               }
-            });
+            }
 
-            salvarProdutosNoArmazenamento();
-            mostrarToast(`${adicionados} produtos importados com sucesso.`);
+            await carregarProdutos();
+            mostrarToast(`${adicionados} produtos importados com sucesso para o servidor.`);
             inputImport.value = '';
           } catch (erro) {
-            mostrarToast('Erro ao importar JSON: formato de arquivo inválido.');
+            mostrarToast(`Erro ao importar JSON: ${erro.message}`);
             inputImport.value = '';
           }
         };
         leitor.readAsText(arquivo);
       });
 
-      // Gerador WhatsApp
       const selectWhats = document.getElementById('select-prod-whatsapp');
       const areaWhats = document.getElementById('texto-whatsapp-preview');
       const btnCopiarWhats = document.getElementById('btn-copiar-whatsapp');
@@ -2357,7 +2664,8 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
 
         const p = produtos.find(item => item.id === idProd);
         if (p) {
-          const valorFmt = p.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+          const precoNum = typeof p.preco === 'number' ? p.preco : parseFloat(p.preco) || 0;
+          const valorFmt = precoNum.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
           const coresNomes = (p.cores || []).map(c => c.nome).join(', ');
           const tamanhosTxt = (p.tamanhos || []).join(', ');
 
@@ -2384,7 +2692,7 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
       document.getElementById('kpi-total-novidades').textContent = produtos.filter(p => p.novo).length;
       document.getElementById('kpi-total-destaques').textContent = produtos.filter(p => p.destaque).length;
 
-      const categoriasUnicas = new Set(produtos.map(p => p.categoria));
+      const categoriasUnicas = new Set(produtos.map(p => p.categoria).filter(Boolean));
       document.getElementById('kpi-total-categorias').textContent = categoriasUnicas.size;
     }
 
@@ -2394,7 +2702,7 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
       produtos.forEach(p => {
         const opt = document.createElement('option');
         opt.value = p.id;
-        opt.textContent = `${p.codigo} - ${p.nome}`;
+        opt.textContent = `${p.codigo || ''} - ${p.nome}`;
         select.appendChild(opt);
       });
     }
@@ -2408,18 +2716,26 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
       const btnConfExclusao = document.getElementById('btn-confirmar-exclusao');
 
       btnCancExclusao.addEventListener('click', () => fecharModal(modalExclusao));
-      btnConfExclusao.addEventListener('click', () => {
-        if (idProdutoExclusaoAlvo) {
-          produtos = produtos.filter(p => p.id !== idProdutoExclusaoAlvo);
-          excluirProdutoNoServidor(idProdutoExclusaoAlvo);
-          salvarProdutosNoArmazenamento();
-          mostrarToast('Produto removido do catálogo com sucesso.');
+      btnConfExclusao.addEventListener('click', async () => {
+        if (!idProdutoExclusaoAlvo) return;
+
+        btnConfExclusao.disabled = true;
+        btnConfExclusao.textContent = 'Excluindo...';
+
+        try {
+          await excluirProdutoNoServidor(idProdutoExclusaoAlvo);
+          mostrarToast('Produto removido com sucesso do servidor.');
           fecharModal(modalExclusao);
           idProdutoExclusaoAlvo = null;
+          await carregarProdutos();
+        } catch (erroExcluir) {
+          mostrarToast(`Erro ao excluir produto: ${erroExcluir.message}`);
+        } finally {
+          btnConfExclusao.disabled = false;
+          btnConfExclusao.textContent = 'Excluir produto';
         }
       });
 
-      // Limpeza Geral
       const modalLimpeza = document.getElementById('modal-confirmar-limpeza');
       const btnAbrirLimpeza = document.getElementById('btn-abrir-limpeza-geral');
       const btnCancLimpeza = document.getElementById('btn-cancelar-limpeza');
@@ -2438,14 +2754,27 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
 
       btnCancLimpeza.addEventListener('click', () => fecharModal(modalLimpeza));
 
-      btnExecLimpeza.addEventListener('click', () => {
-        produtos = [];
-        salvarProdutosNoArmazenamento();
-        fecharModal(modalLimpeza);
-        mostrarToast('Todos os produtos foram removidos do catálogo.');
+      btnExecLimpeza.addEventListener('click', async () => {
+        btnExecLimpeza.disabled = true;
+        btnExecLimpeza.textContent = 'Apagando no servidor...';
+
+        try {
+          const listaAtual = [...produtos];
+          for (const item of listaAtual) {
+            await excluirProdutoNoServidor(item.id);
+          }
+          fecharModal(modalLimpeza);
+          mostrarToast('Todos os produtos foram removidos do servidor.');
+          await carregarProdutos();
+        } catch (erroLimpeza) {
+          mostrarToast(`Erro durante a exclusão geral: ${erroLimpeza.message}`);
+          await carregarProdutos();
+        } finally {
+          btnExecLimpeza.disabled = false;
+          btnExecLimpeza.textContent = 'Apagar tudo';
+        }
       });
 
-      // Fechar modais ao pressionar ESC
       window.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
           fecharModal(modalExclusao);
@@ -2473,7 +2802,6 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
     /* -------------------------------------------------------------------------
        Utilitários: Toast e Escape
     ------------------------------------------------------------------------- */
-    let timerToast = null;
     function mostrarToast(mensagem) {
       const toast = document.getElementById('toast-notificacao');
       toast.textContent = mensagem;
@@ -2532,6 +2860,7 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
   }
   function frame(el, w, h) {
     var svg = svgEl("svg", { viewBox: "0 0 " + w + " " + h, role: "img" });
+    el = resolve(el);
     el.innerHTML = "";
     el.appendChild(svg);
     return svg;
@@ -2615,6 +2944,10 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
   function donut(el, cfg) {
     var W = 320, H = 280, cx = W / 2, cy = H / 2, R = 92, r = 58;
     var svg = frame(el, W, H);
+    // At 100% of a wide container the donut outgrows the height pages give
+    // the box and spills over the next section: keep it at its own size.
+    svg.style.maxWidth = W + "px";
+    svg.style.margin = "0 auto";
     var total = cfg.values.reduce(function (a, b) { return a + b; }, 0) || 1;
     var palette = cfg.colors || [accent(), "#1baf7a", "#eda100", "#e34948", "#4a3aa7", "#e87ba4"];
     var a0 = -Math.PI / 2;
@@ -2637,8 +2970,388 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
     svg.appendChild(center);
   }
 
+  // ---- Page building blocks: what dashboards and small systems kept
+  // re-implementing — a searchable sortable table, a KPI row, tabs, toasts,
+  // dialogs, saved state and mock data. Every call is opt-in, so a page that
+  // brings its own versions keeps them.
+
+  function resolve(target) {
+    return typeof target === "string" ? document.querySelector(target) : target;
+  }
+
+  function node(tag, className, text) {
+    var el = document.createElement(tag);
+    if (className) el.className = className;
+    if (text != null) el.textContent = text;
+    return el;
+  }
+
+  function isNumberColumn(col) {
+    return col.align === "right" || col.format === "num" || col.format === "brl" || col.format === "pct";
+  }
+
+  function cellText(col, row) {
+    var value = row[col.key];
+    if (value == null) return "";
+    return col.format ? coerceFormat(col.format)(value) : String(value);
+  }
+
+  function compareValues(a, b) {
+    if (typeof a === "number" && typeof b === "number") return a - b;
+    return String(a == null ? "" : a).localeCompare(String(b == null ? "" : b), "pt-BR", { numeric: true });
+  }
+
+  // table(el, {columns, rows, search?, pageSize?, empty?, onRowClick?}) — a
+  // table.shell-table with sortable headers, an optional search box and
+  // pager. A column is {key, label, format?, align?, sortable? (true),
+  // render?(value, row) returning a Node or an HTML string — the page writes
+  // its cell templates as markup}. Plain values are always set as text.
+  // Returns {setRows, rows}.
+  function table(target, cfg) {
+    var root = resolve(target);
+    var cols = cfg.columns || [];
+    var pageSize = cfg.pageSize || 0;
+    var state = { rows: (cfg.rows || []).slice(), query: "", key: null, dir: 1, page: 0 };
+    root.innerHTML = "";
+    if (cfg.search) {
+      var search = node("input", "input skip-table-search");
+      search.type = "search";
+      search.placeholder = typeof cfg.search === "string" ? cfg.search : "Buscar…";
+      search.setAttribute("aria-label", search.placeholder);
+      search.addEventListener("input", function () {
+        state.query = search.value.trim().toLowerCase();
+        state.page = 0;
+        draw();
+      });
+      root.appendChild(search);
+    }
+    var tableEl = node("table", "shell-table");
+    var headRow = node("tr");
+    var heads = cols.map(function (col) {
+      var th = node("th", isNumberColumn(col) ? "num" : "", col.label == null ? col.key : col.label);
+      th.scope = "col";
+      if (col.sortable !== false) {
+        var toggle = function () {
+          state.dir = state.key === col.key ? -state.dir : 1;
+          state.key = col.key;
+          draw();
+        };
+        th.setAttribute("data-sort", col.key);
+        th.tabIndex = 0;
+        th.addEventListener("click", toggle);
+        th.addEventListener("keydown", function (e) {
+          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(); }
+        });
+      }
+      headRow.appendChild(th);
+      return th;
+    });
+    var thead = node("thead");
+    var tbody = node("tbody");
+    var wrap = node("div", "skip-table-wrap");
+    var pager = node("div", "skip-pager");
+    thead.appendChild(headRow);
+    tableEl.appendChild(thead);
+    tableEl.appendChild(tbody);
+    wrap.appendChild(tableEl);
+    root.appendChild(wrap);
+    if (pageSize) root.appendChild(pager);
+
+    function visibleRows() {
+      var rows = state.rows;
+      if (state.query) {
+        rows = rows.filter(function (row) {
+          return cols.some(function (col) { return cellText(col, row).toLowerCase().indexOf(state.query) >= 0; });
+        });
+      }
+      if (state.key) {
+        var key = state.key, dir = state.dir;
+        rows = rows.slice().sort(function (a, b) { return dir * compareValues(a[key], b[key]); });
+      }
+      return rows;
+    }
+
+    function drawRow(row) {
+      var tr = node("tr");
+      cols.forEach(function (col) {
+        var td = node("td", isNumberColumn(col) ? "num" : "");
+        if (!col.render) {
+          td.textContent = cellText(col, row);
+        } else {
+          var content = col.render(row[col.key], row);
+          if (content instanceof Node) td.appendChild(content);
+          else td.innerHTML = content == null ? "" : String(content);
+        }
+        tr.appendChild(td);
+      });
+      // The row stays a row (no role) and takes focus, so a keyboard reaches
+      // the same action; keys pressed on a control inside a cell are its own.
+      if (cfg.onRowClick) {
+        tr.style.cursor = "pointer";
+        tr.tabIndex = 0;
+        tr.addEventListener("click", function () { cfg.onRowClick(row); });
+        tr.addEventListener("keydown", function (e) {
+          if (e.target !== tr || (e.key !== "Enter" && e.key !== " ")) return;
+          e.preventDefault();
+          cfg.onRowClick(row);
+        });
+      }
+      return tr;
+    }
+
+    function pagerButton(label, disabled, step) {
+      var button = node("button", "btn", label);
+      button.type = "button";
+      button.setAttribute("data-variant", "outline");
+      button.setAttribute("data-size", "sm");
+      button.disabled = disabled;
+      button.addEventListener("click", function () { state.page += step; draw(); });
+      return button;
+    }
+
+    function draw() {
+      var rows = visibleRows();
+      heads.forEach(function (th, i) {
+        if (cols[i].key === state.key) th.setAttribute("aria-sort", state.dir > 0 ? "ascending" : "descending");
+        else th.removeAttribute("aria-sort");
+      });
+      var pages = pageSize ? Math.max(1, Math.ceil(rows.length / pageSize)) : 1;
+      state.page = Math.min(state.page, pages - 1);
+      var shown = pageSize ? rows.slice(state.page * pageSize, (state.page + 1) * pageSize) : rows;
+      tbody.innerHTML = "";
+      if (!shown.length) {
+        var empty = node("td", "skip-table-empty", cfg.empty || "Nenhum registro encontrado.");
+        empty.colSpan = cols.length;
+        tbody.appendChild(node("tr")).appendChild(empty);
+      }
+      shown.forEach(function (row) { tbody.appendChild(drawRow(row)); });
+      if (!pageSize) return;
+      pager.innerHTML = "";
+      var from = rows.length ? state.page * pageSize + 1 : 0;
+      pager.appendChild(node("span", "", from + "–" + Math.min(rows.length, (state.page + 1) * pageSize) + " de " + rows.length));
+      var nav = node("div", "row gap-2");
+      nav.appendChild(pagerButton("Anterior", state.page === 0, -1));
+      nav.appendChild(pagerButton("Próxima", state.page >= pages - 1, 1));
+      pager.appendChild(nav);
+    }
+
+    draw();
+    return {
+      setRows: function (rows) { state.rows = rows.slice(); draw(); },
+      rows: visibleRows
+    };
+  }
+
+  // kpis(el, [{label, value, format?, delta?, hint?}]) — KPI cards in a
+  // responsive grid; delta is a fraction (0.12 renders as ▲ 12%).
+  function kpis(target, items) {
+    var root = resolve(target);
+    root.innerHTML = "";
+    root.classList.add("shell-grid");
+    items.forEach(function (item) {
+      var card = node("div", "panel kpi");
+      card.appendChild(node("span", "kpi-label", item.label));
+      card.appendChild(node("span", "kpi-value", item.format ? coerceFormat(item.format)(item.value) : String(item.value)));
+      if (typeof item.delta === "number") {
+        var up = item.delta >= 0;
+        card.appendChild(node("span", "kpi-delta " + (up ? "up" : "down"), (up ? "▲ " : "▼ ") + fmt.pct(Math.abs(item.delta))));
+      }
+      if (item.hint) card.appendChild(node("span", "kpi-label", item.hint));
+      root.appendChild(card);
+    });
+  }
+
+  // badge(text, variant?) — a .badge node for table cells and lists;
+  // variant is "secondary" | "outline" | "destructive" (default: primary).
+  function badge(text, variant) {
+    var el = node("span", "badge", text);
+    if (variant) el.setAttribute("data-variant", variant);
+    return el;
+  }
+
+  // tabs(el) — wires one .tabs block: [role=tab] buttons inside
+  // [role=tablist], each with aria-controls naming its [role=tabpanel].
+  function tabs(target) {
+    var root = resolve(target);
+    var buttons = Array.prototype.slice.call(root.querySelectorAll('[role="tab"]'));
+    function select(chosen) {
+      buttons.forEach(function (b) {
+        var on = b === chosen;
+        b.setAttribute("aria-selected", on ? "true" : "false");
+        b.tabIndex = on ? 0 : -1;
+        var panel = document.getElementById(b.getAttribute("aria-controls"));
+        if (panel) panel.hidden = !on;
+      });
+    }
+    buttons.forEach(function (b, i) {
+      b.addEventListener("click", function () { select(b); });
+      b.addEventListener("keydown", function (e) {
+        var step = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+        if (!step) return;
+        var next = buttons[(i + step + buttons.length) % buttons.length];
+        next.focus();
+        select(next);
+      });
+    });
+    select(buttons.filter(function (b) { return b.getAttribute("aria-selected") === "true"; })[0] || buttons[0]);
+  }
+
+  // toast(message, {type?: "success" | "error", title?, duration?}) — a
+  // .toast in a shared .toaster at the bottom of the page.
+  function toast(message, opts) {
+    opts = opts || {};
+    var toaster = document.querySelector(".toaster") || document.body.appendChild(node("div", "toaster"));
+    var item = node("div", "toast");
+    item.setAttribute("role", opts.type === "error" ? "alert" : "status");
+    item.setAttribute("aria-hidden", "true");
+    if (opts.type) item.setAttribute("data-type", opts.type);
+    var content = node("div", "toast-content");
+    var section = node("section");
+    if (opts.title) section.appendChild(node("h2", "", opts.title));
+    section.appendChild(node("p", "", message));
+    content.appendChild(section);
+    item.appendChild(content);
+    toaster.appendChild(item);
+    requestAnimationFrame(function () { item.setAttribute("aria-hidden", "false"); });
+    setTimeout(function () {
+      item.setAttribute("aria-hidden", "true");
+      setTimeout(function () { item.remove(); }, 400);
+    }, opts.duration || 3000);
+  }
+
+  // Dialogs are native <dialog class="dialog">: a [data-dialog-open="id"]
+  // anywhere opens one, a [data-dialog-close] inside closes it, and a click on
+  // its backdrop closes it too. Plain dialog.showModal()/close() still work.
+  document.addEventListener("click", function (e) {
+    var target = e.target;
+    if (!(target instanceof Element)) return;
+    var opener = target.closest("[data-dialog-open]");
+    if (opener) {
+      var dialog = document.getElementById(opener.getAttribute("data-dialog-open"));
+      if (dialog && dialog.showModal && !dialog.open) dialog.showModal();
+      return;
+    }
+    var closer = target.closest("[data-dialog-close]");
+    if (closer && closer.closest("dialog")) {
+      closer.closest("dialog").close();
+      return;
+    }
+    if (target.tagName === "DIALOG" && target.classList.contains("dialog") && target.open) target.close();
+  });
+
+  // store(key, fallback) — JSON state in localStorage that never throws (a
+  // private window or a full quota falls back to memory): {get, set, update}.
+  function store(key, fallback) {
+    var memory;
+    // Set while the last write did not reach localStorage: what is stored
+    // there is older than memory until a write goes through again.
+    var unsaved = false;
+    var initial = function () { return fallback === undefined ? undefined : JSON.parse(JSON.stringify(fallback)); };
+    function get() {
+      if (!unsaved) {
+        try {
+          var raw = localStorage.getItem(key);
+          if (raw != null) return JSON.parse(raw);
+        } catch (e) { /* storage unavailable: memory below */ }
+      }
+      return memory !== undefined ? memory : initial();
+    }
+    function set(value) {
+      memory = value;
+      try {
+        localStorage.setItem(key, JSON.stringify(value));
+        unsaved = false;
+      } catch (e) {
+        unsaved = true;
+      }
+      return value;
+    }
+    return { get: get, set: set, update: function (fn) { return set(fn(get())); } };
+  }
+
+  // mock — seeded random data, so a page asks for 90 days of numbers in one
+  // line instead of writing them out; the same seed gives the same data.
+  var FIRST = ["Ana", "Bruno", "Carla", "Diego", "Eduarda", "Felipe", "Gabriela", "Henrique", "Isabela", "João",
+    "Larissa", "Marcos", "Natália", "Otávio", "Paula", "Rafael", "Sofia", "Thiago", "Vanessa", "Lucas"];
+  var LAST = ["Silva", "Santos", "Oliveira", "Souza", "Pereira", "Costa", "Rodrigues", "Almeida", "Nascimento", "Lima",
+    "Araújo", "Fernandes", "Carvalho", "Gomes", "Martins", "Rocha", "Ribeiro", "Barbosa"];
+  var CITIES = ["São Paulo, SP", "Rio de Janeiro, RJ", "Belo Horizonte, MG", "Curitiba, PR", "Porto Alegre, RS",
+    "Salvador, BA", "Recife, PE", "Fortaleza, CE", "Brasília, DF", "Goiânia, GO", "Campinas, SP", "Florianópolis, SC",
+    "Manaus, AM", "Belém, PA", "Vitória, ES", "Natal, RN"];
+
+  function createMock(seed) {
+    var state = seed >>> 0;
+    function random() {
+      state = (state + 0x6d2b79f5) >>> 0;
+      var t = state;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    }
+    function int(min, max) { return min + Math.floor(random() * (max - min + 1)); }
+    function pick(list) { return list[Math.floor(random() * list.length)]; }
+    var mock = {
+      seed: function (value) { state = value >>> 0; return mock; },
+      random: random,
+      int: int,
+      float: function (min, max, decimals) {
+        var factor = Math.pow(10, decimals == null ? 2 : decimals);
+        return Math.round((min + random() * (max - min)) * factor) / factor;
+      },
+      pick: pick,
+      chance: function (p) { return random() < p; },
+      name: function () { return pick(FIRST) + " " + pick(LAST); },
+      city: function () { return pick(CITIES); },
+      // series(n, {start, trend, noise, min, decimals}) — a walk: each value
+      // moves by trend (fraction per step) plus up to ±noise of itself.
+      series: function (n, opts) {
+        opts = opts || {};
+        var value = opts.start == null ? 100 : opts.start;
+        var factor = Math.pow(10, opts.decimals || 0);
+        var out = [];
+        for (var i = 0; i < n; i++) {
+          out.push(Math.max(opts.min == null ? 0 : opts.min, Math.round(value * factor) / factor));
+          value = value * (1 + (opts.trend || 0)) * (1 + (random() * 2 - 1) * (opts.noise == null ? 0.08 : opts.noise));
+        }
+        return out;
+      },
+      // dates(n, {end?, step?: "day" | "week" | "month"}) — ISO dates
+      // (YYYY-MM-DD), oldest first, ending at end (default: today).
+      dates: function (n, opts) {
+        opts = opts || {};
+        var end = opts.end ? new Date(opts.end) : new Date();
+        var out = [];
+        for (var i = n - 1; i >= 0; i--) {
+          var d = new Date(end.getTime());
+          if (opts.step === "month") d.setMonth(d.getMonth() - i);
+          else d.setDate(d.getDate() - i * (opts.step === "week" ? 7 : 1));
+          out.push(d.toISOString().slice(0, 10));
+        }
+        return out;
+      },
+      // rows(n, spec) — n objects; each spec value is a function(i), a list
+      // to pick from, or a constant.
+      rows: function (n, spec) {
+        var out = [];
+        for (var i = 0; i < n; i++) {
+          var row = {};
+          for (var key in spec) {
+            var value = spec[key];
+            row[key] = typeof value === "function" ? value(i) : Array.isArray(value) ? pick(value) : value;
+          }
+          out.push(row);
+        }
+        return out;
+      }
+    };
+    return mock;
+  }
+
   window.skipShell = { fmt: fmt };
   window.skipChart = { bar: bar, line: line, donut: donut };
+  window.skipUI = { table: table, kpis: kpis, badge: badge, tabs: tabs, toast: toast };
+  window.skipStore = store;
+  window.skipMock = createMock(20261022);
 })();
 
 </script>
