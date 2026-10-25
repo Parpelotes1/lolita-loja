@@ -1,3 +1,6 @@
+// Loja Lolita — Worker Cloudflare
+// Versão com correções de upload, edição (PUT) e cache
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -71,7 +74,7 @@ export default {
       }
     }
 
-    // Editar produto (NOVO)
+    // Editar produto
     if (path.startsWith("/api/produtos/") && request.method === "PUT") {
       if (!(await autorizar(request, env))) return new Response("Não autorizado", { status: 401 });
       const id = decodeURIComponent(path.split("/").pop());
@@ -109,15 +112,14 @@ export default {
         const tipo = request.headers.get("content-type") || "";
         if (!tipo.includes("multipart/form-data")) {
           return Response.json(
-            { ok: false, erro: "Envie a foto como multipart/form-data no campo 'arquivo'" },
+            { ok: false, erro: "Envie a foto como multipart/form-data no campo arquivo" },
             { status: 415 }
           );
         }
         const form = await request.formData();
-        // ATENÇÃO: o nome do campo é "arquivo". Se mudar aqui, mude no admin.html também.
         const arquivo = form.get("arquivo");
         if (!arquivo || typeof arquivo === "string") {
-          return Response.json({ ok: false, erro: "Sem arquivo no campo 'arquivo'" }, { status: 400 });
+          return Response.json({ ok: false, erro: "Sem arquivo no campo arquivo" }, { status: 400 });
         }
         if (arquivo.size > 10 * 1024 * 1024) {
           return Response.json({ ok: false, erro: "Arquivo maior que 10 MB" }, { status: 413 });
@@ -160,3 +162,5 @@ async function autorizar(request, env) {
   const token = request.headers.get("Authorization") || "";
   return token === "Bearer " + env.ADMIN_PASSWORD;
 }
+
+// /atualizado
