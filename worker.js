@@ -1,12 +1,8 @@
-// Loja Lolita — Worker Cloudflare
-// Alinhado com a tabela produtos: id INTEGER, fotos TEXT, foto_principal INTEGER
-
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     const path = url.pathname;
 
-    // Servir fotos do R2
     if (path.startsWith("/fotos/")) {
       const chave = decodeURIComponent(path.replace("/fotos/", ""));
       const objeto = await env.FOTOS.get(chave);
@@ -19,7 +15,6 @@ export default {
       });
     }
 
-    // Login do admin
     if (path === "/api/login" && request.method === "POST") {
       let senha = "";
       try {
@@ -34,52 +29,40 @@ export default {
       return Response.json({ ok: false }, { status: 401 });
     }
 
-    // Listar produtos
     if (path === "/api/produtos" && request.method === "GET") {
       try {
         const { results } = await env.DB.prepare(
           "SELECT * FROM produtos ORDER BY criado_em DESC"
         ).all();
-        const lista = (results || []).map(normalizarProduto);
-        return Response.json(lista);
+        return Response.json((results || []).map(normalizarProduto));
       } catch (e) {
         return Response.json({ erro: String(e) }, { status: 500 });
       }
     }
 
-    // Cadastrar produto
     if (path === "/api/produtos" && request.method === "POST") {
       if (!(await autorizar(request, env))) return new Response("Não autorizado", { status: 401 });
       try {
         const p = await request.json();
-        // O id é INTEGER PRIMARY KEY: deixamos o SQLite gerar
         await env.DB.prepare(
           `INSERT INTO produtos (codigo, nome, categoria, preco, tamanhos, cores, fotos, foto_principal, descricao, novo, destaque, criado_em)
            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
         ).bind(
-          p.codigo || "",
-          p.nome || "",
-          p.categoria || "",
-          Number(p.preco) || 0,
-          JSON.stringify(p.tamanhos || []),
-          JSON.stringify(p.cores || []),
-          JSON.stringify(p.fotos || []),
-          Number(p.foto_principal) || 0,
-          p.descricao || "",
-          p.novo ? 1 : 0,
-          p.destaque ? 1 : 0,
+          p.codigo || "", p.nome || "", p.categoria || "", Number(p.preco) || 0,
+          JSON.stringify(p.tamanhos || []), JSON.stringify(p.cores || []),
+          JSON.stringify(p.fotos || []), Number(p.foto_principal) || 0,
+          p.descricao || "", p.novo ? 1 : 0, p.destaque ? 1 : 0,
           new Date().toISOString()
         ).run();
-        const novoId = await env.DB.prepare(
+        const novo = await env.DB.prepare(
           "SELECT id FROM produtos WHERE codigo = ? ORDER BY id DESC LIMIT 1"
         ).bind(p.codigo || "").first();
-        return Response.json({ ok: true, id: novoId ? novoId.id : null });
+        return Response.json({ ok: true, id: novo ? novo.id : null });
       } catch (e) {
         return Response.json({ ok: false, erro: String(e) }, { status: 500 });
       }
     }
 
-    // Editar produto
     if (path.startsWith("/api/produtos/") && request.method === "PUT") {
       if (!(await autorizar(request, env))) return new Response("Não autorizado", { status: 401 });
       const id = Number(decodeURIComponent(path.split("/").pop()));
@@ -89,18 +72,10 @@ export default {
         await env.DB.prepare(
           `UPDATE produtos SET codigo=?, nome=?, categoria=?, preco=?, tamanhos=?, cores=?, fotos=?, foto_principal=?, descricao=?, novo=?, destaque=? WHERE id=?`
         ).bind(
-          p.codigo || "",
-          p.nome || "",
-          p.categoria || "",
-          Number(p.preco) || 0,
-          JSON.stringify(p.tamanhos || []),
-          JSON.stringify(p.cores || []),
-          JSON.stringify(p.fotos || []),
-          Number(p.foto_principal) || 0,
-          p.descricao || "",
-          p.novo ? 1 : 0,
-          p.destaque ? 1 : 0,
-          id
+          p.codigo || "", p.nome || "", p.categoria || "", Number(p.preco) || 0,
+          JSON.stringify(p.tamanhos || []), JSON.stringify(p.cores || []),
+          JSON.stringify(p.fotos || []), Number(p.foto_principal) || 0,
+          p.descricao || "", p.novo ? 1 : 0, p.destaque ? 1 : 0, id
         ).run();
         return Response.json({ ok: true, id });
       } catch (e) {
@@ -108,7 +83,6 @@ export default {
       }
     }
 
-    // Excluir produto
     if (path.startsWith("/api/produtos/") && request.method === "DELETE") {
       if (!(await autorizar(request, env))) return new Response("Não autorizado", { status: 401 });
       const id = Number(decodeURIComponent(path.split("/").pop()));
@@ -121,16 +95,12 @@ export default {
       }
     }
 
-    // Enviar foto para o R2
     if (path === "/api/upload" && request.method === "POST") {
       if (!(await autorizar(request, env))) return new Response("Não autorizado", { status: 401 });
       try {
         const tipo = request.headers.get("content-type") || "";
         if (!tipo.includes("multipart/form-data")) {
-          return Response.json(
-            { ok: false, erro: "Envie a foto como multipart/form-data no campo arquivo" },
-            { status: 415 }
-          );
+          return Response.json({ ok: false, erro: "Envie como multipart/form-data no campo arquivo" }, { status: 415 });
         }
         const form = await request.formData();
         const arquivo = form.get("arquivo");
@@ -145,14 +115,12 @@ export default {
         await env.FOTOS.put(chave, arquivo.stream(), {
           httpMetadata: { contentType: arquivo.type || "image/jpeg" }
         });
-        const caminho = "/fotos/" + chave;
-        return Response.json({ ok: true, chave, url: caminho });
+        return Response.json({ ok: true, chave, url: "/fotos/" + chave });
       } catch (e) {
         return Response.json({ ok: false, erro: String(e) }, { status: 500 });
       }
     }
 
-    // Todo o resto: arquivos do site
     const resposta = await env.ASSETS.fetch(request);
     const ct = resposta.headers.get("content-type") || "";
     if (ct.includes("text/html")) {
@@ -164,7 +132,6 @@ export default {
   }
 };
 
-// Converte as colunas de texto do banco em arrays reais
 function normalizarProduto(p) {
   return {
     id: p.id,
@@ -176,7 +143,7 @@ function normalizarProduto(p) {
     tamanhos: tentarJson(p.tamanhos, []),
     cores: tentarJson(p.cores, []),
     fotos: tentarJson(p.fotos, []),
-    foto_principal: p.foto_principal || 0,
+    foto_principal: Number(p.foto_principal) || 0,
     novo: !!p.novo,
     destaque: !!p.destaque,
     criado_em: p.criado_em
