@@ -1,0 +1,3132 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>produtos.html — Catálogo Lolita (abas no topo, sem imprimir)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Skip artifact shell — fixed styles served beside every artifact.
+   Tokens, utilities and components (basecoat 1.0 markup, no CDN); artifacts
+   override --accent for their own identity. */
+:root {
+  color-scheme: light dark;
+  --accent: #2563eb;
+  --accent-contrast: #ffffff;
+  --accent-text: color-mix(in srgb, var(--accent) 72%, #000);
+  --bg: #f8f9fb;
+  --surface: #ffffff;
+  --text: #14171f;
+  --text-muted: #5b6472;
+  --border: rgba(20, 23, 31, 0.10);
+  --radius: 10px;
+  --shadow: 0 1px 3px rgba(20, 23, 31, 0.08);
+  --space: 16px;
+  --success: #0a7a35;
+  --danger: #c0262d;
+  --warning: #8a5300;
+}
+/* Theme resolution. Without data-theme the viewer's system preference decides,
+   as it always did. With it, the artifact's own choice wins in BOTH directions:
+   a page that hardcodes one palette must not be handed the opposite set of
+   tokens by the machine it happens to be opened on. The dark values appear
+   twice because a media query cannot be folded into a selector list.
+   The attribute sits inside :where() so these blocks keep the specificity of a
+   bare :root — the page's own <style> is linked after this file and must go on
+   overriding any token it wants, exactly as it could before. */
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    --accent-text: color-mix(in srgb, var(--accent) 78%, #fff);
+    --bg: #101318;
+    --surface: #181c23;
+    --text: #eef1f6;
+    --text-muted: #9aa4b2;
+    --border: rgba(238, 241, 246, 0.12);
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    --success: #4ade80;
+    --danger: #f87171;
+    --warning: #fbbf24;
+  }
+}
+:root:where([data-theme="dark"]) {
+  color-scheme: dark;
+  --accent-text: color-mix(in srgb, var(--accent) 78%, #fff);
+  --bg: #101318;
+  --surface: #181c23;
+  --text: #eef1f6;
+  --text-muted: #9aa4b2;
+  --border: rgba(238, 241, 246, 0.12);
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --success: #4ade80;
+  --danger: #f87171;
+  --warning: #fbbf24;
+}
+:root:where([data-theme="light"]) { color-scheme: light; }
+/* Pages generated before the shell had its own components still link the
+   basecoat CDN, which reads its own tokens and switches theme only on a
+   .dark class. Bridged to the shell's, whatever of it those pages use takes
+   the page's accent and follows the declared theme. Its --accent token is a
+   hover tint, renamed in its theme as --color-accent; the shell's --accent is
+   the brand colour, so the tint is derived from it here. */
+:root {
+  --background: var(--bg);
+  --foreground: var(--text);
+  --card: var(--surface);
+  --card-foreground: var(--text);
+  --popover: var(--surface);
+  --popover-foreground: var(--text);
+  --primary: var(--accent);
+  --primary-foreground: var(--accent-contrast);
+  --secondary: color-mix(in srgb, var(--text) 7%, var(--surface));
+  --secondary-foreground: var(--text);
+  --muted: color-mix(in srgb, var(--text) 5%, var(--surface));
+  --muted-foreground: var(--text-muted);
+  --color-accent: color-mix(in srgb, var(--accent) 12%, var(--surface));
+  --color-accent-foreground: var(--text);
+  --destructive: var(--danger);
+  --input: var(--border);
+  --ring: var(--accent);
+}
+* { box-sizing: border-box; }
+/* The reset the pages were written against: they all linked basecoat, which
+   ships Tailwind's. Its components now live here, so the reset does too. */
+*, ::before, ::after, ::backdrop { margin: 0; padding: 0; border: 0 solid; }
+/* Preflight's rule too: without it a component class that sets display
+   (.alert, .card, .btn…) beats the hidden attribute and shows the element. */
+[hidden]:where(:not([hidden="until-found"])) { display: none !important; }
+.hidden { display: none !important; }
+h1, h2, h3, h4, h5, h6 { font-size: inherit; font-weight: inherit; }
+a { color: inherit; text-decoration: inherit; }
+b, strong { font-weight: bolder; }
+ol, ul, menu { list-style: none; }
+svg, video, canvas, iframe { display: block; vertical-align: middle; }
+button, input, select, textarea { color: inherit; background-color: transparent; border-radius: 0; }
+table { border-collapse: collapse; }
+hr { height: 0; color: inherit; border-top-width: 1px; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+img { max-width: 100%; display: block; }
+
+.shell-container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+.shell-section { padding: calc(var(--space) * 2) 0; }
+.shell-grid { display: grid; gap: var(--space); grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.shell-toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: var(--space); }
+.shell-footer { padding: 24px 0 40px; color: var(--text-muted); font-size: 13px; }
+
+.shell-hero { padding: calc(var(--space) * 3) 0 calc(var(--space) * 2); }
+.shell-hero h1 { font-size: clamp(26px, 4vw, 40px); line-height: 1.15; margin: 0 0 10px; text-wrap: balance; }
+.shell-hero p { color: var(--text-muted); max-width: 60ch; margin: 0; }
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: var(--space);
+}
+
+.kpi { display: flex; flex-direction: column; gap: 4px; }
+.kpi .kpi-value { font-size: clamp(22px, 2.3vw, 28px); font-weight: 650; line-height: 1.1; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.kpi .kpi-label { font-size: 13px; color: var(--text-muted); }
+.kpi .kpi-delta { font-size: 12.5px; font-weight: 600; }
+.kpi .kpi-delta.up { color: var(--success); }
+.kpi .kpi-delta.down { color: var(--danger); }
+
+table.shell-table { border-collapse: collapse; width: 100%; font-size: 14px; }
+table.shell-table th {
+  text-align: left; font-size: 11.5px; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--text-muted); font-weight: 600;
+}
+table.shell-table th, table.shell-table td { padding: 9px 12px 9px 0; border-bottom: 1px solid var(--border); }
+table.shell-table td.num, table.shell-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
+table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 6%, transparent); }
+
+.chart-box { width: 100%; min-height: 220px; }
+.chart-box svg { width: 100%; height: auto; display: block; }
+.chart-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 16px; margin-top: 12px; font-size: 12.5px; color: var(--text-muted); }
+.chart-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.chart-legend i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+.chart-legend b { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+.muted { color: var(--text-muted); }
+.accent { color: var(--accent-text); }
+.shell-badge, .eyebrow {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent-text);
+}
+/* A pill keeps its content width inside flex and grid columns, which would
+   otherwise stretch it across the card; a centred parent still centres it. */
+.shell-badge, .eyebrow, .badge { width: fit-content; max-width: 100%; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .shell-fade { animation: shell-fade 400ms ease both; }
+  @keyframes shell-fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+}
+
+/* Layout and type utilities: what the pages kept spelling in style="".
+   Spacing and type sizes follow Tailwind's scale; there is no Tailwind. */
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.stack { display: flex; flex-direction: column; gap: var(--space); }
+.between { justify-content: space-between; }
+.grow { flex: 1 1 0; min-width: 0; }
+.cols-2, .cols-3, .cols-4, .cols-5 { display: grid; gap: var(--space); grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 720px) {
+  .cols-2, .cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .cols-5 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (min-width: 1000px) { .cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (min-width: 1100px) { .cols-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+.gap-1 { gap: 4px; } .gap-2 { gap: 8px; } .gap-3 { gap: 12px; } .gap-4 { gap: 16px; } .gap-6 { gap: 24px; }
+.m-0 { margin: 0; }
+.mt-1 { margin-top: 4px; } .mt-2 { margin-top: 8px; } .mt-3 { margin-top: 12px; } .mt-4 { margin-top: 16px; } .mt-6 { margin-top: 24px; }
+.mb-1 { margin-bottom: 4px; } .mb-2 { margin-bottom: 8px; } .mb-3 { margin-bottom: 12px; } .mb-4 { margin-bottom: 16px; } .mb-6 { margin-bottom: 24px; }
+.p-2 { padding: 8px; } .p-3 { padding: 12px; } .p-4 { padding: 16px; } .p-6 { padding: 24px; }
+.text-xs { font-size: 12px; } .text-sm { font-size: 14px; } .text-base { font-size: 16px; }
+.text-lg { font-size: 18px; } .text-xl { font-size: 20px; line-height: 1.35; }
+.text-2xl { font-size: 24px; line-height: 1.25; } .text-3xl { font-size: 30px; line-height: 1.2; }
+.font-medium { font-weight: 500; } .font-semibold { font-weight: 600; } .font-bold { font-weight: 700; }
+.text-right { text-align: right; } .text-center { text-align: center; }
+.nowrap { white-space: nowrap; }
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-variant-numeric: tabular-nums; }
+.w-full { width: 100%; }
+.text-success { color: var(--success); } .text-danger { color: var(--danger); } .text-warning { color: var(--warning); }
+
+/* Components, with basecoat 1.0 markup (variants and sizes are data
+   attributes) and the shell tokens, so a page needs neither component CSS
+   nor a CSS framework. An older page that also links basecoat gets these
+   rules after it, over the same properties. */
+button, input, select, textarea { font: inherit; }
+input[type="checkbox"], input[type="radio"] { accent-color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  height: 36px; padding: 0 14px; border: 1px solid transparent; border-radius: calc(var(--radius) - 2px);
+  background: var(--accent); color: var(--accent-contrast);
+  font-size: 14px; font-weight: 500; line-height: 1; white-space: nowrap; text-decoration: none; cursor: pointer;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+.btn:hover { background: color-mix(in srgb, var(--accent) 86%, #000); }
+.btn:disabled, .btn[aria-disabled="true"] { opacity: 0.5; pointer-events: none; }
+.btn[data-variant="secondary"] { background: color-mix(in srgb, var(--text) 8%, var(--surface)); color: var(--text); }
+.btn[data-variant="secondary"]:hover { background: color-mix(in srgb, var(--text) 14%, var(--surface)); }
+.btn[data-variant="outline"] { background: var(--surface); color: var(--text); border-color: var(--border); }
+.btn[data-variant="ghost"] { background: transparent; color: var(--text); }
+.btn[data-variant="outline"]:hover, .btn[data-variant="ghost"]:hover { background: color-mix(in srgb, var(--accent) 10%, var(--surface)); }
+.btn[data-variant="destructive"] { background: var(--danger); color: var(--bg); }
+.btn[data-variant="destructive"]:hover { background: color-mix(in srgb, var(--danger) 86%, var(--text)); }
+.btn[data-variant="link"] { height: auto; padding: 0; background: none; color: var(--accent-text); text-decoration: underline; text-underline-offset: 3px; }
+.btn[data-size="sm"] { height: 30px; padding: 0 10px; font-size: 13px; }
+.btn[data-size="lg"] { height: 42px; padding: 0 20px; font-size: 15px; }
+.btn[data-size="icon"] { width: 36px; padding: 0; }
+
+.badge {
+  display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px;
+  border: 1px solid transparent; border-radius: 999px; background: var(--accent); color: var(--accent-contrast);
+  font-size: 12px; font-weight: 600; line-height: 1.5; white-space: nowrap;
+}
+.badge[data-variant="secondary"] { background: color-mix(in srgb, var(--text) 8%, var(--surface)); color: var(--text); }
+.badge[data-variant="outline"] { background: transparent; color: var(--text); border-color: var(--border); }
+.badge[data-variant="destructive"] { background: color-mix(in srgb, var(--danger) 14%, var(--surface)); color: var(--danger); }
+
+.alert {
+  display: grid; gap: 4px; padding: 12px 16px; border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--surface); color: var(--text); font-size: 14px;
+}
+.alert h2, .alert h3 { margin: 0; font-size: 14px; font-weight: 600; }
+.alert p, .alert section { margin: 0; color: var(--text-muted); }
+.alert[data-variant="destructive"] { border-color: color-mix(in srgb, var(--danger) 45%, var(--border)); background: color-mix(in srgb, var(--danger) 7%, var(--surface)); color: var(--danger); }
+
+.card {
+  display: flex; flex-direction: column; gap: 16px; padding: 20px 0;
+  border: 1px solid var(--border); border-radius: calc(var(--radius) + 2px);
+  background: var(--surface); color: var(--text); box-shadow: var(--shadow);
+}
+.card > header, .card > section, .card > footer { padding: 0 20px; }
+.card > header { display: grid; gap: 4px; }
+.card > header h2, .card > header h3 { margin: 0; font-size: 16px; font-weight: 600; line-height: 1.3; }
+.card > header p { margin: 0; color: var(--text-muted); font-size: 14px; }
+.card > footer { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+
+.input {
+  width: 100%; min-height: 36px; padding: 6px 12px; border: 1px solid var(--border); border-radius: calc(var(--radius) - 2px);
+  background: var(--surface); color: var(--text); font-size: 14px;
+}
+textarea.input { min-height: 84px; resize: vertical; }
+.input::placeholder { color: var(--text-muted); }
+.input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent); }
+.field { display: grid; gap: 6px; }
+.field label { font-size: 14px; font-weight: 500; }
+.field [role="alert"] { color: var(--danger); font-size: 13px; }
+
+dialog.dialog {
+  width: min(520px, calc(100vw - 32px)); max-height: calc(100vh - 32px); margin: auto; padding: 0;
+  border: 1px solid var(--border); border-radius: calc(var(--radius) + 4px);
+  background: var(--surface); color: var(--text); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+}
+dialog.dialog::backdrop { background: rgba(0, 0, 0, 0.5); }
+dialog.dialog > div { display: grid; gap: 16px; padding: 24px; }
+dialog.dialog header { display: grid; gap: 4px; }
+dialog.dialog header h2 { margin: 0; font-size: 18px; font-weight: 600; }
+dialog.dialog header p { margin: 0; color: var(--text-muted); font-size: 14px; }
+dialog.dialog footer { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+
+.tabs { display: grid; gap: 12px; }
+.tabs > [role="tablist"] {
+  display: inline-flex; gap: 4px; width: fit-content; max-width: 100%; padding: 4px; overflow-x: auto;
+  border-radius: var(--radius); background: color-mix(in srgb, var(--text) 6%, var(--surface));
+}
+.tabs [role="tab"] {
+  padding: 6px 12px; border: 0; border-radius: calc(var(--radius) - 4px); background: transparent;
+  color: var(--text-muted); font-size: 14px; font-weight: 500; white-space: nowrap; cursor: pointer;
+}
+.tabs [role="tab"][aria-selected="true"] { background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
+.tabs [role="tabpanel"][hidden] { display: none; }
+
+.accordion > details { border-bottom: 1px solid var(--border); }
+.accordion > details > summary {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 14px 0; font-weight: 500; list-style: none; cursor: pointer;
+}
+.accordion > details > summary::-webkit-details-marker { display: none; }
+.accordion > details > summary::after { content: "+"; color: var(--text-muted); font-size: 18px; line-height: 1; }
+.accordion > details[open] > summary::after { content: "\2212"; }
+.accordion > details > :not(summary) { margin: 0 0 14px; color: var(--text-muted); }
+
+.toaster {
+  position: fixed; right: 16px; bottom: 16px; z-index: 50; display: flex; flex-direction: column-reverse; gap: 8px;
+  width: min(360px, calc(100vw - 32px)); pointer-events: none;
+}
+.toaster .toast { pointer-events: auto; transition: opacity 200ms ease, transform 200ms ease; }
+.toaster .toast[aria-hidden="true"] { opacity: 0; transform: translateY(8px); }
+.toaster .toast-content {
+  padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--surface); color: var(--text); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12); font-size: 13px;
+}
+.toaster .toast-content h2 { margin: 0 0 2px; font-size: 14px; font-weight: 600; }
+.toaster .toast-content p { margin: 0; color: var(--text-muted); }
+
+/* skipUI building blocks. */
+.skip-table-search { max-width: 320px; margin-bottom: 12px; }
+.skip-table-wrap { overflow-x: auto; }
+table.shell-table th[data-sort] { cursor: pointer; user-select: none; }
+table.shell-table th[aria-sort="ascending"]::after { content: " \25B2"; font-size: 9px; }
+table.shell-table th[aria-sort="descending"]::after { content: " \25BC"; font-size: 9px; }
+table.shell-table td.skip-table-empty { color: var(--text-muted); text-align: center; padding: 24px 0; }
+.skip-pager { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-top: 12px; font-size: 13px; color: var(--text-muted); }
+.toaster .toast[data-type="success"] .toast-content { border-left: 3px solid var(--success); }
+.toaster .toast[data-type="error"] .toast-content { border-left: 3px solid var(--danger); }
+
+</style>
+<script>
+/* Skip artifact shell — fixed helpers served beside every artifact. */
+(function () {
+  "use strict";
+
+  var fmt = {
+    num: function (v, opts) { return new Intl.NumberFormat("pt-BR", opts || {}).format(v); },
+    brl: function (v) { return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v); },
+    pct: function (v) { return new Intl.NumberFormat("pt-BR", { style: "percent", maximumFractionDigits: 1 }).format(v); },
+    compact: function (v) { return new Intl.NumberFormat("pt-BR", { notation: "compact", maximumFractionDigits: 1 }).format(v); },
+    brlCompact: function (v) { return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", notation: "compact", maximumFractionDigits: 1 }).format(v); }
+  };
+
+  // axisLabels formats the five y-axis ticks in the unit the chart declared
+  // (percent, BRL or plain numbers), compact so long values never clip, with
+  // the fewest decimals that still print every tick exactly (1,5 mi, not 2 mi).
+  function axisLabels(format, ticks) {
+    function at(digits) {
+      var opts = { notation: "compact", maximumFractionDigits: digits };
+      if (format === "pct") opts = { style: "percent", maximumFractionDigits: digits };
+      else if (format === "brl") opts = { style: "currency", currency: "BRL", notation: "compact", maximumFractionDigits: digits };
+      var nf = new Intl.NumberFormat("pt-BR", opts);
+      return ticks.map(function (t) { return nf.format(t); });
+    }
+    for (var digits = 0; digits < 2; digits++) {
+      if (at(digits).join("|") === at(digits + 1).join("|")) return at(digits);
+    }
+    return at(2);
+  }
+
+  // yAxisPad formats the ticks and measures the left padding they need from
+  // the longest one; drawYAxis then draws the grid and the labels.
+  function yAxisPad(format, max) {
+    var labels = axisLabels(format, [0, max / 4, max / 2, (max * 3) / 4, max]);
+    var longest = labels.reduce(function (m, l) { return Math.max(m, l.length); }, 0);
+    return { labels: labels, padL: Math.max(40, Math.round(longest * 6.2) + 14) };
+  }
+  function drawYAxis(svg, axis, W, padR, padT, plotH) {
+    for (var g = 0; g <= 4; g++) {
+      var gy = padT + plotH - (plotH * g) / 4;
+      svg.appendChild(svgEl("line", { x1: axis.padL, y1: gy, x2: W - padR, y2: gy, stroke: "currentColor", "stroke-opacity": 0.08 }));
+      var lbl = svgEl("text", { x: axis.padL - 8, y: gy + 4, "text-anchor": "end", "font-size": 10, fill: mutedColor() });
+      lbl.textContent = axis.labels[g];
+      svg.appendChild(lbl);
+    }
+  }
+
+  // xLabelStep: show every k-th category label so labels never overlap, and
+  // always the last one (counted back from the end).
+  function xLabelStep(labels, step) {
+    var longest = labels.reduce(function (m, l) { return Math.max(m, String(l).length); }, 0);
+    return Math.max(1, Math.ceil((longest * 6.4 + 8) / Math.max(step, 1)));
+  }
+  function drawXLabel(svg, text, x, y, W, edgeGuard) {
+    var anchor = "middle";
+    var half = String(text).length * 3.2;
+    if (edgeGuard && x - half < 4) anchor = "start";
+    if (edgeGuard && x + half > W - 4) anchor = "end";
+    var tx = svgEl("text", { x: x, y: y, "text-anchor": anchor, "font-size": 11, fill: mutedColor() });
+    tx.textContent = text;
+    svg.appendChild(tx);
+  }
+  // categoryLines fits a bar's category name in its slot: one line, two lines
+  // split at a space, or cut with "…". A bar without its name can't be read, so
+  // categories are never skipped; null when the slot is too narrow for that.
+  function categoryLines(text, slot) {
+    var fit = Math.floor((slot - 6) / 6.4);
+    var s = String(text);
+    if (fit < 4) return null;
+    if (s.length <= fit) return [s];
+    var cut = function (t) { return t.length <= fit ? t : t.slice(0, fit - 1).trimEnd() + "…"; };
+    var best = -1;
+    for (var i = 0; i < s.length; i++) {
+      if (s[i] === " " && (best < 0 || Math.abs(s.length / 2 - i) < Math.abs(s.length / 2 - best))) best = i;
+    }
+    if (best < 0) return [cut(s)];
+    return [cut(s.slice(0, best)), cut(s.slice(best + 1))];
+  }
+  function legend(el, items) {
+    var box = document.createElement("div");
+    box.className = "chart-legend";
+    items.forEach(function (it) {
+      var row = document.createElement("span");
+      var dot = document.createElement("i");
+      dot.style.background = it.color;
+      row.appendChild(dot);
+      row.appendChild(document.createTextNode((it.label || "") + (it.value ? " " : "")));
+      if (it.value) {
+        var v = document.createElement("b");
+        v.textContent = it.value;
+        row.appendChild(v);
+      }
+      box.appendChild(row);
+    });
+    resolve(el).appendChild(box);
+  }
+  var seriesPalette = ["#1baf7a", "#eda100", "#e34948", "#4a3aa7", "#e87ba4", "#0ea5b7"];
+
+  // format accepts a function OR one of the fmt names ("num" | "brl" | "pct").
+  // A page's function may return nothing or throw: the chart prints its
+  // number instead of taking the rest of the page script down with it.
+  function coerceFormat(spec) {
+    if (typeof spec === "function") {
+      return function (v) {
+        try {
+          var out = spec(v);
+          return out == null ? "" : String(out);
+        } catch (e) {
+          return fmt.num(v);
+        }
+      };
+    }
+    if (typeof spec === "string" && fmt[spec]) return fmt[spec];
+    return function (v) { return fmt.num(v); };
+  }
+
+  function accent() {
+    return getComputedStyle(document.documentElement).getPropertyValue("--accent").trim() || "#2563eb";
+  }
+  function mutedColor() {
+    return getComputedStyle(document.documentElement).getPropertyValue("--text-muted").trim() || "#5b6472";
+  }
+  function svgEl(tag, attrs) {
+    var el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+    for (var k in attrs) el.setAttribute(k, attrs[k]);
+    return el;
+  }
+  function frame(el, w, h) {
+    var svg = svgEl("svg", { viewBox: "0 0 " + w + " " + h, role: "img" });
+    el = resolve(el);
+    el.innerHTML = "";
+    el.appendChild(svg);
+    return svg;
+  }
+
+  // maxOf guards the axis scale: empty values would give -Infinity (truthy,
+  // so "|| 1" can't catch it) and a non-positive max would flip the chart.
+  // finite reads a chart value as a number, 0 when it is not one (NaN,
+  // Infinity, a stray string), so one bad value cannot blank the axis.
+  function finite(v) {
+    var n = +v;
+    return isFinite(n) ? n : 0;
+  }
+
+  function maxOf(values) {
+    var m = values.length ? Math.max.apply(null, values.map(finite)) : 0;
+    return m > 0 ? m : 1;
+  }
+
+  // labelsFor pads or trims the category names to the n points drawn: pages
+  // pass labels and values of different lengths, and one throw here loses
+  // every section the page renders after the chart.
+  function labelsFor(cfg, n) {
+    var out = [];
+    for (var i = 0; i < n; i++) out.push(cfg.labels && cfg.labels[i] != null ? String(cfg.labels[i]) : "");
+    return out;
+  }
+
+  // niceMax rounds the scale up so the four grid steps land on round values
+  // (1, 1.5, 2, 2.5, 3, 4, 5, 6 or 8 × 10^k) and the tick labels read exactly.
+  function niceMax(max) {
+    var raw = max / 4;
+    var mag = Math.pow(10, Math.floor(Math.log10(raw)));
+    var res = raw / mag;
+    var steps = [1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10];
+    var nice = steps.filter(function (s) { return s >= res - 1e-9; })[0];
+    return nice * mag * 4;
+  }
+
+  // bar(el, {labels:[], values:[], color?, format?}) — vertical bar chart.
+  function bar(el, cfg) {
+    var W = 640, H = 280, padB = 30, padT = 12, padR = 12;
+    var max = niceMax(maxOf(cfg.values));
+    var axis = yAxisPad(cfg.format, max);
+    var svg = frame(el, W, H);
+    var n = cfg.values.length;
+    var labels = labelsFor(cfg, n);
+    var plotW = W - axis.padL - padR;
+    var step = plotW / n, bw = Math.min(step * 0.62, 64);
+    var names = labels.map(function (l) { return categoryLines(l, step); });
+    var named = names.every(Boolean);
+    if (named && names.some(function (l) { return l.length > 1; })) padB = 42;
+    var plotH = H - padT - padB;
+    var color = cfg.color || accent();
+    var f = coerceFormat(cfg.format);
+    var every = xLabelStep(labels, step);
+    drawYAxis(svg, axis, W, padR, padT, plotH);
+    cfg.values.forEach(function (v, i) {
+      var bh = Math.max(0, (finite(v) / max) * plotH);
+      var x = axis.padL + i * step + (step - bw) / 2;
+      var y = padT + plotH - bh;
+      var r = svgEl("rect", { x: x, y: y, width: bw, height: bh, rx: 4, fill: (cfg.colors && cfg.colors[i]) || color });
+      var t = svgEl("title", {});
+      t.textContent = labels[i] + ": " + f(v);
+      r.appendChild(t);
+      svg.appendChild(r);
+      if (named) {
+        names[i].forEach(function (text, li) {
+          drawXLabel(svg, text, x + bw / 2, padT + plotH + 18 + li * 13, W, false);
+        });
+      } else if ((n - 1 - i) % every === 0) {
+        drawXLabel(svg, labels[i], x + bw / 2, H - 10, W, false);
+      }
+    });
+  }
+
+  // line(el, {labels:[], values:[] | series:[{label, values, color?}], color?, format?})
+  // — one line, or several series on one scale with a legend under the chart.
+  function line(el, cfg) {
+    var W = 640, H = 280, padB = 30, padT = 12, padR = 16;
+    var series = cfg.series && cfg.series.length
+      ? cfg.series
+      : [{ label: "", values: cfg.values || [], color: cfg.color }];
+    var all = [];
+    series.forEach(function (s) { all = all.concat(s.values || []); });
+    var max = niceMax(maxOf(all));
+    var axis = yAxisPad(cfg.format, max);
+    var svg = frame(el, W, H);
+    var n = series.reduce(function (m, s) { return Math.max(m, (s.values || []).length); }, 0);
+    var labels = labelsFor(cfg, n);
+    var plotW = W - axis.padL - padR, plotH = H - padT - padB;
+    var f = coerceFormat(cfg.format);
+    drawYAxis(svg, axis, W, padR, padT, plotH);
+    var xs = labels.map(function (_, i) { return axis.padL + (n === 1 ? plotW / 2 : (plotW * i) / (n - 1)); });
+    var every = xLabelStep(labels, n > 1 ? plotW / (n - 1) : plotW);
+    labels.forEach(function (label, i) {
+      if ((n - 1 - i) % every === 0) drawXLabel(svg, label, xs[i], H - 10, W, true);
+    });
+    var colors = series.map(function (s, si) {
+      return s.color || (si === 0 ? (cfg.color || accent()) : seriesPalette[(si - 1) % seriesPalette.length]);
+    });
+    series.forEach(function (s, si) {
+      var color = colors[si];
+      var pts = (s.values || []).map(function (v, i) { return [xs[i], padT + plotH - (finite(v) / max) * plotH]; });
+      var d = pts.map(function (p, i) { return (i ? "L" : "M") + p[0].toFixed(1) + " " + p[1].toFixed(1); }).join(" ");
+      svg.appendChild(svgEl("path", { d: d, fill: "none", stroke: color, "stroke-width": 2, "stroke-linejoin": "round" }));
+      pts.forEach(function (p, i) {
+        var c = svgEl("circle", { cx: p[0], cy: p[1], r: 3.5, fill: color });
+        var t = svgEl("title", {});
+        t.textContent = (s.label ? s.label + " · " : "") + labels[i] + ": " + f(s.values[i]);
+        c.appendChild(t);
+        svg.appendChild(c);
+      });
+    });
+    if (series.length > 1) {
+      legend(el, series.map(function (s, si) { return { label: s.label, color: colors[si] }; }));
+    }
+  }
+
+  // donut(el, {labels:[], values:[], colors?, format?, center?, centerLabel?, legend?})
+  // — donut with a short total in the centre (compact, in the declared unit)
+  // and, with legend: true, the labels and shares listed under it.
+  function donut(el, cfg) {
+    var W = 320, H = 280, cx = W / 2, cy = H / 2, R = 92, r = 58;
+    var svg = frame(el, W, H);
+    // At 100% of a wide container the donut outgrows the height pages give
+    // the box and spills over the next section: keep it at its own size.
+    svg.style.maxWidth = W + "px";
+    svg.style.margin = "0 auto";
+    var values = cfg.values.map(finite);
+    var labels = labelsFor(cfg, values.length);
+    var sum = values.reduce(function (a, b) { return a + b; }, 0);
+    var total = sum || 1;
+    var palette = cfg.colors || [accent()].concat(seriesPalette);
+    // The hover keeps the full value; the centre has room for a short one.
+    var full = coerceFormat(cfg.format);
+    var short = typeof cfg.format === "function" ? full : cfg.format === "brl" ? fmt.brlCompact : fmt.compact;
+    var a0 = -Math.PI / 2;
+    values.forEach(function (v, i) {
+      var a1 = a0 + (v / total) * Math.PI * 2;
+      var large = a1 - a0 > Math.PI ? 1 : 0;
+      var p = ["M", cx + R * Math.cos(a0), cy + R * Math.sin(a0),
+        "A", R, R, 0, large, 1, cx + R * Math.cos(a1), cy + R * Math.sin(a1),
+        "L", cx + r * Math.cos(a1), cy + r * Math.sin(a1),
+        "A", r, r, 0, large, 0, cx + r * Math.cos(a0), cy + r * Math.sin(a0), "Z"].join(" ");
+      var path = svgEl("path", { d: p, fill: palette[i % palette.length] });
+      var t = svgEl("title", {});
+      t.textContent = labels[i] + ": " + full(v) + " (" + fmt.pct(v / total) + ")";
+      path.appendChild(t);
+      svg.appendChild(path);
+      a0 = a1;
+    });
+    // A share chart has no total worth printing: without its own centre text
+    // the caption alone takes the middle.
+    var text = cfg.center != null ? String(cfg.center) : (cfg.format === "pct" ? "" : short(sum));
+    if (text) {
+      var size = text.length > 9 ? 14 : text.length > 7 ? 17 : 20;
+      var center = svgEl("text", { x: cx, y: cfg.centerLabel ? cy + 1 : cy + 6, "text-anchor": "middle", "font-size": size, "font-weight": 650, fill: "currentColor" });
+      center.textContent = text;
+      svg.appendChild(center);
+    }
+    if (cfg.centerLabel) {
+      var cap = svgEl("text", { x: cx, y: text ? cy + 19 : cy + 5, "text-anchor": "middle", "font-size": 11, fill: mutedColor() });
+      cap.textContent = cfg.centerLabel;
+      svg.appendChild(cap);
+    }
+    if (cfg.legend) {
+      legend(el, labels.map(function (label, i) {
+        return { label: label, color: palette[i % palette.length], value: fmt.pct(values[i] / total) };
+      }));
+    }
+  }
+
+  // ---- Page building blocks: what dashboards and small systems kept
+  // re-implementing — a searchable sortable table, a KPI row, tabs, toasts,
+  // dialogs, saved state and mock data. Every call is opt-in, so a page that
+  // brings its own versions keeps them.
+
+  function resolve(target) {
+    return typeof target === "string" ? document.querySelector(target) : target;
+  }
+
+  function node(tag, className, text) {
+    var el = document.createElement(tag);
+    if (className) el.className = className;
+    if (text != null) el.textContent = text;
+    return el;
+  }
+
+  function isNumberColumn(col) {
+    return col.align === "right" || col.format === "num" || col.format === "brl" || col.format === "pct";
+  }
+
+  function cellText(col, row) {
+    var value = row[col.key];
+    if (value == null) return "";
+    return col.format ? coerceFormat(col.format)(value) : String(value);
+  }
+
+  function compareValues(a, b) {
+    if (typeof a === "number" && typeof b === "number") return a - b;
+    return String(a == null ? "" : a).localeCompare(String(b == null ? "" : b), "pt-BR", { numeric: true });
+  }
+
+  // table(el, {columns, rows, search?, pageSize?, empty?, onRowClick?}) — a
+  // table.shell-table with sortable headers, an optional search box and
+  // pager. A column is {key, label, format?, align?, sortable? (true),
+  // render?(value, row) returning a Node or an HTML string — the page writes
+  // its cell templates as markup}. Plain values are always set as text.
+  // Returns {setRows, rows}.
+  function table(target, cfg) {
+    var root = resolve(target);
+    var cols = cfg.columns || [];
+    var pageSize = cfg.pageSize || 0;
+    var state = { rows: (cfg.rows || []).slice(), query: "", key: null, dir: 1, page: 0 };
+    root.innerHTML = "";
+    if (cfg.search) {
+      var search = node("input", "input skip-table-search");
+      search.type = "search";
+      search.placeholder = typeof cfg.search === "string" ? cfg.search : "Buscar…";
+      search.setAttribute("aria-label", search.placeholder);
+      search.addEventListener("input", function () {
+        state.query = search.value.trim().toLowerCase();
+        state.page = 0;
+        draw();
+      });
+      root.appendChild(search);
+    }
+    var tableEl = node("table", "shell-table");
+    var headRow = node("tr");
+    var heads = cols.map(function (col) {
+      var th = node("th", isNumberColumn(col) ? "num" : "", col.label == null ? col.key : col.label);
+      th.scope = "col";
+      if (col.sortable !== false) {
+        var toggle = function () {
+          state.dir = state.key === col.key ? -state.dir : 1;
+          state.key = col.key;
+          draw();
+        };
+        th.setAttribute("data-sort", col.key);
+        th.tabIndex = 0;
+        th.addEventListener("click", toggle);
+        th.addEventListener("keydown", function (e) {
+          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(); }
+        });
+      }
+      headRow.appendChild(th);
+      return th;
+    });
+    var thead = node("thead");
+    var tbody = node("tbody");
+    var wrap = node("div", "skip-table-wrap");
+    var pager = node("div", "skip-pager");
+    thead.appendChild(headRow);
+    tableEl.appendChild(thead);
+    tableEl.appendChild(tbody);
+    wrap.appendChild(tableEl);
+    root.appendChild(wrap);
+    if (pageSize) root.appendChild(pager);
+
+    function visibleRows() {
+      var rows = state.rows;
+      if (state.query) {
+        rows = rows.filter(function (row) {
+          return cols.some(function (col) { return cellText(col, row).toLowerCase().indexOf(state.query) >= 0; });
+        });
+      }
+      if (state.key) {
+        var key = state.key, dir = state.dir;
+        rows = rows.slice().sort(function (a, b) { return dir * compareValues(a[key], b[key]); });
+      }
+      return rows;
+    }
+
+    function drawRow(row) {
+      var tr = node("tr");
+      cols.forEach(function (col) {
+        var td = node("td", isNumberColumn(col) ? "num" : "");
+        if (!col.render) {
+          td.textContent = cellText(col, row);
+        } else {
+          var content = col.render(row[col.key], row);
+          if (content instanceof Node) td.appendChild(content);
+          else td.innerHTML = content == null ? "" : String(content);
+        }
+        tr.appendChild(td);
+      });
+      // The row stays a row (no role) and takes focus, so a keyboard reaches
+      // the same action; keys pressed on a control inside a cell are its own.
+      if (cfg.onRowClick) {
+        tr.style.cursor = "pointer";
+        tr.tabIndex = 0;
+        tr.addEventListener("click", function () { cfg.onRowClick(row); });
+        tr.addEventListener("keydown", function (e) {
+          if (e.target !== tr || (e.key !== "Enter" && e.key !== " ")) return;
+          e.preventDefault();
+          cfg.onRowClick(row);
+        });
+      }
+      return tr;
+    }
+
+    function pagerButton(label, disabled, step) {
+      var button = node("button", "btn", label);
+      button.type = "button";
+      button.setAttribute("data-variant", "outline");
+      button.setAttribute("data-size", "sm");
+      button.disabled = disabled;
+      button.addEventListener("click", function () { state.page += step; draw(); });
+      return button;
+    }
+
+    function draw() {
+      var rows = visibleRows();
+      heads.forEach(function (th, i) {
+        if (cols[i].key === state.key) th.setAttribute("aria-sort", state.dir > 0 ? "ascending" : "descending");
+        else th.removeAttribute("aria-sort");
+      });
+      var pages = pageSize ? Math.max(1, Math.ceil(rows.length / pageSize)) : 1;
+      state.page = Math.min(state.page, pages - 1);
+      var shown = pageSize ? rows.slice(state.page * pageSize, (state.page + 1) * pageSize) : rows;
+      tbody.innerHTML = "";
+      if (!shown.length) {
+        var empty = node("td", "skip-table-empty", cfg.empty || "Nenhum registro encontrado.");
+        empty.colSpan = cols.length;
+        tbody.appendChild(node("tr")).appendChild(empty);
+      }
+      shown.forEach(function (row) { tbody.appendChild(drawRow(row)); });
+      if (!pageSize) return;
+      pager.innerHTML = "";
+      var from = rows.length ? state.page * pageSize + 1 : 0;
+      pager.appendChild(node("span", "", from + "–" + Math.min(rows.length, (state.page + 1) * pageSize) + " de " + rows.length));
+      var nav = node("div", "row gap-2");
+      nav.appendChild(pagerButton("Anterior", state.page === 0, -1));
+      nav.appendChild(pagerButton("Próxima", state.page >= pages - 1, 1));
+      pager.appendChild(nav);
+    }
+
+    draw();
+    return {
+      setRows: function (rows) { state.rows = rows.slice(); draw(); },
+      rows: visibleRows
+    };
+  }
+
+  // kpis(el, [{label, value, format?, delta?, hint?}]) — KPI cards in a
+  // responsive grid; delta is a fraction (0.12 renders as ▲ 12%).
+  function kpis(target, items) {
+    var root = resolve(target);
+    root.innerHTML = "";
+    root.classList.add("shell-grid");
+    items.forEach(function (item) {
+      var card = node("div", "panel kpi");
+      card.appendChild(node("span", "kpi-label", item.label));
+      // Large money values go compact ("R$ 27,5 mi"): the full amount does
+      // not fit a KPI card at four per row.
+      var kpiFormat = item.format === "brl" && Math.abs(item.value) >= 1e6 ? fmt.brlCompact : (item.format ? coerceFormat(item.format) : null);
+      card.appendChild(node("span", "kpi-value", kpiFormat ? kpiFormat(item.value) : String(item.value)));
+      if (typeof item.delta === "number") {
+        var up = item.delta >= 0;
+        card.appendChild(node("span", "kpi-delta " + (up ? "up" : "down"), (up ? "▲ " : "▼ ") + fmt.pct(Math.abs(item.delta))));
+      }
+      if (item.hint) card.appendChild(node("span", "kpi-label", item.hint));
+      root.appendChild(card);
+    });
+  }
+
+  // badge(text, variant?) — a .badge node for table cells and lists;
+  // variant is "secondary" | "outline" | "destructive" (default: primary).
+  function badge(text, variant) {
+    var el = node("span", "badge", text);
+    if (variant) el.setAttribute("data-variant", variant);
+    return el;
+  }
+
+  // tabs(el) — wires one .tabs block: [role=tab] buttons inside
+  // [role=tablist], each with aria-controls naming its [role=tabpanel].
+  function tabs(target) {
+    var root = resolve(target);
+    var buttons = Array.prototype.slice.call(root.querySelectorAll('[role="tab"]'));
+    function select(chosen) {
+      buttons.forEach(function (b) {
+        var on = b === chosen;
+        b.setAttribute("aria-selected", on ? "true" : "false");
+        b.tabIndex = on ? 0 : -1;
+        var panel = document.getElementById(b.getAttribute("aria-controls"));
+        if (panel) panel.hidden = !on;
+      });
+    }
+    buttons.forEach(function (b, i) {
+      b.addEventListener("click", function () { select(b); });
+      b.addEventListener("keydown", function (e) {
+        var step = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+        if (!step) return;
+        var next = buttons[(i + step + buttons.length) % buttons.length];
+        next.focus();
+        select(next);
+      });
+    });
+    select(buttons.filter(function (b) { return b.getAttribute("aria-selected") === "true"; })[0] || buttons[0]);
+  }
+
+  // toast(message, {type?: "success" | "error", title?, duration?}) — a
+  // .toast in a shared .toaster at the bottom of the page.
+  function toast(message, opts) {
+    opts = opts || {};
+    var toaster = document.querySelector(".toaster") || document.body.appendChild(node("div", "toaster"));
+    var item = node("div", "toast");
+    item.setAttribute("role", opts.type === "error" ? "alert" : "status");
+    item.setAttribute("aria-hidden", "true");
+    if (opts.type) item.setAttribute("data-type", opts.type);
+    var content = node("div", "toast-content");
+    var section = node("section");
+    if (opts.title) section.appendChild(node("h2", "", opts.title));
+    section.appendChild(node("p", "", message));
+    content.appendChild(section);
+    item.appendChild(content);
+    toaster.appendChild(item);
+    requestAnimationFrame(function () { item.setAttribute("aria-hidden", "false"); });
+    setTimeout(function () {
+      item.setAttribute("aria-hidden", "true");
+      setTimeout(function () { item.remove(); }, 400);
+    }, opts.duration || 3000);
+  }
+
+  // Dialogs are native <dialog class="dialog">: a [data-dialog-open="id"]
+  // anywhere opens one, a [data-dialog-close] inside closes it, and a click on
+  // its backdrop closes it too. Plain dialog.showModal()/close() still work.
+  document.addEventListener("click", function (e) {
+    var target = e.target;
+    if (!(target instanceof Element)) return;
+    var opener = target.closest("[data-dialog-open]");
+    if (opener) {
+      var dialog = document.getElementById(opener.getAttribute("data-dialog-open"));
+      if (dialog && dialog.showModal && !dialog.open) dialog.showModal();
+      return;
+    }
+    var closer = target.closest("[data-dialog-close]");
+    if (closer && closer.closest("dialog")) {
+      closer.closest("dialog").close();
+      return;
+    }
+    if (target.tagName === "DIALOG" && target.classList.contains("dialog") && target.open) target.close();
+  });
+
+  // store(key, fallback) — JSON state in localStorage that never throws (a
+  // private window or a full quota falls back to memory): {get, set, update}.
+  function store(key, fallback) {
+    var memory;
+    // Set while the last write did not reach localStorage: what is stored
+    // there is older than memory until a write goes through again.
+    var unsaved = false;
+    var initial = function () { return fallback === undefined ? undefined : JSON.parse(JSON.stringify(fallback)); };
+    function get() {
+      if (!unsaved) {
+        try {
+          var raw = localStorage.getItem(key);
+          if (raw != null) return JSON.parse(raw);
+        } catch (e) { /* storage unavailable: memory below */ }
+      }
+      return memory !== undefined ? memory : initial();
+    }
+    function set(value) {
+      memory = value;
+      try {
+        localStorage.setItem(key, JSON.stringify(value));
+        unsaved = false;
+      } catch (e) {
+        unsaved = true;
+      }
+      return value;
+    }
+    return { get: get, set: set, update: function (fn) { return set(fn(get())); } };
+  }
+
+  // mock — seeded random data, so a page asks for 90 days of numbers in one
+  // line instead of writing them out; the same seed gives the same data.
+  var FIRST = ["Ana", "Bruno", "Carla", "Diego", "Eduarda", "Felipe", "Gabriela", "Henrique", "Isabela", "João",
+    "Larissa", "Marcos", "Natália", "Otávio", "Paula", "Rafael", "Sofia", "Thiago", "Vanessa", "Lucas"];
+  var LAST = ["Silva", "Santos", "Oliveira", "Souza", "Pereira", "Costa", "Rodrigues", "Almeida", "Nascimento", "Lima",
+    "Araújo", "Fernandes", "Carvalho", "Gomes", "Martins", "Rocha", "Ribeiro", "Barbosa"];
+  var INITIALS = "ABCDEFGHIJLMNOPRSTV".split("");
+  var CITIES = ["São Paulo, SP", "Rio de Janeiro, RJ", "Belo Horizonte, MG", "Curitiba, PR", "Porto Alegre, RS",
+    "Salvador, BA", "Recife, PE", "Fortaleza, CE", "Brasília, DF", "Goiânia, GO", "Campinas, SP", "Florianópolis, SC",
+    "Manaus, AM", "Belém, PA", "Vitória, ES", "Natal, RN"];
+
+  function createMock(seed) {
+    var state = seed >>> 0;
+    var names = 0;
+    function random() {
+      state = (state + 0x6d2b79f5) >>> 0;
+      var t = state;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    }
+    function int(min, max) { return min + Math.floor(random() * (max - min + 1)); }
+    function pick(list) { return list[Math.floor(random() * list.length)]; }
+    var mock = {
+      seed: function (value) { state = value >>> 0; names = 0; return mock; },
+      random: random,
+      int: int,
+      float: function (min, max, decimals) {
+        var factor = Math.pow(10, decimals == null ? 2 : decimals);
+        return Math.round((min + random() * (max - min)) * factor) / factor;
+      },
+      pick: pick,
+      chance: function (p) { return random() < p; },
+      // There are 360 first/last pairs. A page that draws until the name is
+      // new (do { … } while (used.has(name))) froze the tab past them, so
+      // later draws widen the space: a second surname after 200 (6,480), a
+      // middle initial after 4,000.
+      name: function () {
+        names++;
+        var middle = names > 4000 ? pick(INITIALS) + ". " : "";
+        return pick(FIRST) + " " + middle + (names > 200 ? pick(LAST) + " " : "") + pick(LAST);
+      },
+      city: function () { return pick(CITIES); },
+      // series(n, {start, trend, noise, min, decimals}) — a walk: each value
+      // moves by trend (fraction per step) plus up to ±noise of itself.
+      series: function (n, opts) {
+        opts = opts || {};
+        var value = opts.start == null ? 100 : opts.start;
+        var factor = Math.pow(10, opts.decimals || 0);
+        var out = [];
+        for (var i = 0; i < n; i++) {
+          out.push(Math.max(opts.min == null ? 0 : opts.min, Math.round(value * factor) / factor));
+          value = value * (1 + (opts.trend || 0)) * (1 + (random() * 2 - 1) * (opts.noise == null ? 0.08 : opts.noise));
+        }
+        return out;
+      },
+      // dates(n, {end?, step?: "day" | "week" | "month"}) — ISO dates
+      // (YYYY-MM-DD), oldest first, ending at end (default: today).
+      dates: function (n, opts) {
+        opts = opts || {};
+        var end = opts.end ? new Date(opts.end) : new Date();
+        var out = [];
+        for (var i = n - 1; i >= 0; i--) {
+          var d = new Date(end.getTime());
+          if (opts.step === "month") d.setMonth(d.getMonth() - i);
+          else d.setDate(d.getDate() - i * (opts.step === "week" ? 7 : 1));
+          out.push(d.toISOString().slice(0, 10));
+        }
+        return out;
+      },
+      // rows(n, spec) — n objects; each spec value is a function(i), a list
+      // to pick from, or a constant.
+      rows: function (n, spec) {
+        var out = [];
+        for (var i = 0; i < n; i++) {
+          var row = {};
+          for (var key in spec) {
+            var value = spec[key];
+            row[key] = typeof value === "function" ? value(i) : Array.isArray(value) ? pick(value) : value;
+          }
+          out.push(row);
+        }
+        return out;
+      }
+    };
+    return mock;
+  }
+
+  window.skipShell = { fmt: fmt };
+  window.skipChart = { bar: bar, line: line, donut: donut };
+  window.skipUI = { table: table, kpis: kpis, badge: badge, tabs: tabs, toast: toast };
+  window.skipStore = store;
+  window.skipMock = createMock(20261022);
+})();
+
+</script>
+<style>
+:root {
+  --cor-fundo: #FFFFFF;
+  --cor-creme: #FAF7F2;
+  --cor-creme-alt: #F5EFE8;
+  --cor-texto: #1A1A1A;
+  --cor-texto-suave: #5A5A5A;
+  --cor-rosa: #E8B7B0;
+  --cor-rosa-escura: #9B4B42;
+  --cor-ocre: #F4C189;
+  --cor-borda: #E8DDD6;
+  --fonte-serifa: Georgia, 'Times New Roman', serif;
+  --fonte-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --transicao: all 0.3s cubic-bezier(0.2,0.8,0.2,1);
+  --accent: #9B4B42;
+  --accent-text: #7E3A33;
+  --accent-contrast: #FFFFFF;
+  font-family: var(--fonte-sans);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--cor-fundo);
+  color: var(--cor-texto);
+  font-family: var(--fonte-sans);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid #9B4B42;
+  outline-offset: 2px;
+}
+
+img { display: block; max-width: 100%; }
+
+.container-loja {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* ---------- Cabeçalho fixo ---------- */
+.cabecalho {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  height: 72px;
+  background: rgba(255,255,255,0.97);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid transparent;
+  transition: var(--transicao);
+}
+.cabecalho.rolado {
+  box-shadow: 0 6px 22px rgba(26,26,26,0.08);
+  border-bottom-color: var(--cor-borda);
+}
+.cabecalho .container-loja {
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.logo-link {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+.logo-svg {
+  width: 150px;
+  height: 60px;
+  display: block;
+}
+.menu-central {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+.menu-central a {
+  position: relative;
+  text-decoration: none;
+  color: var(--cor-texto-suave);
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+  padding: 6px 0;
+  transition: var(--transicao);
+}
+.menu-central a::after {
+  content: '';
+  position: absolute;
+  left: 0; bottom: 0;
+  width: 0; height: 1px;
+  background: var(--cor-rosa-escura);
+  transition: width 0.3s ease;
+}
+.menu-central a:hover { color: var(--cor-rosa-escura); }
+.menu-central a:hover::after { width: 100%; }
+.menu-central a.ativo { color: var(--cor-texto); font-weight: 600; }
+.menu-central a.ativo::after { width: 100%; background: var(--cor-rosa-escura); }
+
+.acoes-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.icone-btn {
+  position: relative;
+  width: 42px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  color: var(--cor-texto);
+  cursor: pointer;
+  transition: var(--transicao);
+}
+.icone-btn:hover { background: var(--cor-creme); border-color: var(--cor-borda); color: var(--cor-rosa-escura); }
+.icone-btn svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.badge-sacola {
+  position: absolute;
+  top: 2px;
+  right: 0;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--cor-rosa-escura);
+  color: #FFFFFF;
+  font-size: 0.68rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+.badge-sacola.pulso {
+  animation: pulsoSacola 0.3s ease;
+}
+@keyframes pulsoSacola {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.35); }
+  100% { transform: scale(1); }
+}
+.menu-mais {
+  position: relative;
+}
+.menu-mais-lista {
+  position: absolute;
+  top: 48px;
+  right: 0;
+  min-width: 200px;
+  background: #FFFFFF;
+  border: 1px solid var(--cor-borda);
+  border-radius: 12px;
+  box-shadow: 0 16px 40px rgba(26,26,26,0.12);
+  padding: 8px;
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 1100;
+}
+.menu-mais-lista.aberto { display: flex; animation: entradaSuave 0.25s ease; }
+.menu-mais-lista button,
+.menu-mais-lista a {
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  color: var(--cor-texto);
+  text-decoration: none;
+  cursor: pointer;
+}
+.menu-mais-lista button:hover,
+.menu-mais-lista a:hover { background: var(--cor-creme); color: var(--cor-rosa-escura); }
+
+@keyframes entradaSuave {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- Faixa de categorias (abas) ---------- */
+.faixa-categorias {
+  background: #FFFFFF;
+  border-bottom: 1px solid #E8DDD6;
+  position: sticky;
+  top: 72px;
+  z-index: 900;
+}
+.abas-categoria {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  align-items: center;
+  height: 54px;
+}
+.abas-categoria::-webkit-scrollbar { display: none; }
+.aba-categoria {
+  position: relative;
+  flex: 0 0 auto;
+  padding: 16px 18px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-family: var(--fonte-sans);
+  font-size: 0.88rem;
+  letter-spacing: 0.03em;
+  color: #5A5A5A;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.25s ease, border-color 0.25s ease;
+  white-space: nowrap;
+}
+.aba-categoria:hover {
+  color: #9B4B42;
+  border-bottom-color: #E8B7B0;
+}
+.aba-categoria.ativo {
+  color: #1A1A1A;
+  font-weight: 600;
+  border-bottom-color: #9B4B42;
+}
+.aba-categoria.ativo::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: #9B4B42;
+}
+
+/* ---------- Área de busca ---------- */
+.area-busca {
+  background: #FAF7F2;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--cor-borda);
+}
+.area-busca .linha-busca {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.campo-busca {
+  position: relative;
+  flex: 1 1 360px;
+  max-width: 520px;
+}
+.campo-busca svg {
+  position: absolute;
+  left: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: var(--cor-texto-suave);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+.campo-busca input {
+  width: 100%;
+  height: 46px;
+  padding: 0 20px 0 48px;
+  border: 1px solid #E8DDD6;
+  border-radius: 999px;
+  background: #FFFFFF;
+  color: var(--cor-texto);
+  font-size: 0.94rem;
+  transition: var(--transicao);
+}
+.campo-busca input::placeholder { color: #8A8A8A; }
+.campo-busca input:focus {
+  outline: none;
+  border-color: #9B4B42;
+  box-shadow: 0 0 0 3px rgba(155,75,66,0.12);
+}
+.controles-busca {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.seletor-ordem {
+  height: 46px;
+  padding: 0 16px;
+  border: 1px solid #E8DDD6;
+  border-radius: 999px;
+  background: #FFFFFF;
+  color: var(--cor-texto);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: var(--transicao);
+}
+.seletor-ordem:focus { outline: none; border-color: #9B4B42; }
+.contador-resultados {
+  font-size: 0.9rem;
+  color: var(--cor-texto-suave);
+  white-space: nowrap;
+}
+
+/* ---------- Conteúdo ---------- */
+.area-produtos {
+  padding: 48px 0 72px;
+  background: #FFFFFF;
+}
+.cabecalho-pagina {
+  text-align: center;
+  margin-bottom: 40px;
+}
+.eyebrow {
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: 999px;
+  background: var(--cor-creme-alt);
+  color: var(--accent-text);
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.titulo-pagina {
+  font-family: var(--fonte-serifa);
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  font-weight: 400;
+  margin: 0 0 10px;
+  color: var(--cor-texto);
+}
+.subtitulo-pagina {
+  color: var(--cor-texto-suave);
+  font-size: 0.98rem;
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+.grade-produtos {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px 24px;
+}
+@media (min-width: 640px) { .grade-produtos { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 992px) { .grade-produtos { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 1200px) { .grade-produtos { grid-template-columns: repeat(4, 1fr); } }
+
+/* ---------- Card de produto ---------- */
+.card-produto {
+  position: relative;
+  background: #FFFFFF;
+  border-radius: 16px;
+  padding: 14px 14px 20px;
+  transform-style: preserve-3d;
+  transition: transform 0.35s cubic-bezier(0.2,0.8,0.2,1), box-shadow 0.4s ease, opacity 0.5s ease;
+  perspective: 900px;
+  opacity: 0;
+  transform: translateY(18px);
+  animation: entradaCard 0.6s ease forwards;
+  animation-delay: var(--atraso, 0ms);
+  will-change: transform;
+}
+@keyframes entradaCard {
+  to { opacity: 1; transform: translateY(0); }
+}
+.card-produto:hover {
+  box-shadow: 0 22px 46px rgba(26,26,26,0.12);
+}
+.card-produto.oculto { display: none; }
+
+.moldura-arco {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border-radius: 999px 999px 12px 12px;
+  overflow: hidden;
+  background: var(--cor-creme-alt);
+  cursor: pointer;
+}
+.moldura-arco img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.45s ease, transform 0.6s ease;
+}
+.moldura-arco .img-principal { opacity: 1; z-index: 1; }
+.moldura-arco .img-hover { opacity: 0; z-index: 2; }
+.moldura-arco.com-hover .img-principal,
+.moldura-arco.com-hover .img-hover { transform: scale(1.06); }
+.moldura-arco.com-hover .img-hover.visivel { opacity: 1; }
+.moldura-arco.com-hover .img-principal.escondida { opacity: 0; }
+
+.tag-novidade {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 3;
+  background: var(--cor-ocre);
+  color: #1A1A1A;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+.card-info {
+  padding: 16px 6px 0;
+}
+.card-categoria {
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent-text);
+  margin-bottom: 4px;
+}
+.card-codigo {
+  font-size: 0.76rem;
+  color: var(--cor-texto-suave);
+  margin-bottom: 4px;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+}
+.card-nome {
+  font-family: var(--fonte-serifa);
+  font-size: 1.08rem;
+  margin: 0 0 8px;
+  color: var(--cor-texto);
+  line-height: 1.3;
+}
+.card-preco {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--cor-texto);
+  margin-bottom: 10px;
+}
+.linha-cores {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+.bolinha-cor {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,0,0,0.12);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.5);
+}
+.linha-tamanhos {
+  font-size: 0.8rem;
+  color: var(--cor-texto-suave);
+  margin-bottom: 14px;
+}
+.botao-ver {
+  position: relative;
+  width: 100%;
+  height: 44px;
+  border: 1px solid var(--cor-rosa-escura);
+  background: transparent;
+  color: var(--cor-rosa-escura);
+  border-radius: 999px;
+  font-size: 0.88rem;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  overflow: hidden;
+  z-index: 0;
+  transition: color 0.35s ease;
+}
+.botao-ver::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 0;
+  background: var(--cor-rosa-escura);
+  transition: height 0.35s ease;
+  z-index: -1;
+}
+.botao-ver:hover { color: #FFFFFF; }
+.botao-ver:hover::before { height: 100%; }
+
+/* ---------- Skeleton ---------- */
+.skeleton-card {
+  background: #FFFFFF;
+  border-radius: 16px;
+  padding: 14px;
+}
+.skeleton-img {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border-radius: 999px 999px 12px 12px;
+  background: linear-gradient(90deg, #F5EFE8 25%, #FBF7F2 50%, #F5EFE8 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite linear;
+}
+.skeleton-linha {
+  height: 12px;
+  border-radius: 6px;
+  margin-top: 14px;
+  background: linear-gradient(90deg, #F5EFE8 25%, #FBF7F2 50%, #F5EFE8 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite linear;
+}
+.skeleton-linha.curta { width: 50%; }
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ---------- Estados ---------- */
+.estado-msg {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 20px;
+  border: 1px dashed var(--cor-borda);
+  border-radius: 16px;
+  background: var(--cor-creme);
+}
+.estado-msg h3 {
+  font-family: var(--fonte-serifa);
+  font-weight: 400;
+  margin: 0 0 8px;
+  font-size: 1.3rem;
+}
+.estado-msg p {
+  color: var(--cor-texto-suave);
+  margin: 0 0 18px;
+}
+.btn-primario {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 46px;
+  padding: 0 26px;
+  border-radius: 999px;
+  border: 1px solid var(--cor-rosa-escura);
+  background: var(--cor-rosa-escura);
+  color: #FFFFFF;
+  font-size: 0.92rem;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  overflow: hidden;
+  z-index: 0;
+  transition: color 0.35s ease, transform 0.2s ease;
+  text-decoration: none;
+}
+.btn-primario::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 0;
+  background: #1A1A1A;
+  transition: height 0.35s ease;
+  z-index: -1;
+}
+.btn-primario:hover::before { height: 100%; }
+.btn-primario:active { transform: scale(0.98); }
+.btn-secundario {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 46px;
+  padding: 0 24px;
+  border-radius: 999px;
+  border: 1px solid var(--cor-rosa-escura);
+  background: transparent;
+  color: var(--cor-rosa-escura);
+  font-size: 0.92rem;
+  cursor: pointer;
+  overflow: hidden;
+  z-index: 0;
+  transition: color 0.35s ease;
+  text-decoration: none;
+}
+.btn-secundario::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 0;
+  background: var(--cor-rosa-escura);
+  transition: height 0.35s ease;
+  z-index: -1;
+}
+.btn-secundario:hover { color: #FFFFFF; }
+.btn-secundario:hover::before { height: 100%; }
+.btn-whats {
+  background: #25D366;
+  border-color: #25D366;
+  color: #FFFFFF;
+}
+.btn-whats::before { background: #1EB957; }
+
+/* ---------- Modal de detalhe ---------- */
+.overlay-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(26,26,26,0.5);
+  z-index: 2000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.overlay-modal.aberto { display: flex; animation: fadeOverlay 0.25s ease; }
+@keyframes fadeOverlay { from { opacity: 0; } to { opacity: 1; } }
+
+.modal-detalhe {
+  position: relative;
+  background: #FFFFFF;
+  width: 100%;
+  max-width: 920px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 20px;
+  padding: 32px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  box-shadow: 0 30px 80px rgba(26,26,26,0.25);
+  animation: subirModal 0.35s cubic-bezier(0.2,0.8,0.2,1);
+}
+@keyframes subirModal {
+  from { opacity: 0; transform: translateY(24px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.modal-fechar {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 50%;
+  background: var(--cor-creme);
+  color: var(--cor-texto);
+  cursor: pointer;
+  font-size: 1.2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transicao);
+  z-index: 5;
+}
+.modal-fechar:hover { background: var(--cor-rosa); }
+.galeria-detalhe { display: flex; flex-direction: column; gap: 12px; }
+.galeria-principal {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border-radius: 999px 999px 14px 14px;
+  overflow: hidden;
+  background: var(--cor-creme-alt);
+}
+.galeria-principal img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.35s ease;
+}
+.miniaturas {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.miniaturas::-webkit-scrollbar { display: none; }
+.miniatura {
+  flex: 0 0 auto;
+  width: 60px;
+  height: 76px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 2px solid transparent;
+  padding: 0;
+  background: var(--cor-creme-alt);
+  cursor: pointer;
+  transition: var(--transicao);
+}
+.miniatura img { width: 100%; height: 100%; object-fit: cover; }
+.miniatura.ativa { border-color: var(--cor-rosa-escura); }
+
+.info-detalhe h2 {
+  font-family: var(--fonte-serifa);
+  font-weight: 400;
+  font-size: 1.7rem;
+  margin: 6px 0 10px;
+}
+.info-detalhe .preco-grande {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+.info-detalhe .descricao {
+  color: var(--cor-texto-suave);
+  font-size: 0.95rem;
+  margin-bottom: 18px;
+}
+.rotulo-campo {
+  display: block;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--cor-texto);
+  margin: 14px 0 8px;
+  font-weight: 600;
+}
+.opcoes-tamanho,
+.opcoes-cor {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.opcao-tamanho {
+  min-width: 46px;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid var(--cor-borda);
+  background: #FFFFFF;
+  color: var(--cor-texto);
+  cursor: pointer;
+  font-size: 0.88rem;
+  transition: var(--transicao);
+}
+.opcao-tamanho:hover { border-color: var(--cor-rosa-escura); }
+.opcao-tamanho.selecionado {
+  background: var(--cor-rosa-escura);
+  color: #FFFFFF;
+  border-color: var(--cor-rosa-escura);
+}
+.opcao-cor {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,0,0,0.15);
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.2s ease;
+}
+.opcao-cor:hover { transform: scale(1.08); }
+.opcao-cor.selecionado {
+  outline: 2px solid var(--cor-rosa-escura);
+  outline-offset: 2px;
+}
+.aviso-tamanho {
+  display: none;
+  margin-top: 10px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #FCEBE9;
+  color: #7E3A33;
+  font-size: 0.85rem;
+}
+.aviso-tamanho.visivel { display: block; }
+.acoes-detalhe {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+/* ---------- Sacola ---------- */
+.painel-sacola {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: min(400px, 100vw);
+  background: #FFFFFF;
+  box-shadow: -12px 0 40px rgba(26,26,26,0.15);
+  transform: translateX(100%);
+  transition: transform 0.4s cubic-bezier(0.2,0.8,0.2,1);
+  z-index: 2100;
+  display: flex;
+  flex-direction: column;
+}
+.painel-sacola.aberto { transform: translateX(0); }
+.painel-sacola-cabecalho {
+  padding: 22px 24px;
+  border-bottom: 1px solid var(--cor-borda);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.painel-sacola-cabecalho h3 {
+  font-family: var(--fonte-serifa);
+  font-weight: 400;
+  font-size: 1.3rem;
+  margin: 0;
+}
+.painel-sacola-corpo {
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px 24px;
+}
+.item-sacola {
+  display: grid;
+  grid-template-columns: 64px 1fr auto;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--cor-borda);
+  align-items: center;
+}
+.item-sacola img {
+  width: 64px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 10px 10px 6px 6px;
+  background: var(--cor-creme-alt);
+}
+.item-sacola-nome { font-size: 0.92rem; font-weight: 600; margin-bottom: 2px; }
+.item-sacola-meta { font-size: 0.8rem; color: var(--cor-texto-suave); }
+.item-sacola-preco { font-size: 0.9rem; font-weight: 600; margin-top: 4px; }
+.botao-remover {
+  background: transparent;
+  border: none;
+  color: var(--cor-rosa-escura);
+  font-size: 0.8rem;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  margin-top: 4px;
+}
+.sacola-vazia {
+  text-align: center;
+  padding: 50px 10px;
+  color: var(--cor-texto-suave);
+}
+.sacola-vazia h4 {
+  font-family: var(--fonte-serifa);
+  font-weight: 400;
+  color: var(--cor-texto);
+  font-size: 1.15rem;
+  margin: 0 0 8px;
+}
+.painel-sacola-rodape {
+  border-top: 1px solid var(--cor-borda);
+  padding: 20px 24px 24px;
+  background: var(--cor-creme);
+}
+.linha-subtotal {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1rem;
+  margin-bottom: 14px;
+}
+.linha-subtotal strong { font-weight: 600; }
+.fundo-sacola {
+  position: fixed;
+  inset: 0;
+  background: rgba(26,26,26,0.3);
+  z-index: 2050;
+  display: none;
+}
+.fundo-sacola.aberto { display: block; animation: fadeOverlay 0.25s ease; }
+
+/* ---------- Rodapé ---------- */
+.rodape {
+  background: var(--cor-creme);
+  border-top: 1px solid var(--cor-borda);
+  padding: 56px 0 28px;
+}
+.rodape-grade {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 28px;
+  align-items: center;
+  justify-items: center;
+  text-align: center;
+}
+@media (min-width: 768px) {
+  .rodape-grade {
+    grid-template-columns: 1fr 1fr 1fr;
+    justify-items: start;
+    text-align: left;
+  }
+}
+.rodape-grade p {
+  margin: 0;
+  color: var(--cor-texto-suave);
+  font-size: 0.92rem;
+}
+.rodape-grade .titulo-rodape {
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cor-texto);
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+.rodape-base {
+  margin-top: 36px;
+  padding-top: 20px;
+  border-top: 1px solid var(--cor-borda);
+  text-align: center;
+  color: var(--cor-texto-suave);
+  font-size: 0.8rem;
+}
+
+/* ---------- WhatsApp flutuante ---------- */
+.whats-flutuante {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: #25D366;
+  color: #FFFFFF;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 28px rgba(37,211,102,0.4);
+  z-index: 1500;
+  text-decoration: none;
+  animation: respiracao 2.6s ease-in-out infinite;
+}
+.whats-flutuante svg { width: 28px; height: 28px; fill: #FFFFFF; }
+@keyframes respiracao {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+/* ---------- Mensagem toast simples ---------- */
+.aviso-rapido {
+  position: fixed;
+  left: 50%;
+  bottom: 96px;
+  transform: translateX(-50%) translateY(20px);
+  background: #1A1A1A;
+  color: #FFFFFF;
+  padding: 12px 22px;
+  border-radius: 999px;
+  font-size: 0.88rem;
+  opacity: 0;
+  transition: all 0.35s ease;
+  pointer-events: none;
+  z-index: 3000;
+  max-width: 90vw;
+  text-align: center;
+}
+.aviso-rapido.visivel {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ---------- Responsivo ---------- */
+@media (max-width: 900px) {
+  .menu-central { display: none; }
+}
+@media (max-width: 640px) {
+  .faixa-categorias { top: 64px; }
+  .cabecalho { height: 64px; }
+  .cabecalho .container-loja { height: 64px; }
+  .logo-svg { width: 120px; height: 48px; }
+  .modal-detalhe {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 24px 20px 28px;
+    border-radius: 24px 24px 0 0;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    max-width: 100%;
+    max-height: 88vh;
+    animation: subirBottomSheet 0.38s cubic-bezier(0.2,0.8,0.2,1);
+  }
+  .overlay-modal { align-items: flex-end; padding: 0; }
+  .galeria-principal { aspect-ratio: 4 / 5; }
+  .area-busca .linha-busca { flex-direction: column; align-items: stretch; }
+  .campo-busca { max-width: none; }
+  .contador-resultados { text-align: center; }
+  .controles-busca { justify-content: space-between; }
+}
+@keyframes subirBottomSheet {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+/* ---------- Reduzir movimento ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .card-produto { opacity: 1; transform: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===================== CABEÇALHO ===================== -->
+<header class="cabecalho" id="cabecalho">
+  <div class="container-loja">
+    <a href="index.html" class="logo-link" aria-label="Lolita boutique — início">
+      <svg class="logo-svg" viewBox="0 0 250 100" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Lolita boutique">
+        <defs>
+          <pattern id="pontosPretos" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse">
+            <circle cx="5" cy="5" r="0.9" fill="#1A1A1A" opacity="0.65" />
+          </pattern>
+        </defs>
+        <path d="M 175,0 C 205,0 248,15 250,45 C 251,75 220,60 195,50 C 170,40 155,18 175,0 Z" fill="#E8B7B0" opacity="0.9" />
+        <path d="M 175,0 C 205,0 248,15 250,45 C 251,75 220,60 195,50 C 170,40 155,18 175,0 Z" fill="url(#pontosPretos)" />
+        <path d="M 0,60 C 20,40 55,50 68,72 C 80,95 50,100 25,100 C 5,100 0,85 0,60 Z" fill="#F4C189" opacity="0.9" />
+        <path d="M 0,60 C 20,40 55,50 68,72 C 80,95 50,100 25,100 C 5,100 0,85 0,60 Z" fill="url(#pontosPretos)" />
+        <g stroke="#1A1A1A" stroke-width="1.2" fill="none" stroke-linecap="round">
+          <path d="M 10,38 Q 22,22 45,12" />
+          <path d="M 22,25 Q 18,18 20,13" fill="#1A1A1A" />
+          <path d="M 32,18 Q 30,10 35,7" fill="#1A1A1A" />
+          <path d="M 45,12 Q 45,5 50,4" fill="#1A1A1A" />
+        </g>
+        <g stroke="#1A1A1A" stroke-width="1.2" fill="none" stroke-linecap="round">
+          <path d="M 235,62 Q 220,80 198,90" />
+          <path d="M 222,74 Q 227,82 225,87" fill="#1A1A1A" />
+          <path d="M 210,82 Q 212,90 207,93" fill="#1A1A1A" />
+          <path d="M 198,90 Q 196,96 190,97" fill="#1A1A1A" />
+        </g>
+        <text x="32" y="66" font-family="'Brush Script MT', 'Segoe Script', cursive" font-size="60" font-style="italic" fill="#1A1A1A" transform="rotate(-4 32 66)">Lolita</text>
+        <text x="210" y="88" text-anchor="end" font-family="Georgia, serif" font-size="16" letter-spacing="5" font-weight="normal" fill="#1A1A1A">BOUTIQUE</text>
+      </svg>
+    </a>
+
+    <nav class="menu-central" aria-label="Menu principal">
+      <a href="produtos.html" class="ativo" aria-current="page">Navegar</a>
+      <a href="index.html#colorimetria">Colorimetria</a>
+      <a href="index.html#consorcio">Consórcio</a>
+      <a href="index.html#sobre">Sobre</a>
+    </nav>
+
+    <div class="acoes-header">
+      <button type="button" class="icone-btn" id="btnBuscaTopo" aria-label="Ir para a busca">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      </button>
+      <button type="button" class="icone-btn" id="btnSacola" aria-label="Abrir sacola" aria-controls="painelSacola">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+        <span class="badge-sacola" id="badgeSacola" aria-live="polite">0</span>
+      </button>
+      <div class="menu-mais">
+        <button type="button" class="icone-btn" id="btnMais" aria-label="Mais opções" aria-expanded="false" aria-controls="menuMais">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="1.5"></circle><circle cx="19" cy="12" r="1.5"></circle><circle cx="5" cy="12" r="1.5"></circle></svg>
+        </button>
+        <div class="menu-mais-lista" id="menuMais" role="menu">
+          <a href="index.html" role="menuitem">Página inicial</a>
+          <a href="index.html#colorimetria" role="menuitem">Colorimetria</a>
+          <a href="index.html#consorcio" role="menuitem">Consórcio</a>
+          <a href="index.html#sobre" role="menuitem">Sobre a loja</a>
+          <button type="button" role="menuitem" id="btnLimparSacola">Esvaziar sacola</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ===================== FAIXA DE CATEGORIAS (ABAS) ===================== -->
+<nav class="faixa-categorias" aria-label="Categorias de produtos">
+  <div class="container-loja">
+    <div class="abas-categoria" id="abasCategoria">
+      <!-- botões de aba gerados aqui -->
+    </div>
+  </div>
+</nav>
+
+<!-- ===================== ÁREA DE BUSCA ===================== -->
+<section class="area-busca" id="areaBusca" aria-label="Buscar peças">
+  <div class="container-loja">
+    <div class="linha-busca">
+      <div class="campo-busca">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="search" id="inputBusca" placeholder="Buscar por nome ou código da peça" aria-label="Buscar por nome ou código da peça" autocomplete="off">
+      </div>
+      <div class="controles-busca">
+        <label class="sr-only" for="selectOrdem" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);">Ordenar por</label>
+        <select class="seletor-ordem" id="selectOrdem" aria-label="Ordenar peças">
+          <option value="relevancia">Relevância</option>
+          <option value="menor-preco">Menor preço</option>
+          <option value="maior-preco">Maior preço</option>
+          <option value="recentes">Mais recentes</option>
+        </select>
+        <span class="contador-resultados" id="contadorResultados" aria-live="polite">Carregando peças…</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== GRADE DE PRODUTOS ===================== -->
+<main class="area-produtos">
+  <div class="container-loja">
+    <header class="cabecalho-pagina">
+      <span class="eyebrow">Coleção do momento</span>
+      <h1 class="titulo-pagina">Catálogo de peças</h1>
+      <p class="subtitulo-pagina">Roupas femininas do 34 ao 52, com peças novas toda semana. Escolha sua peça, o tamanho e chame a Lolita no WhatsApp.</p>
+    </header>
+
+    <div class="grade-produtos" id="gradeProdutos" aria-live="polite">
+      <!-- preenchido por JS -->
+    </div>
+  </div>
+</main>
+
+<!-- ===================== RODAPÉ ===================== -->
+<footer class="rodape">
+  <div class="container-loja">
+    <div class="rodape-grade">
+      <div>
+        <svg class="logo-svg" viewBox="0 0 250 100" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Lolita boutique">
+          <defs>
+            <pattern id="pontosPretosFooter" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse">
+              <circle cx="5" cy="5" r="0.9" fill="#1A1A1A" opacity="0.65" />
+            </pattern>
+          </defs>
+          <path d="M 175,0 C 205,0 248,15 250,45 C 251,75 220,60 195,50 C 170,40 155,18 175,0 Z" fill="#E8B7B0" opacity="0.9" />
+          <path d="M 175,0 C 205,0 248,15 250,45 C 251,75 220,60 195,50 C 170,40 155,18 175,0 Z" fill="url(#pontosPretosFooter)" />
+          <path d="M 0,60 C 20,40 55,50 68,72 C 80,95 50,100 25,100 C 5,100 0,85 0,60 Z" fill="#F4C189" opacity="0.9" />
+          <path d="M 0,60 C 20,40 55,50 68,72 C 80,95 50,100 25,100 C 5,100 0,85 0,60 Z" fill="url(#pontosPretosFooter)" />
+          <g stroke="#1A1A1A" stroke-width="1.2" fill="none" stroke-linecap="round">
+            <path d="M 10,38 Q 22,22 45,12" />
+            <path d="M 22,25 Q 18,18 20,13" fill="#1A1A1A" />
+            <path d="M 32,18 Q 30,10 35,7" fill="#1A1A1A" />
+            <path d="M 45,12 Q 45,5 50,4" fill="#1A1A1A" />
+          </g>
+          <g stroke="#1A1A1A" stroke-width="1.2" fill="none" stroke-linecap="round">
+            <path d="M 235,62 Q 220,80 198,90" />
+            <path d="M 222,74 Q 227,82 225,87" fill="#1A1A1A" />
+            <path d="M 210,82 Q 212,90 207,93" fill="#1A1A1A" />
+            <path d="M 198,90 Q 196,96 190,97" fill="#1A1A1A" />
+          </g>
+          <text x="32" y="66" font-family="'Brush Script MT', 'Segoe Script', cursive" font-size="60" font-style="italic" fill="#1A1A1A" transform="rotate(-4 32 66)">Lolita</text>
+          <text x="210" y="88" text-anchor="end" font-family="Georgia, serif" font-size="16" letter-spacing="5" font-weight="normal" fill="#1A1A1A">BOUTIQUE</text>
+        </svg>
+      </div>
+      <div>
+        <div class="titulo-rodape">Endereço</div>
+        <p>Rua 4, 684 — Centro<br>Orlândia (SP) — CEP 14620-000</p>
+      </div>
+      <div>
+        <div class="titulo-rodape">Siga a loja</div>
+        <p>Instagram: @lolitaboutique_store</p>
+      </div>
+    </div>
+    <div class="rodape-base">
+      Lolita boutique — roupas femininas do 34 ao 52 — Orlândia (SP)
+    </div>
+  </div>
+</footer>
+
+<!-- ===================== MODAL DE DETALHE ===================== -->
+<div class="overlay-modal" id="overlayDetalhe" aria-hidden="true">
+  <div class="modal-detalhe" id="modalDetalhe" role="dialog" aria-modal="true" aria-labelledby="tituloDetalhe">
+    <button type="button" class="modal-fechar" id="btnFecharDetalhe" aria-label="Fechar detalhes">×</button>
+
+    <div class="galeria-detalhe">
+      <div class="galeria-principal" id="galeriaPrincipal"></div>
+      <div class="miniaturas" id="miniaturas"></div>
+    </div>
+
+    <div class="info-detalhe">
+      <span class="card-categoria" id="detCategoria"></span>
+      <div class="card-codigo" id="detCodigo"></div>
+      <h2 id="tituloDetalhe"></h2>
+      <div class="preco-grande" id="detPreco"></div>
+      <p class="descricao" id="detDescricao"></p>
+
+      <span class="rotulo-campo">Tamanho (obrigatório)</span>
+      <div class="opcoes-tamanho" id="opcoesTamanho" role="radiogroup" aria-label="Selecione o tamanho"></div>
+      <div class="aviso-tamanho" id="avisoTamanho" role="alert">Escolha um tamanho</div>
+
+      <span class="rotulo-campo">Cor</span>
+      <div class="opcoes-cor" id="opcoesCor" role="radiogroup" aria-label="Selecione a cor"></div>
+
+      <div class="acoes-detalhe">
+        <button type="button" class="btn-primario" id="btnAdicionarSacola">Adicionar à sacola</button>
+        <a class="btn-secundario btn-whats" id="btnWhatsDetalhe" href="https://wa.me/5516000000000" target="_blank" rel="noopener">Chamar no WhatsApp</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== PAINEL DA SACOLA ===================== -->
+<div class="fundo-sacola" id="fundoSacola"></div>
+<aside class="painel-sacola" id="painelSacola" aria-label="Sacola de compras" role="dialog" aria-modal="false">
+  <div class="painel-sacola-cabecalho">
+    <h3>Sua sacola</h3>
+    <button type="button" class="modal-fechar" id="btnFecharSacola" aria-label="Fechar sacola" style="position:static;">×</button>
+  </div>
+  <div class="painel-sacola-corpo" id="corpoSacola"></div>
+  <div class="painel-sacola-rodape" id="rodapeSacola">
+    <div class="linha-subtotal"><span>Subtotal</span><strong id="subtotalSacola">R$ 0,00</strong></div>
+    <button type="button" class="btn-primario btn-whats" id="btnEnviarPedido" style="width:100%;">Enviar pedido pelo WhatsApp</button>
+  </div>
+</aside>
+
+<!-- ===================== WHATSAPP FLUTUANTE ===================== -->
+<!-- Para trocar o número, substitua 5516000000000 pelo número real da loja (DDI + DDD + número) -->
+<a class="whats-flutuante" id="whatsFlutuante" href="https://wa.me/5516000000000" target="_blank" rel="noopener" aria-label="Falar com a Lolita no WhatsApp">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38c1.45.79 3.08 1.21 4.79 1.21 5.46 0 9.91-4.45 9.91-9.91C21.95 6.45 17.5 2 12.04 2zm5.8 14.13c-.25.7-1.45 1.34-2 1.4-.52.05-1.17.07-1.89-.12-.44-.12-1-.32-1.73-.64-3.04-1.31-5.02-4.37-5.17-4.57-.15-.2-1.24-1.65-1.24-3.15s.78-2.24 1.06-2.55c.28-.31.6-.39.8-.39h.58c.19 0 .44-.07.69.53.25.6.85 2.07.93 2.22.07.15.12.33.02.53-.1.2-.15.33-.3.5-.15.18-.31.4-.45.54-.15.15-.3.31-.13.61.17.3.75 1.24 1.61 2.01 1.11.99 2.04 1.3 2.34 1.45.3.15.47.13.65-.08.18-.2.75-.87.95-1.17.2-.3.4-.25.67-.15.27.1 1.72.81 2.02.96.3.15.5.22.57.35.07.13.07.74-.18 1.44z"/></svg>
+</a>
+
+<!-- Aviso rápido (mensagens) -->
+<div class="aviso-rapido" id="avisoRapido" role="status" aria-live="polite"></div>
+
+<script>
+/* ======================================================================
+   CONFIGURAÇÕES E ESTADO
+   ====================================================================== */
+const CHAVE_SACOLA = 'lolita_sacola';
+const URL_API = '/api/produtos';
+const WHATS_NUMERO = '5516000000000'; // TROCAR pelo número real da loja
+const CATEGORIAS_BASE = [
+  'Todos', 'Novidades', 'Vestidos', 'Macacões', 'Blusas', 'Camisas', 'Saias',
+  'Calças', 'Shorts', 'Conjuntos', 'Casacos', 'Jaquetas', 'Bolsas', 'Cintos',
+  'Sapatos', 'Calçados', 'Acessórios', 'Plus Size', 'Bazar'
+];
+
+let produtosBase = [];      // catálogo recebido da API (clone)
+let categoriaAtiva = 'Todos';
+let termoBusca = '';
+let ordemAtual = 'relevancia';
+let timerBusca = null;
+let produtoAberto = null;
+let seletorTamanho = null;
+let seletorCor = null;
+let fotoDetalheIdx = 0;
+
+/* ======================================================================
+   UTILITÁRIOS
+   ====================================================================== */
+
+/** Normaliza texto: minúsculas, sem acentos e sem espaços extras. */
+function normalizar(texto) {
+  return String(texto || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim();
+}
+
+/** Formata número como moeda BRL. */
+function formatarBRL(valor) {
+  const n = Number(valor) || 0;
+  return n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+
+/** Mostra um aviso rápido na parte inferior da tela. */
+function mostrarAviso(mensagem) {
+  const el = document.getElementById('avisoRapido');
+  if (!el) return;
+  el.textContent = mensagem;
+  el.classList.add('visivel');
+  clearTimeout(el._timer);
+  el._timer = setTimeout(() => el.classList.remove('visivel'), 2400);
+}
+
+/** Escapa HTML para evitar injeção em textos vindos da API. */
+function escaparHTML(texto) {
+  return String(texto == null ? '' : texto)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+/** Gera um identificador único simples. */
+function gerarUid() {
+  return 'uid-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+}
+
+/** Converte uma categoria em um código de cor de silhueta para fallback. */
+function paletaPorCategoria(categoria) {
+  const paletas = {
+    vestidos: ['#F8D7D2', '#E8B7B0'],
+    blusas: ['#F5E1DC', '#E8B7B0'],
+    camisas: ['#F3E3D8', '#E3B9A5'],
+    saias: ['#F9E6D9', '#F4C189'],
+    calcas: ['#F4E2DD', '#D9A39A'],
+    shorts: ['#FBE9E4', '#F0C0B5'],
+    conjuntos: ['#F7DED8', '#DFA79E'],
+    casacos: ['#F1DCD6', '#C98A81'],
+    jaquetas: ['#EED2CB', '#C98A81'],
+    bolsas: ['#FAEBE6', '#E8B7B0'],
+    default: ['#F8E4DE', '#E8B7B0']
+  };
+  const chave = normalizar(categoria).replace(/\s+/g, '');
+  return paletas[chave] || paletas.default;
+}
+
+/** Cria uma silhueta SVG em tons de rosa para quando a imagem falhar. */
+function silhuetaSVG(categoria) {
+  const [claro, medio] = paletaPorCategoria(categoria);
+  return 'data:image/svg+xml;utf8,' + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 400">' +
+    '<rect width="300" height="400" fill="' + claro + '"/>' +
+    '<circle cx="150" cy="110" r="38" fill="' + medio + '"/>' +
+    '<path d="M95 170 Q150 150 205 170 L230 370 Q150 390 70 370 Z" fill="' + medio + '"/>' +
+    '<path d="M120 170 L110 260 M180 170 L190 260" stroke="' + claro + '" stroke-width="6" stroke-linecap="round"/>' +
+    '</svg>'
+  );
+}
+
+/** Retorna a URL de uma foto do produto ou um índice fora de alcance seguro. */
+function urlFoto(produto, indice) {
+  const fotos = Array.isArray(produto.fotos) ? produto.fotos : [];
+  if (fotos.length === 0) return silhuetaSVG(produto.categoria);
+  const i = ((indice % fotos.length) + fotos.length) % fotos.length;
+  return '/fotos/' + fotos[i];
+}
+
+/** Cria um elemento img com fallback de silhueta em caso de erro. */
+function criarImagem(src, alt, categoria, classe) {
+  const img = document.createElement('img');
+  img.src = src;
+  img.alt = alt || 'Peça da Lolita boutique';
+  img.loading = 'lazy';
+  if (classe) img.className = classe;
+  img.onerror = function () {
+    if (img.dataset.fallback === '1') return;
+    img.dataset.fallback = '1';
+    img.src = silhuetaSVG(categoria);
+  };
+  return img;
+}
+
+/* ======================================================================
+   SACOLA (localStorage)
+   ====================================================================== */
+
+/** Lê a sacola do localStorage de forma defensiva. */
+function lerSacola() {
+  try {
+    const bruto = localStorage.getItem(CHAVE_SACOLA);
+    const lista = bruto ? JSON.parse(bruto) : [];
+    return Array.isArray(lista) ? lista : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+/** Grava a sacola no localStorage. */
+function gravarSacola(lista) {
+  try {
+    localStorage.setItem(CHAVE_SACOLA, JSON.stringify(lista));
+  } catch (e) {
+    mostrarAviso('Não foi possível salvar a sacola neste navegador');
+  }
+}
+
+/** Atualiza o contador de itens do cabeçalho. */
+function atualizarBadge() {
+  const badge = document.getElementById('badgeSacola');
+  if (!badge) return;
+  const total = lerSacola().length;
+  badge.textContent = String(total);
+}
+
+/** Dispara a animação de pulso no badge da sacola. */
+function pulsarBadge() {
+  const badge = document.getElementById('badgeSacola');
+  if (!badge) return;
+  badge.classList.remove('pulso');
+  void badge.offsetWidth;
+  badge.classList.add('pulso');
+  setTimeout(() => badge.classList.remove('pulso'), 300);
+}
+
+/** Renderiza o conteúdo do painel lateral da sacola. */
+function renderizarSacola() {
+  const corpo = document.getElementById('corpoSacola');
+  const subtotalEl = document.getElementById('subtotalSacola');
+  const rodape = document.getElementById('rodapeSacola');
+  if (!corpo) return;
+
+  const lista = lerSacola();
+  corpo.innerHTML = '';
+
+  if (lista.length === 0) {
+    corpo.innerHTML =
+      '<div class="sacola-vazia">' +
+        '<h4>Sua sacola está vazia</h4>' +
+        '<p>Escolha uma peça no catálogo e ela aparecerá aqui, com o tamanho e a cor selecionados.</p>' +
+      '</div>';
+    if (rodape) rodape.style.display = 'none';
+    atualizarBadge();
+    return;
+  }
+
+  if (rodape) rodape.style.display = 'block';
+
+  let subtotal = 0;
+  lista.forEach((item) => {
+    subtotal += Number(item.preco) || 0;
+
+    const linha = document.createElement('div');
+    linha.className = 'item-sacola';
+
+    const img = criarImagem(item.foto || silhuetaSVG(item.categoria), item.nome, item.categoria, '');
+    const bloco = document.createElement('div');
+    bloco.innerHTML =
+      '<div class="item-sacola-nome">' + escaparHTML(item.nome) + '</div>' +
+      '<div class="item-sacola-meta">Tamanho ' + escaparHTML(item.tamanho) + ' · ' + escaparHTML(item.cor || 'Cor única') + '</div>' +
+      '<div class="item-sacola-preco">' + formatarBRL(item.preco) + '</div>';
+
+    const botao = document.createElement('button');
+    botao.type = 'button';
+    botao.className = 'botao-remover';
+    botao.textContent = 'Remover';
+    botao.addEventListener('click', () => removerDaSacola(item.uid));
+
+    const coluna = document.createElement('div');
+    coluna.appendChild(botao);
+
+    linha.appendChild(img);
+    linha.appendChild(bloco);
+    linha.appendChild(coluna);
+    corpo.appendChild(linha);
+  });
+
+  if (subtotalEl) subtotalEl.textContent = formatarBRL(subtotal);
+  atualizarBadge();
+}
+
+/** Remove um item da sacola pelo uid. */
+function removerDaSacola(uid) {
+  const lista = lerSacola().filter((i) => i.uid !== uid);
+  gravarSacola(lista);
+  renderizarSacola();
+  mostrarAviso('Peça removida da sacola');
+}
+
+/** Adiciona o produto à sacola com tamanho obrigatório. */
+function adicionarNaSacola(produto, tamanho, cor, indiceFoto) {
+  if (!tamanho) {
+    const aviso = document.getElementById('avisoTamanho');
+    if (aviso) aviso.classList.add('visivel');
+    return false;
+  }
+  const lista = lerSacola();
+  const item = {
+    uid: gerarUid(),
+    id: produto.id,
+    codigo: produto.codigo,
+    nome: produto.nome,
+    preco: Number(produto.preco) || 0,
+    categoria: produto.categoria,
+    tamanho: tamanho,
+    cor: cor ? cor.nome : '',
+    foto: urlFoto(produto, indiceFoto || 0),
+    dataHora: new Date().toISOString()
+  };
+  lista.push(item);
+  gravarSacola(lista);
+  atualizarBadge();
+  pulsarBadge();
+  renderizarSacola();
+  mostrarAviso('Peça adicionada à sacola');
+  return true;
+}
+
+/** Abre ou fecha o painel lateral da sacola. */
+function alternarSacola(abrir) {
+  const painel = document.getElementById('painelSacola');
+  const fundo = document.getElementById('fundoSacola');
+  if (!painel || !fundo) return;
+  const estado = typeof abrir === 'boolean' ? abrir : !painel.classList.contains('aberto');
+  painel.classList.toggle('aberto', estado);
+  fundo.classList.toggle('aberto', estado);
+  if (estado) renderizarSacola();
+}
+
+/** Monta o texto do pedido e abre o WhatsApp. */
+function enviarPedidoWhats() {
+  const lista = lerSacola();
+  if (lista.length === 0) {
+    mostrarAviso('Sua sacola está vazia');
+    return;
+  }
+  let subtotal = 0;
+  const linhas = lista.map((i, n) => {
+    subtotal += Number(i.preco) || 0;
+    return (n + 1) + '. ' + i.nome + ' (' + i.codigo + ') — Tam. ' + i.tamanho +
+      (i.cor ? ' — Cor ' + i.cor : '') + ' — ' + formatarBRL(i.preco);
+  });
+  const texto = 'Olá! Gostaria de fazer o pedido:\n' + linhas.join('\n') +
+    '\n\nSubtotal: ' + formatarBRL(subtotal);
+  const url = 'https://wa.me/' + WHATS_NUMERO + '?text=' + encodeURIComponent(texto);
+  window.open(url, '_blank', 'noopener');
+}
+
+/* ======================================================================
+   FILTRO, BUSCA E ORDENAÇÃO
+   ====================================================================== */
+
+/** Retorna a lista de categorias: base + extras vindos da API. */
+function listaCategorias() {
+  const lista = CATEGORIAS_BASE.slice();
+  const normalizadas = lista.map(normalizar);
+  produtosBase.forEach((p) => {
+    if (!p.categoria) return;
+    const n = normalizar(p.categoria);
+    if (!normalizadas.includes(n)) {
+      lista.push(p.categoria);
+      normalizadas.push(n);
+    }
+  });
+  return lista;
+}
+
+/** Desenha as abas de categoria. */
+function renderizarAbas() {
+  const container = document.getElementById('abasCategoria');
+  if (!container) return;
+  container.innerHTML = '';
+  listaCategorias().forEach((cat) => {
+    const botao = document.createElement('button');
+    botao.type = 'button';
+    botao.className = 'aba-categoria' + (normalizar(cat) === normalizar(categoriaAtiva) ? ' ativo' : '');
+    botao.dataset.categoria = cat;
+    botao.textContent = cat;
+    botao.setAttribute('role', 'tab');
+    botao.setAttribute('aria-selected', normalizar(cat) === normalizar(categoriaAtiva) ? 'true' : 'false');
+    botao.addEventListener('click', () => selecionarCategoria(cat));
+    container.appendChild(botao);
+  });
+}
+
+/** Aplica a categoria escolhida e marca a aba ativa. */
+function selecionarCategoria(cat) {
+  categoriaAtiva = cat;
+  const abas = document.querySelectorAll('#abasCategoria .aba-categoria');
+  abas.forEach((aba) => {
+    const ativa = aba.dataset.categoria === cat;
+    aba.classList.toggle('ativo', ativa);
+    aba.setAttribute('aria-selected', ativa ? 'true' : 'false');
+    if (ativa && typeof aba.scrollIntoView === 'function') {
+      aba.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+    }
+  });
+  renderizarGrade();
+}
+
+/** Verifica se um produto pertence à categoria ativa. */
+function pertenceCategoria(produto, cat) {
+  if (normalizar(cat) === 'todos') return true;
+  if (normalizar(cat) === 'novidades') return produto.novo === true;
+  return normalizar(produto.categoria) === normalizar(cat);
+}
+
+/** Verifica se o produto corresponde ao termo de busca. */
+function correspondeBusca(produto, termo) {
+  if (!termo) return true;
+  const t = normalizar(termo);
+  return normalizar(produto.nome).includes(t) || normalizar(produto.codigo).includes(t);
+}
+
+/** Retorna os produtos após filtro e ordenação. */
+function obterProdutosFiltrados() {
+  let lista = produtosBase.filter((p) =>
+    pertenceCategoria(p, categoriaAtiva) && correspondeBusca(p, termoBusca)
+  );
+  const copia = lista.slice();
+  switch (ordemAtual) {
+    case 'menor-preco':
+      copia.sort((a, b) => (Number(a.preco) || 0) - (Number(b.preco) || 0));
+      break;
+    case 'maior-preco':
+      copia.sort((a, b) => (Number(b.preco) || 0) - (Number(a.preco) || 0));
+      break;
+    case 'recentes':
+      copia.sort((a, b) => new Date(b.criado_em || 0) - new Date(a.criado_em || 0));
+      break;
+    default:
+      copia.sort((a, b) => (b.destaque ? 1 : 0) - (a.destaque ? 1 : 0));
+  }
+  return copia;
+}
+
+/** Atualiza o texto de contagem com plural correto. */
+function atualizarContador(total) {
+  const el = document.getElementById('contadorResultados');
+  if (!el) return;
+  if (total === 0) el.textContent = 'Nenhuma peça encontrada';
+  else if (total === 1) el.textContent = '1 peça encontrada';
+  else el.textContent = total + ' peças encontradas';
+}
+
+/* ======================================================================
+   GRADE DE PRODUTOS
+   ====================================================================== */
+
+/** Mostra seis cards de esqueleto durante o carregamento. */
+function mostrarSkeleton() {
+  const grade = document.getElementById('gradeProdutos');
+  if (!grade) return;
+  grade.innerHTML = '';
+  for (let i = 0; i < 6; i++) {
+    const card = document.createElement('div');
+    card.className = 'skeleton-card';
+    card.innerHTML = '<div class="skeleton-img"></div><div class="skeleton-linha"></div><div class="skeleton-linha curta"></div>';
+    grade.appendChild(card);
+  }
+  atualizarContador(0);
+  const el = document.getElementById('contadorResultados');
+  if (el) el.textContent = 'Carregando peças…';
+}
+
+/** Mostra mensagem de erro com botão para tentar de novo. */
+function mostrarErro() {
+  const grade = document.getElementById('gradeProdutos');
+  if (!grade) return;
+  grade.innerHTML =
+    '<div class="estado-msg">' +
+      '<h3>Não foi possível carregar as peças</h3>' +
+      '<p>Verifique sua conexão e tente novamente em instantes.</p>' +
+      '<button type="button" class="btn-primario" id="btnTentarNovamente">Tentar novamente</button>' +
+    '</div>';
+  const btn = document.getElementById('btnTentarNovamente');
+  if (btn) btn.addEventListener('click', carregarProdutos);
+  const el = document.getElementById('contadorResultados');
+  if (el) el.textContent = 'Peças indisponíveis';
+}
+
+/** Cria o card visual de um produto com todas as interações. */
+function criarCard(produto, indice) {
+  const card = document.createElement('article');
+  card.className = 'card-produto';
+  card.style.setProperty('--atraso', (indice * 60) + 'ms');
+  card.dataset.id = produto.id;
+  card.dataset.timer = '';
+
+  const molde = document.createElement('div');
+  molde.className = 'moldura-arco';
+
+  const fotoPrincipalIdx = Number.isInteger(produto.foto_principal) ? produto.foto_principal : 0;
+  const imgPrincipal = criarImagem(urlFoto(produto, fotoPrincipalIdx), produto.nome, produto.categoria, 'img-principal');
+  const imgHover = criarImagem(urlFoto(produto, fotoPrincipalIdx + 1), produto.nome, produto.categoria, 'img-hover');
+  molde.appendChild(imgPrincipal);
+  molde.appendChild(imgHover);
+
+  if (produto.novo) {
+    const tag = document.createElement('span');
+    tag.className = 'tag-novidade';
+    tag.textContent = 'Novidade';
+    molde.appendChild(tag);
+  }
+
+  const info = document.createElement('div');
+  info.className = 'card-info';
+
+  const coresHTML = (Array.isArray(produto.cores) ? produto.cores : []).map((c) =>
+    '<span class="bolinha-cor" title="' + escaparHTML(c.nome) + '" style="background:' + escaparHTML(c.hex) + ';"></span>'
+  ).join('');
+  const tamanhosTxt = (Array.isArray(produto.tamanhos) ? produto.tamanhos : []).join(' · ');
+
+  info.innerHTML =
+    '<div class="card-categoria">' + escaparHTML(produto.categoria) + '</div>' +
+    '<div class="card-codigo">' + escaparHTML(produto.codigo) + '</div>' +
+    '<h3 class="card-nome">' + escaparHTML(produto.nome) + '</h3>' +
+    '<div class="card-preco">' + formatarBRL(produto.preco) + '</div>' +
+    '<div class="linha-cores">' + coresHTML + '</div>' +
+    '<div class="linha-tamanhos">Tamanhos: ' + escaparHTML(tamanhosTxt || 'sob consulta') + '</div>';
+
+  const botao = document.createElement('button');
+  botao.type = 'button';
+  botao.className = 'botao-ver';
+  botao.textContent = 'Ver peça';
+  botao.addEventListener('click', () => abrirDetalhe(produto));
+  info.appendChild(botao);
+
+  card.appendChild(molde);
+  card.appendChild(info);
+
+  configurarHoverFotos(card, molde, produto, imgPrincipal, imgHover);
+  configurarTilt(card);
+  molde.addEventListener('click', () => abrirDetalhe(produto));
+
+  return card;
+}
+
+/** Configura a troca de fotos no hover e no toque. */
+function configurarHoverFotos(card, molde, produto, imgPrincipal, imgHover) {
+  const fotos = Array.isArray(produto.fotos) ? produto.fotos : [];
+  const fotoBase = Number.isInteger(produto.foto_principal) ? produto.foto_principal : 0;
+
+  let indiceAtual = 0;
+
+  function mostrarFoto(idx) {
+    indiceAtual = idx;
+    const proximo = (fotoBase + idx + 1) % Math.max(fotos.length, 1);
+    imgPrincipal.src = urlFoto(produto, fotoBase + idx);
+    imgHover.src = urlFoto(produto, proximo);
+  }
+
+  function pararTimer() {
+    if (card.dataset.timer) {
+      clearInterval(Number(card.dataset.timer));
+      card.dataset.timer = '';
+    }
+  }
+
+  card.addEventListener('mouseenter', () => {
+    molde.classList.add('com-hover');
+    if (fotos.length > 1) {
+      pararTimer();
+      let passo = 0;
+      const timer = setInterval(() => {
+        passo = (passo + 1) % fotos.length;
+        imgHover.src = urlFoto(produto, passo);
+        imgHover.classList.add('visivel');
+        imgPrincipal.classList.add('escondida');
+        setTimeout(() => {
+          imgPrincipal.src = imgHover.src;
+          imgHover.classList.remove('visivel');
+          imgPrincipal.classList.remove('escondida');
+        }, 450);
+      }, 900);
+      card.dataset.timer = String(timer);
+    }
+  });
+
+  card.addEventListener('mouseleave', () => {
+    pararTimer();
+    molde.classList.remove('com-hover');
+    imgHover.classList.remove('visivel');
+    imgPrincipal.classList.remove('escondida');
+    imgPrincipal.src = urlFoto(produto, fotoBase);
+    imgHover.src = urlFoto(produto, fotoBase + 1);
+  });
+
+  card.addEventListener('touchstart', () => {
+    if (fotos.length > 1) {
+      const proximo = (indiceAtual + 1) % fotos.length;
+      mostrarFoto(proximo);
+    }
+  }, { passive: true });
+}
+
+/** Aplica o efeito de inclinação 3D suave ao card. */
+function configurarTilt(card) {
+  const LIMITE = 6;
+  card.addEventListener('mousemove', (e) => {
+    const r = card.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width - 0.5;
+    const y = (e.clientY - r.top) / r.height - 0.5;
+    card.style.transform = 'rotateX(' + (-y * LIMITE * 2).toFixed(2) + 'deg) rotateY(' + (x * LIMITE * 2).toFixed(2) + 'deg)';
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = 'rotateX(0deg) rotateY(0deg)';
+  });
+}
+
+/** Desenha a grade de acordo com o filtro e a busca. */
+function renderizarGrade() {
+  const grade = document.getElementById('gradeProdutos');
+  if (!grade) return;
+  const lista = obterProdutosFiltrados();
+  grade.innerHTML = '';
+
+  atualizarContador(lista.length);
+
+  if (produtosBase.length === 0) {
+    grade.innerHTML =
+      '<div class="estado-msg"><h3>Nenhuma peça disponível no momento</h3>' +
+      '<p>Novas peças chegam toda semana. Volte em breve.</p></div>';
+    return;
+  }
+
+  if (lista.length === 0) {
+    grade.innerHTML =
+      '<div class="estado-msg"><h3>Nenhuma peça encontrada</h3>' +
+      '<p>Tente outro nome, código ou escolha outra categoria.</p></div>';
+    return;
+  }
+
+  lista.forEach((produto, i) => {
+    grade.appendChild(criarCard(produto, i));
+  });
+}
+
+/* ======================================================================
+   DETALHE DO PRODUTO (MODAL)
+   ====================================================================== */
+
+/** Desenha as miniaturas e a foto principal da galeria. */
+function mostrarFotoDetalhe(idx) {
+  if (!produtoAberto) return;
+  const fotos = Array.isArray(produtoAberto.fotos) ? produtoAberto.fotos : [];
+  const total = Math.max(fotos.length, 1);
+  fotoDetalheIdx = ((idx % total) + total) % total;
+
+  const principal = document.getElementById('galeriaPrincipal');
+  if (principal) {
+    principal.innerHTML = '';
+    const img = criarImagem(urlFoto(produtoAberto, fotoDetalheIdx), produtoAberto.nome, produtoAberto.categoria, '');
+    principal.appendChild(img);
+  }
+
+  const miniaturas = document.getElementById('miniaturas');
+  if (miniaturas) {
+    miniaturas.innerHTML = '';
+    for (let i = 0; i < total; i++) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'miniatura' + (i === fotoDetalheIdx ? ' ativa' : '');
+      b.setAttribute('aria-label', 'Foto ' + (i + 1));
+      b.appendChild(criarImagem(urlFoto(produtoAberto, i), produtoAberto.nome, produtoAberto.categoria, ''));
+      b.addEventListener('click', () => mostrarFotoDetalhe(i));
+      miniaturas.appendChild(b);
+    }
+  }
+}
+
+/** Preenche os seletores de tamanho e cor do modal. */
+function montarSeletores(produto) {
+  const boxTam = document.getElementById('opcoesTamanho');
+  const boxCor = document.getElementById('opcoesCor');
+  const aviso = document.getElementById('avisoTamanho');
+  if (aviso) aviso.classList.remove('visivel');
+  seletorTamanho = null;
+  seletorCor = null;
+
+  if (boxTam) {
+    boxTam.innerHTML = '';
+    (Array.isArray(produto.tamanhos) ? produto.tamanhos : []).forEach((t) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'opcao-tamanho';
+      b.textContent = t;
+      b.setAttribute('role', 'radio');
+      b.setAttribute('aria-checked', 'false');
+      b.addEventListener('click', () => {
+        seletorTamanho = t;
+        boxTam.querySelectorAll('.opcao-tamanho').forEach((x) => {
+          x.classList.remove('selecionado');
+          x.setAttribute('aria-checked', 'false');
+        });
+        b.classList.add('selecionado');
+        b.setAttribute('aria-checked', 'true');
+        if (aviso) aviso.classList.remove('visivel');
+      });
+      boxTam.appendChild(b);
+    });
+  }
+
+  if (boxCor) {
+    boxCor.innerHTML = '';
+    (Array.isArray(produto.cores) ? produto.cores : []).forEach((c, i) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'opcao-cor';
+      b.title = c.nome;
+      b.setAttribute('aria-label', 'Cor ' + c.nome);
+      b.style.background = c.hex;
+      b.addEventListener('click', () => {
+        seletorCor = c;
+        boxCor.querySelectorAll('.opcao-cor').forEach((x) => x.classList.remove('selecionado'));
+        b.classList.add('selecionado');
+      });
+      if (i === 0) {
+        seletorCor = c;
+        b.classList.add('selecionado');
+      }
+      boxCor.appendChild(b);
+    });
+  }
+}
+
+/** Abre o modal de detalhe com os dados do produto. */
+function abrirDetalhe(produto) {
+  produtoAberto = JSON.parse(JSON.stringify(produto));
+  const overlay = document.getElementById('overlayDetalhe');
+  if (!overlay) return;
+
+  document.getElementById('tituloDetalhe').textContent = produto.nome;
+  document.getElementById('detCategoria').textContent = produto.categoria;
+  document.getElementById('detCodigo').textContent = 'Código ' + produto.codigo;
+  document.getElementById('detPreco').textContent = formatarBRL(produto.preco);
+  document.getElementById('detDescricao').textContent = produto.descricao || 'Peça delicada da coleção Lolita.';
+
+  const linkWhats = document.getElementById('btnWhatsDetalhe');
+  if (linkWhats) {
+    const msg = 'Olá! Tenho interesse na peça ' + produto.nome + ' (' + produto.codigo + ').';
+    linkWhats.href = 'https://wa.me/' + WHATS_NUMERO + '?text=' + encodeURIComponent(msg);
+  }
+
+  montarSeletores(produto);
+  mostrarFotoDetalhe(produto.foto_principal || 0);
+
+  overlay.classList.add('aberto');
+  overlay.setAttribute('aria-hidden', 'false');
+  const dialogo = document.getElementById('modalDetalhe');
+  if (dialogo) dialogo.focus && dialogo.setAttribute('tabindex', '-1');
+  const fechar = document.getElementById('btnFecharDetalhe');
+  if (fechar) fechar.focus();
+}
+
+/** Fecha o modal de detalhe. */
+function fecharDetalhe() {
+  const overlay = document.getElementById('overlayDetalhe');
+  if (!overlay) return;
+  overlay.classList.remove('aberto');
+  overlay.setAttribute('aria-hidden', 'true');
+  produtoAberto = null;
+}
+
+/** Adiciona a peça aberta no modal à sacola, após validar o tamanho. */
+function adicionarDoModal() {
+  if (!produtoAberto) return;
+  const ok = adicionarNaSacola(produtoAberto, seletorTamanho, seletorCor, fotoDetalheIdx);
+  if (ok) {
+    fecharDetalhe();
+  }
+}
+
+/* ======================================================================
+   CARREGAMENTO DA API
+   ====================================================================== */
+
+/** Busca os produtos em /api/produtos e atualiza a tela. */
+async function carregarProdutos() {
+  mostrarSkeleton();
+  try {
+    const resposta = await fetch(URL_API);
+    if (!resposta.ok) throw new Error('HTTP ' + resposta.status);
+    const dados = await resposta.json();
+    if (!Array.isArray(dados)) throw new Error('Formato inválido');
+    produtosBase = JSON.parse(JSON.stringify(dados));
+    renderizarAbas();
+    renderizarGrade();
+  } catch (erro) {
+    console.warn('Falha ao carregar produtos:', erro);
+    produtosBase = [];
+    mostrarErro();
+  }
+}
+
+/* ======================================================================
+   CABEÇALHO, EVENTOS GERAIS
+   ====================================================================== */
+
+/** Liga o efeito de sombra no cabeçalho ao rolar a página. */
+function configurarScrollCabecalho() {
+  const cab = document.getElementById('cabecalho');
+  if (!cab) return;
+  const verificar = () => cab.classList.toggle('rolado', window.scrollY > 10);
+  window.addEventListener('scroll', verificar, { passive: true });
+  verificar();
+}
+
+/** Liga o menu de três pontinhos. */
+function configurarMenuMais() {
+  const btn = document.getElementById('btnMais');
+  const menu = document.getElementById('menuMais');
+  if (!btn || !menu) return;
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const aberto = menu.classList.toggle('aberto');
+    btn.setAttribute('aria-expanded', aberto ? 'true' : 'false');
+  });
+  document.addEventListener('click', (e) => {
+    if (!menu.contains(e.target) && e.target !== btn) {
+      menu.classList.remove('aberto');
+      btn.setAttribute('aria-expanded', 'false');
+    }
+  });
+  const btnLimpar = document.getElementById('btnLimparSacola');
+  if (btnLimpar) {
+    btnLimpar.addEventListener('click', () => {
+      gravarSacola([]);
+      renderizarSacola();
+      menu.classList.remove('aberto');
+      mostrarAviso('Sacola esvaziada');
+    });
+  }
+}
+
+/** Liga os eventos da busca e da ordenação. */
+function configurarBusca() {
+  const input = document.getElementById('inputBusca');
+  const select = document.getElementById('selectOrdem');
+  if (input) {
+    input.addEventListener('input', () => {
+      clearTimeout(timerBusca);
+      timerBusca = setTimeout(() => {
+        termoBusca = input.value.trim();
+        renderizarGrade();
+      }, 250);
+    });
+  }
+  if (select) {
+    select.addEventListener('change', () => {
+      ordemAtual = select.value;
+      renderizarGrade();
+    });
+  }
+  const btnTopo = document.getElementById('btnBuscaTopo');
+  if (btnTopo) {
+    btnTopo.addEventListener('click', () => {
+      const area = document.getElementById('areaBusca');
+      if (area) area.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (input) setTimeout(() => input.focus(), 350);
+    });
+  }
+}
+
+/** Liga os eventos do modal de detalhe. */
+function configurarModal() {
+  const overlay = document.getElementById('overlayDetalhe');
+  const fechar = document.getElementById('btnFecharDetalhe');
+  const btnAdd = document.getElementById('btnAdicionarSacola');
+  if (fechar) fechar.addEventListener('click', fecharDetalhe);
+  if (overlay) {
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) fecharDetalhe();
+    });
+  }
+  if (btnAdd) btnAdd.addEventListener('click', adicionarDoModal);
+}
+
+/** Liga os eventos do painel da sacola. */
+function configurarSacola() {
+  const btn = document.getElementById('btnSacola');
+  const fechar = document.getElementById('btnFecharSacola');
+  const fundo = document.getElementById('fundoSacola');
+  const enviar = document.getElementById('btnEnviarPedido');
+  if (btn) btn.addEventListener('click', () => alternarSacola(true));
+  if (fechar) fechar.addEventListener('click', () => alternarSacola(false));
+  if (fundo) fundo.addEventListener('click', () => alternarSacola(false));
+  if (enviar) enviar.addEventListener('click', enviarPedidoWhats);
+}
+
+/** Fecha modal, sacola e menus ao pressionar Escape. */
+function configurarTeclado() {
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    fecharDetalhe();
+    alternarSacola(false);
+    const menu = document.getElementById('menuMais');
+    if (menu) menu.classList.remove('aberto');
+  });
+}
+
+/* ======================================================================
+   INICIALIZAÇÃO
+   ====================================================================== */
+
+/** Ponto de entrada: liga tudo e carrega o catálogo. */
+function iniciarLoja() {
+  try {
+    configurarScrollCabecalho();
+    configurarMenuMais();
+    configurarBusca();
+    configurarModal();
+    configurarSacola();
+    configurarTeclado();
+    atualizarBadge();
+    renderizarAbas();
+    carregarProdutos();
+  } catch (erro) {
+    console.error('Erro ao iniciar a loja:', erro);
+    mostrarErro();
+  }
+}
+
+document.addEventListener('DOMContentLoaded', iniciarLoja);
+</script>
+</body>
+</html>
