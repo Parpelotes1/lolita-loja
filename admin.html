@@ -1,0 +1,2994 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>admin.html — Painel Lolita boutique</title>
+<style>
+/* Skip artifact shell — fixed styles served beside every artifact.
+   Tokens, utilities and components (basecoat 1.0 markup, no CDN); artifacts
+   override --accent for their own identity. */
+:root {
+  color-scheme: light dark;
+  --accent: #2563eb;
+  --accent-contrast: #ffffff;
+  --accent-text: color-mix(in srgb, var(--accent) 72%, #000);
+  --bg: #f8f9fb;
+  --surface: #ffffff;
+  --text: #14171f;
+  --text-muted: #5b6472;
+  --border: rgba(20, 23, 31, 0.10);
+  --radius: 10px;
+  --shadow: 0 1px 3px rgba(20, 23, 31, 0.08);
+  --space: 16px;
+  --success: #0a7a35;
+  --danger: #c0262d;
+  --warning: #8a5300;
+}
+/* Theme resolution. Without data-theme the viewer's system preference decides,
+   as it always did. With it, the artifact's own choice wins in BOTH directions:
+   a page that hardcodes one palette must not be handed the opposite set of
+   tokens by the machine it happens to be opened on. The dark values appear
+   twice because a media query cannot be folded into a selector list.
+   The attribute sits inside :where() so these blocks keep the specificity of a
+   bare :root — the page's own <style> is linked after this file and must go on
+   overriding any token it wants, exactly as it could before. */
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    --accent-text: color-mix(in srgb, var(--accent) 78%, #fff);
+    --bg: #101318;
+    --surface: #181c23;
+    --text: #eef1f6;
+    --text-muted: #9aa4b2;
+    --border: rgba(238, 241, 246, 0.12);
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    --success: #4ade80;
+    --danger: #f87171;
+    --warning: #fbbf24;
+  }
+}
+:root:where([data-theme="dark"]) {
+  color-scheme: dark;
+  --accent-text: color-mix(in srgb, var(--accent) 78%, #fff);
+  --bg: #101318;
+  --surface: #181c23;
+  --text: #eef1f6;
+  --text-muted: #9aa4b2;
+  --border: rgba(238, 241, 246, 0.12);
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --success: #4ade80;
+  --danger: #f87171;
+  --warning: #fbbf24;
+}
+:root:where([data-theme="light"]) { color-scheme: light; }
+/* Pages generated before the shell had its own components still link the
+   basecoat CDN, which reads its own tokens and switches theme only on a
+   .dark class. Bridged to the shell's, whatever of it those pages use takes
+   the page's accent and follows the declared theme. Its --accent token is a
+   hover tint, renamed in its theme as --color-accent; the shell's --accent is
+   the brand colour, so the tint is derived from it here. */
+:root {
+  --background: var(--bg);
+  --foreground: var(--text);
+  --card: var(--surface);
+  --card-foreground: var(--text);
+  --popover: var(--surface);
+  --popover-foreground: var(--text);
+  --primary: var(--accent);
+  --primary-foreground: var(--accent-contrast);
+  --secondary: color-mix(in srgb, var(--text) 7%, var(--surface));
+  --secondary-foreground: var(--text);
+  --muted: color-mix(in srgb, var(--text) 5%, var(--surface));
+  --muted-foreground: var(--text-muted);
+  --color-accent: color-mix(in srgb, var(--accent) 12%, var(--surface));
+  --color-accent-foreground: var(--text);
+  --destructive: var(--danger);
+  --input: var(--border);
+  --ring: var(--accent);
+}
+* { box-sizing: border-box; }
+/* The reset the pages were written against: they all linked basecoat, which
+   ships Tailwind's. Its components now live here, so the reset does too. */
+*, ::before, ::after, ::backdrop { margin: 0; padding: 0; border: 0 solid; }
+/* Preflight's rule too: without it a component class that sets display
+   (.alert, .card, .btn…) beats the hidden attribute and shows the element. */
+[hidden]:where(:not([hidden="until-found"])) { display: none !important; }
+.hidden { display: none !important; }
+h1, h2, h3, h4, h5, h6 { font-size: inherit; font-weight: inherit; }
+a { color: inherit; text-decoration: inherit; }
+b, strong { font-weight: bolder; }
+ol, ul, menu { list-style: none; }
+svg, video, canvas, iframe { display: block; vertical-align: middle; }
+button, input, select, textarea { color: inherit; background-color: transparent; border-radius: 0; }
+table { border-collapse: collapse; }
+hr { height: 0; color: inherit; border-top-width: 1px; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+img { max-width: 100%; display: block; }
+
+.shell-container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+.shell-section { padding: calc(var(--space) * 2) 0; }
+.shell-grid { display: grid; gap: var(--space); grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.shell-toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: var(--space); }
+.shell-footer { padding: 24px 0 40px; color: var(--text-muted); font-size: 13px; }
+
+.shell-hero { padding: calc(var(--space) * 3) 0 calc(var(--space) * 2); }
+.shell-hero h1 { font-size: clamp(26px, 4vw, 40px); line-height: 1.15; margin: 0 0 10px; text-wrap: balance; }
+.shell-hero p { color: var(--text-muted); max-width: 60ch; margin: 0; }
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: var(--space);
+}
+
+.kpi { display: flex; flex-direction: column; gap: 4px; }
+.kpi .kpi-value { font-size: clamp(22px, 2.3vw, 28px); font-weight: 650; line-height: 1.1; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.kpi .kpi-label { font-size: 13px; color: var(--text-muted); }
+.kpi .kpi-delta { font-size: 12.5px; font-weight: 600; }
+.kpi .kpi-delta.up { color: var(--success); }
+.kpi .kpi-delta.down { color: var(--danger); }
+
+table.shell-table { border-collapse: collapse; width: 100%; font-size: 14px; }
+table.shell-table th {
+  text-align: left; font-size: 11.5px; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--text-muted); font-weight: 600;
+}
+table.shell-table th, table.shell-table td { padding: 9px 12px 9px 0; border-bottom: 1px solid var(--border); }
+table.shell-table td.num, table.shell-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
+table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 6%, transparent); }
+
+.chart-box { width: 100%; min-height: 220px; }
+.chart-box svg { width: 100%; height: auto; display: block; }
+.chart-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 16px; margin-top: 12px; font-size: 12.5px; color: var(--text-muted); }
+.chart-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.chart-legend i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+.chart-legend b { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+.muted { color: var(--text-muted); }
+.accent { color: var(--accent-text); }
+.shell-badge, .eyebrow {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent-text);
+}
+/* A pill keeps its content width inside flex and grid columns, which would
+   otherwise stretch it across the card; a centred parent still centres it. */
+.shell-badge, .eyebrow, .badge { width: fit-content; max-width: 100%; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .shell-fade { animation: shell-fade 400ms ease both; }
+  @keyframes shell-fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+}
+
+/* Layout and type utilities: what the pages kept spelling in style="".
+   Spacing and type sizes follow Tailwind's scale; there is no Tailwind. */
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.stack { display: flex; flex-direction: column; gap: var(--space); }
+.between { justify-content: space-between; }
+.grow { flex: 1 1 0; min-width: 0; }
+.cols-2, .cols-3, .cols-4, .cols-5 { display: grid; gap: var(--space); grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 720px) {
+  .cols-2, .cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .cols-5 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (min-width: 1000px) { .cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (min-width: 1100px) { .cols-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+.gap-1 { gap: 4px; } .gap-2 { gap: 8px; } .gap-3 { gap: 12px; } .gap-4 { gap: 16px; } .gap-6 { gap: 24px; }
+.m-0 { margin: 0; }
+.mt-1 { margin-top: 4px; } .mt-2 { margin-top: 8px; } .mt-3 { margin-top: 12px; } .mt-4 { margin-top: 16px; } .mt-6 { margin-top: 24px; }
+.mb-1 { margin-bottom: 4px; } .mb-2 { margin-bottom: 8px; } .mb-3 { margin-bottom: 12px; } .mb-4 { margin-bottom: 16px; } .mb-6 { margin-bottom: 24px; }
+.p-2 { padding: 8px; } .p-3 { padding: 12px; } .p-4 { padding: 16px; } .p-6 { padding: 24px; }
+.text-xs { font-size: 12px; } .text-sm { font-size: 14px; } .text-base { font-size: 16px; }
+.text-lg { font-size: 18px; } .text-xl { font-size: 20px; line-height: 1.35; }
+.text-2xl { font-size: 24px; line-height: 1.25; } .text-3xl { font-size: 30px; line-height: 1.2; }
+.font-medium { font-weight: 500; } .font-semibold { font-weight: 600; } .font-bold { font-weight: 700; }
+.text-right { text-align: right; } .text-center { text-align: center; }
+.nowrap { white-space: nowrap; }
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-variant-numeric: tabular-nums; }
+.w-full { width: 100%; }
+.text-success { color: var(--success); } .text-danger { color: var(--danger); } .text-warning { color: var(--warning); }
+
+/* Components, with basecoat 1.0 markup (variants and sizes are data
+   attributes) and the shell tokens, so a page needs neither component CSS
+   nor a CSS framework. An older page that also links basecoat gets these
+   rules after it, over the same properties. */
+button, input, select, textarea { font: inherit; }
+input[type="checkbox"], input[type="radio"] { accent-color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  height: 36px; padding: 0 14px; border: 1px solid transparent; border-radius: calc(var(--radius) - 2px);
+  background: var(--accent); color: var(--accent-contrast);
+  font-size: 14px; font-weight: 500; line-height: 1; white-space: nowrap; text-decoration: none; cursor: pointer;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+.btn:hover { background: color-mix(in srgb, var(--accent) 86%, #000); }
+.btn:disabled, .btn[aria-disabled="true"] { opacity: 0.5; pointer-events: none; }
+.btn[data-variant="secondary"] { background: color-mix(in srgb, var(--text) 8%, var(--surface)); color: var(--text); }
+.btn[data-variant="secondary"]:hover { background: color-mix(in srgb, var(--text) 14%, var(--surface)); }
+.btn[data-variant="outline"] { background: var(--surface); color: var(--text); border-color: var(--border); }
+.btn[data-variant="ghost"] { background: transparent; color: var(--text); }
+.btn[data-variant="outline"]:hover, .btn[data-variant="ghost"]:hover { background: color-mix(in srgb, var(--accent) 10%, var(--surface)); }
+.btn[data-variant="destructive"] { background: var(--danger); color: var(--bg); }
+.btn[data-variant="destructive"]:hover { background: color-mix(in srgb, var(--danger) 86%, var(--text)); }
+.btn[data-variant="link"] { height: auto; padding: 0; background: none; color: var(--accent-text); text-decoration: underline; text-underline-offset: 3px; }
+.btn[data-size="sm"] { height: 30px; padding: 0 10px; font-size: 13px; }
+.btn[data-size="lg"] { height: 42px; padding: 0 20px; font-size: 15px; }
+.btn[data-size="icon"] { width: 36px; padding: 0; }
+
+.badge {
+  display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px;
+  border: 1px solid transparent; border-radius: 999px; background: var(--accent); color: var(--accent-contrast);
+  font-size: 12px; font-weight: 600; line-height: 1.5; white-space: nowrap;
+}
+.badge[data-variant="secondary"] { background: color-mix(in srgb, var(--text) 8%, var(--surface)); color: var(--text); }
+.badge[data-variant="outline"] { background: transparent; color: var(--text); border-color: var(--border); }
+.badge[data-variant="destructive"] { background: color-mix(in srgb, var(--danger) 14%, var(--surface)); color: var(--danger); }
+
+.alert {
+  display: grid; gap: 4px; padding: 12px 16px; border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--surface); color: var(--text); font-size: 14px;
+}
+.alert h2, .alert h3 { margin: 0; font-size: 14px; font-weight: 600; }
+.alert p, .alert section { margin: 0; color: var(--text-muted); }
+.alert[data-variant="destructive"] { border-color: color-mix(in srgb, var(--danger) 45%, var(--border)); background: color-mix(in srgb, var(--danger) 7%, var(--surface)); color: var(--danger); }
+
+.card {
+  display: flex; flex-direction: column; gap: 16px; padding: 20px 0;
+  border: 1px solid var(--border); border-radius: calc(var(--radius) + 2px);
+  background: var(--surface); color: var(--text); box-shadow: var(--shadow);
+}
+.card > header, .card > section, .card > footer { padding: 0 20px; }
+.card > header { display: grid; gap: 4px; }
+.card > header h2, .card > header h3 { margin: 0; font-size: 16px; font-weight: 600; line-height: 1.3; }
+.card > header p { margin: 0; color: var(--text-muted); font-size: 14px; }
+.card > footer { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+
+.input {
+  width: 100%; min-height: 36px; padding: 6px 12px; border: 1px solid var(--border); border-radius: calc(var(--radius) - 2px);
+  background: var(--surface); color: var(--text); font-size: 14px;
+}
+textarea.input { min-height: 84px; resize: vertical; }
+.input::placeholder { color: var(--text-muted); }
+.input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent); }
+.field { display: grid; gap: 6px; }
+.field label { font-size: 14px; font-weight: 500; }
+.field [role="alert"] { color: var(--danger); font-size: 13px; }
+
+dialog.dialog {
+  width: min(520px, calc(100vw - 32px)); max-height: calc(100vh - 32px); margin: auto; padding: 0;
+  border: 1px solid var(--border); border-radius: calc(var(--radius) + 4px);
+  background: var(--surface); color: var(--text); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+}
+dialog.dialog::backdrop { background: rgba(0, 0, 0, 0.5); }
+dialog.dialog > div { display: grid; gap: 16px; padding: 24px; }
+dialog.dialog header { display: grid; gap: 4px; }
+dialog.dialog header h2 { margin: 0; font-size: 18px; font-weight: 600; }
+dialog.dialog header p { margin: 0; color: var(--text-muted); font-size: 14px; }
+dialog.dialog footer { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+
+.tabs { display: grid; gap: 12px; }
+.tabs > [role="tablist"] {
+  display: inline-flex; gap: 4px; width: fit-content; max-width: 100%; padding: 4px; overflow-x: auto;
+  border-radius: var(--radius); background: color-mix(in srgb, var(--text) 6%, var(--surface));
+}
+.tabs [role="tab"] {
+  padding: 6px 12px; border: 0; border-radius: calc(var(--radius) - 4px); background: transparent;
+  color: var(--text-muted); font-size: 14px; font-weight: 500; white-space: nowrap; cursor: pointer;
+}
+.tabs [role="tab"][aria-selected="true"] { background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
+.tabs [role="tabpanel"][hidden] { display: none; }
+
+.accordion > details { border-bottom: 1px solid var(--border); }
+.accordion > details > summary {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 14px 0; font-weight: 500; list-style: none; cursor: pointer;
+}
+.accordion > details > summary::-webkit-details-marker { display: none; }
+.accordion > details > summary::after { content: "+"; color: var(--text-muted); font-size: 18px; line-height: 1; }
+.accordion > details[open] > summary::after { content: "\2212"; }
+.accordion > details > :not(summary) { margin: 0 0 14px; color: var(--text-muted); }
+
+.toaster {
+  position: fixed; right: 16px; bottom: 16px; z-index: 50; display: flex; flex-direction: column-reverse; gap: 8px;
+  width: min(360px, calc(100vw - 32px)); pointer-events: none;
+}
+.toaster .toast { pointer-events: auto; transition: opacity 200ms ease, transform 200ms ease; }
+.toaster .toast[aria-hidden="true"] { opacity: 0; transform: translateY(8px); }
+.toaster .toast-content {
+  padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--surface); color: var(--text); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12); font-size: 13px;
+}
+.toaster .toast-content h2 { margin: 0 0 2px; font-size: 14px; font-weight: 600; }
+.toaster .toast-content p { margin: 0; color: var(--text-muted); }
+
+/* skipUI building blocks. */
+.skip-table-search { max-width: 320px; margin-bottom: 12px; }
+.skip-table-wrap { overflow-x: auto; }
+table.shell-table th[data-sort] { cursor: pointer; user-select: none; }
+table.shell-table th[aria-sort="ascending"]::after { content: " \25B2"; font-size: 9px; }
+table.shell-table th[aria-sort="descending"]::after { content: " \25BC"; font-size: 9px; }
+table.shell-table td.skip-table-empty { color: var(--text-muted); text-align: center; padding: 24px 0; }
+.skip-pager { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-top: 12px; font-size: 13px; color: var(--text-muted); }
+.toaster .toast[data-type="success"] .toast-content { border-left: 3px solid var(--success); }
+.toaster .toast[data-type="error"] .toast-content { border-left: 3px solid var(--danger); }
+
+</style>
+<script>
+/* Skip artifact shell — fixed helpers served beside every artifact. */
+(function () {
+  "use strict";
+
+  var fmt = {
+    num: function (v, opts) { return new Intl.NumberFormat("pt-BR", opts || {}).format(v); },
+    brl: function (v) { return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v); },
+    pct: function (v) { return new Intl.NumberFormat("pt-BR", { style: "percent", maximumFractionDigits: 1 }).format(v); },
+    compact: function (v) { return new Intl.NumberFormat("pt-BR", { notation: "compact", maximumFractionDigits: 1 }).format(v); },
+    brlCompact: function (v) { return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", notation: "compact", maximumFractionDigits: 1 }).format(v); }
+  };
+
+  // axisLabels formats the five y-axis ticks in the unit the chart declared
+  // (percent, BRL or plain numbers), compact so long values never clip, with
+  // the fewest decimals that still print every tick exactly (1,5 mi, not 2 mi).
+  function axisLabels(format, ticks) {
+    function at(digits) {
+      var opts = { notation: "compact", maximumFractionDigits: digits };
+      if (format === "pct") opts = { style: "percent", maximumFractionDigits: digits };
+      else if (format === "brl") opts = { style: "currency", currency: "BRL", notation: "compact", maximumFractionDigits: digits };
+      var nf = new Intl.NumberFormat("pt-BR", opts);
+      return ticks.map(function (t) { return nf.format(t); });
+    }
+    for (var digits = 0; digits < 2; digits++) {
+      if (at(digits).join("|") === at(digits + 1).join("|")) return at(digits);
+    }
+    return at(2);
+  }
+
+  // yAxisPad formats the ticks and measures the left padding they need from
+  // the longest one; drawYAxis then draws the grid and the labels.
+  function yAxisPad(format, max) {
+    var labels = axisLabels(format, [0, max / 4, max / 2, (max * 3) / 4, max]);
+    var longest = labels.reduce(function (m, l) { return Math.max(m, l.length); }, 0);
+    return { labels: labels, padL: Math.max(40, Math.round(longest * 6.2) + 14) };
+  }
+  function drawYAxis(svg, axis, W, padR, padT, plotH) {
+    for (var g = 0; g <= 4; g++) {
+      var gy = padT + plotH - (plotH * g) / 4;
+      svg.appendChild(svgEl("line", { x1: axis.padL, y1: gy, x2: W - padR, y2: gy, stroke: "currentColor", "stroke-opacity": 0.08 }));
+      var lbl = svgEl("text", { x: axis.padL - 8, y: gy + 4, "text-anchor": "end", "font-size": 10, fill: mutedColor() });
+      lbl.textContent = axis.labels[g];
+      svg.appendChild(lbl);
+    }
+  }
+
+  // xLabelStep: show every k-th category label so labels never overlap, and
+  // always the last one (counted back from the end).
+  function xLabelStep(labels, step) {
+    var longest = labels.reduce(function (m, l) { return Math.max(m, String(l).length); }, 0);
+    return Math.max(1, Math.ceil((longest * 6.4 + 8) / Math.max(step, 1)));
+  }
+  function drawXLabel(svg, text, x, y, W, edgeGuard) {
+    var anchor = "middle";
+    var half = String(text).length * 3.2;
+    if (edgeGuard && x - half < 4) anchor = "start";
+    if (edgeGuard && x + half > W - 4) anchor = "end";
+    var tx = svgEl("text", { x: x, y: y, "text-anchor": anchor, "font-size": 11, fill: mutedColor() });
+    tx.textContent = text;
+    svg.appendChild(tx);
+  }
+  // categoryLines fits a bar's category name in its slot: one line, two lines
+  // split at a space, or cut with "…". A bar without its name can't be read, so
+  // categories are never skipped; null when the slot is too narrow for that.
+  function categoryLines(text, slot) {
+    var fit = Math.floor((slot - 6) / 6.4);
+    var s = String(text);
+    if (fit < 4) return null;
+    if (s.length <= fit) return [s];
+    var cut = function (t) { return t.length <= fit ? t : t.slice(0, fit - 1).trimEnd() + "…"; };
+    var best = -1;
+    for (var i = 0; i < s.length; i++) {
+      if (s[i] === " " && (best < 0 || Math.abs(s.length / 2 - i) < Math.abs(s.length / 2 - best))) best = i;
+    }
+    if (best < 0) return [cut(s)];
+    return [cut(s.slice(0, best)), cut(s.slice(best + 1))];
+  }
+  function legend(el, items) {
+    var box = document.createElement("div");
+    box.className = "chart-legend";
+    items.forEach(function (it) {
+      var row = document.createElement("span");
+      var dot = document.createElement("i");
+      dot.style.background = it.color;
+      row.appendChild(dot);
+      row.appendChild(document.createTextNode((it.label || "") + (it.value ? " " : "")));
+      if (it.value) {
+        var v = document.createElement("b");
+        v.textContent = it.value;
+        row.appendChild(v);
+      }
+      box.appendChild(row);
+    });
+    resolve(el).appendChild(box);
+  }
+  var seriesPalette = ["#1baf7a", "#eda100", "#e34948", "#4a3aa7", "#e87ba4", "#0ea5b7"];
+
+  // format accepts a function OR one of the fmt names ("num" | "brl" | "pct").
+  // A page's function may return nothing or throw: the chart prints its
+  // number instead of taking the rest of the page script down with it.
+  function coerceFormat(spec) {
+    if (typeof spec === "function") {
+      return function (v) {
+        try {
+          var out = spec(v);
+          return out == null ? "" : String(out);
+        } catch (e) {
+          return fmt.num(v);
+        }
+      };
+    }
+    if (typeof spec === "string" && fmt[spec]) return fmt[spec];
+    return function (v) { return fmt.num(v); };
+  }
+
+  function accent() {
+    return getComputedStyle(document.documentElement).getPropertyValue("--accent").trim() || "#2563eb";
+  }
+  function mutedColor() {
+    return getComputedStyle(document.documentElement).getPropertyValue("--text-muted").trim() || "#5b6472";
+  }
+  function svgEl(tag, attrs) {
+    var el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+    for (var k in attrs) el.setAttribute(k, attrs[k]);
+    return el;
+  }
+  function frame(el, w, h) {
+    var svg = svgEl("svg", { viewBox: "0 0 " + w + " " + h, role: "img" });
+    el = resolve(el);
+    el.innerHTML = "";
+    el.appendChild(svg);
+    return svg;
+  }
+
+  // maxOf guards the axis scale: empty values would give -Infinity (truthy,
+  // so "|| 1" can't catch it) and a non-positive max would flip the chart.
+  // finite reads a chart value as a number, 0 when it is not one (NaN,
+  // Infinity, a stray string), so one bad value cannot blank the axis.
+  function finite(v) {
+    var n = +v;
+    return isFinite(n) ? n : 0;
+  }
+
+  function maxOf(values) {
+    var m = values.length ? Math.max.apply(null, values.map(finite)) : 0;
+    return m > 0 ? m : 1;
+  }
+
+  // labelsFor pads or trims the category names to the n points drawn: pages
+  // pass labels and values of different lengths, and one throw here loses
+  // every section the page renders after the chart.
+  function labelsFor(cfg, n) {
+    var out = [];
+    for (var i = 0; i < n; i++) out.push(cfg.labels && cfg.labels[i] != null ? String(cfg.labels[i]) : "");
+    return out;
+  }
+
+  // niceMax rounds the scale up so the four grid steps land on round values
+  // (1, 1.5, 2, 2.5, 3, 4, 5, 6 or 8 × 10^k) and the tick labels read exactly.
+  function niceMax(max) {
+    var raw = max / 4;
+    var mag = Math.pow(10, Math.floor(Math.log10(raw)));
+    var res = raw / mag;
+    var steps = [1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10];
+    var nice = steps.filter(function (s) { return s >= res - 1e-9; })[0];
+    return nice * mag * 4;
+  }
+
+  // bar(el, {labels:[], values:[], color?, format?}) — vertical bar chart.
+  function bar(el, cfg) {
+    var W = 640, H = 280, padB = 30, padT = 12, padR = 12;
+    var max = niceMax(maxOf(cfg.values));
+    var axis = yAxisPad(cfg.format, max);
+    var svg = frame(el, W, H);
+    var n = cfg.values.length;
+    var labels = labelsFor(cfg, n);
+    var plotW = W - axis.padL - padR;
+    var step = plotW / n, bw = Math.min(step * 0.62, 64);
+    var names = labels.map(function (l) { return categoryLines(l, step); });
+    var named = names.every(Boolean);
+    if (named && names.some(function (l) { return l.length > 1; })) padB = 42;
+    var plotH = H - padT - padB;
+    var color = cfg.color || accent();
+    var f = coerceFormat(cfg.format);
+    var every = xLabelStep(labels, step);
+    drawYAxis(svg, axis, W, padR, padT, plotH);
+    cfg.values.forEach(function (v, i) {
+      var bh = Math.max(0, (finite(v) / max) * plotH);
+      var x = axis.padL + i * step + (step - bw) / 2;
+      var y = padT + plotH - bh;
+      var r = svgEl("rect", { x: x, y: y, width: bw, height: bh, rx: 4, fill: (cfg.colors && cfg.colors[i]) || color });
+      var t = svgEl("title", {});
+      t.textContent = labels[i] + ": " + f(v);
+      r.appendChild(t);
+      svg.appendChild(r);
+      if (named) {
+        names[i].forEach(function (text, li) {
+          drawXLabel(svg, text, x + bw / 2, padT + plotH + 18 + li * 13, W, false);
+        });
+      } else if ((n - 1 - i) % every === 0) {
+        drawXLabel(svg, labels[i], x + bw / 2, H - 10, W, false);
+      }
+    });
+  }
+
+  // line(el, {labels:[], values:[] | series:[{label, values, color?}], color?, format?})
+  // — one line, or several series on one scale with a legend under the chart.
+  function line(el, cfg) {
+    var W = 640, H = 280, padB = 30, padT = 12, padR = 16;
+    var series = cfg.series && cfg.series.length
+      ? cfg.series
+      : [{ label: "", values: cfg.values || [], color: cfg.color }];
+    var all = [];
+    series.forEach(function (s) { all = all.concat(s.values || []); });
+    var max = niceMax(maxOf(all));
+    var axis = yAxisPad(cfg.format, max);
+    var svg = frame(el, W, H);
+    var n = series.reduce(function (m, s) { return Math.max(m, (s.values || []).length); }, 0);
+    var labels = labelsFor(cfg, n);
+    var plotW = W - axis.padL - padR, plotH = H - padT - padB;
+    var f = coerceFormat(cfg.format);
+    drawYAxis(svg, axis, W, padR, padT, plotH);
+    var xs = labels.map(function (_, i) { return axis.padL + (n === 1 ? plotW / 2 : (plotW * i) / (n - 1)); });
+    var every = xLabelStep(labels, n > 1 ? plotW / (n - 1) : plotW);
+    labels.forEach(function (label, i) {
+      if ((n - 1 - i) % every === 0) drawXLabel(svg, label, xs[i], H - 10, W, true);
+    });
+    var colors = series.map(function (s, si) {
+      return s.color || (si === 0 ? (cfg.color || accent()) : seriesPalette[(si - 1) % seriesPalette.length]);
+    });
+    series.forEach(function (s, si) {
+      var color = colors[si];
+      var pts = (s.values || []).map(function (v, i) { return [xs[i], padT + plotH - (finite(v) / max) * plotH]; });
+      var d = pts.map(function (p, i) { return (i ? "L" : "M") + p[0].toFixed(1) + " " + p[1].toFixed(1); }).join(" ");
+      svg.appendChild(svgEl("path", { d: d, fill: "none", stroke: color, "stroke-width": 2, "stroke-linejoin": "round" }));
+      pts.forEach(function (p, i) {
+        var c = svgEl("circle", { cx: p[0], cy: p[1], r: 3.5, fill: color });
+        var t = svgEl("title", {});
+        t.textContent = (s.label ? s.label + " · " : "") + labels[i] + ": " + f(s.values[i]);
+        c.appendChild(t);
+        svg.appendChild(c);
+      });
+    });
+    if (series.length > 1) {
+      legend(el, series.map(function (s, si) { return { label: s.label, color: colors[si] }; }));
+    }
+  }
+
+  // donut(el, {labels:[], values:[], colors?, format?, center?, centerLabel?, legend?})
+  // — donut with a short total in the centre (compact, in the declared unit)
+  // and, with legend: true, the labels and shares listed under it.
+  function donut(el, cfg) {
+    var W = 320, H = 280, cx = W / 2, cy = H / 2, R = 92, r = 58;
+    var svg = frame(el, W, H);
+    // At 100% of a wide container the donut outgrows the height pages give
+    // the box and spills over the next section: keep it at its own size.
+    svg.style.maxWidth = W + "px";
+    svg.style.margin = "0 auto";
+    var values = cfg.values.map(finite);
+    var labels = labelsFor(cfg, values.length);
+    var sum = values.reduce(function (a, b) { return a + b; }, 0);
+    var total = sum || 1;
+    var palette = cfg.colors || [accent()].concat(seriesPalette);
+    // The hover keeps the full value; the centre has room for a short one.
+    var full = coerceFormat(cfg.format);
+    var short = typeof cfg.format === "function" ? full : cfg.format === "brl" ? fmt.brlCompact : fmt.compact;
+    var a0 = -Math.PI / 2;
+    values.forEach(function (v, i) {
+      var a1 = a0 + (v / total) * Math.PI * 2;
+      var large = a1 - a0 > Math.PI ? 1 : 0;
+      var p = ["M", cx + R * Math.cos(a0), cy + R * Math.sin(a0),
+        "A", R, R, 0, large, 1, cx + R * Math.cos(a1), cy + R * Math.sin(a1),
+        "L", cx + r * Math.cos(a1), cy + r * Math.sin(a1),
+        "A", r, r, 0, large, 0, cx + r * Math.cos(a0), cy + r * Math.sin(a0), "Z"].join(" ");
+      var path = svgEl("path", { d: p, fill: palette[i % palette.length] });
+      var t = svgEl("title", {});
+      t.textContent = labels[i] + ": " + full(v) + " (" + fmt.pct(v / total) + ")";
+      path.appendChild(t);
+      svg.appendChild(path);
+      a0 = a1;
+    });
+    // A share chart has no total worth printing: without its own centre text
+    // the caption alone takes the middle.
+    var text = cfg.center != null ? String(cfg.center) : (cfg.format === "pct" ? "" : short(sum));
+    if (text) {
+      var size = text.length > 9 ? 14 : text.length > 7 ? 17 : 20;
+      var center = svgEl("text", { x: cx, y: cfg.centerLabel ? cy + 1 : cy + 6, "text-anchor": "middle", "font-size": size, "font-weight": 650, fill: "currentColor" });
+      center.textContent = text;
+      svg.appendChild(center);
+    }
+    if (cfg.centerLabel) {
+      var cap = svgEl("text", { x: cx, y: text ? cy + 19 : cy + 5, "text-anchor": "middle", "font-size": 11, fill: mutedColor() });
+      cap.textContent = cfg.centerLabel;
+      svg.appendChild(cap);
+    }
+    if (cfg.legend) {
+      legend(el, labels.map(function (label, i) {
+        return { label: label, color: palette[i % palette.length], value: fmt.pct(values[i] / total) };
+      }));
+    }
+  }
+
+  // ---- Page building blocks: what dashboards and small systems kept
+  // re-implementing — a searchable sortable table, a KPI row, tabs, toasts,
+  // dialogs, saved state and mock data. Every call is opt-in, so a page that
+  // brings its own versions keeps them.
+
+  function resolve(target) {
+    return typeof target === "string" ? document.querySelector(target) : target;
+  }
+
+  function node(tag, className, text) {
+    var el = document.createElement(tag);
+    if (className) el.className = className;
+    if (text != null) el.textContent = text;
+    return el;
+  }
+
+  function isNumberColumn(col) {
+    return col.align === "right" || col.format === "num" || col.format === "brl" || col.format === "pct";
+  }
+
+  function cellText(col, row) {
+    var value = row[col.key];
+    if (value == null) return "";
+    return col.format ? coerceFormat(col.format)(value) : String(value);
+  }
+
+  function compareValues(a, b) {
+    if (typeof a === "number" && typeof b === "number") return a - b;
+    return String(a == null ? "" : a).localeCompare(String(b == null ? "" : b), "pt-BR", { numeric: true });
+  }
+
+  // table(el, {columns, rows, search?, pageSize?, empty?, onRowClick?}) — a
+  // table.shell-table with sortable headers, an optional search box and
+  // pager. A column is {key, label, format?, align?, sortable? (true),
+  // render?(value, row) returning a Node or an HTML string — the page writes
+  // its cell templates as markup}. Plain values are always set as text.
+  // Returns {setRows, rows}.
+  function table(target, cfg) {
+    var root = resolve(target);
+    var cols = cfg.columns || [];
+    var pageSize = cfg.pageSize || 0;
+    var state = { rows: (cfg.rows || []).slice(), query: "", key: null, dir: 1, page: 0 };
+    root.innerHTML = "";
+    if (cfg.search) {
+      var search = node("input", "input skip-table-search");
+      search.type = "search";
+      search.placeholder = typeof cfg.search === "string" ? cfg.search : "Buscar…";
+      search.setAttribute("aria-label", search.placeholder);
+      search.addEventListener("input", function () {
+        state.query = search.value.trim().toLowerCase();
+        state.page = 0;
+        draw();
+      });
+      root.appendChild(search);
+    }
+    var tableEl = node("table", "shell-table");
+    var headRow = node("tr");
+    var heads = cols.map(function (col) {
+      var th = node("th", isNumberColumn(col) ? "num" : "", col.label == null ? col.key : col.label);
+      th.scope = "col";
+      if (col.sortable !== false) {
+        var toggle = function () {
+          state.dir = state.key === col.key ? -state.dir : 1;
+          state.key = col.key;
+          draw();
+        };
+        th.setAttribute("data-sort", col.key);
+        th.tabIndex = 0;
+        th.addEventListener("click", toggle);
+        th.addEventListener("keydown", function (e) {
+          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(); }
+        });
+      }
+      headRow.appendChild(th);
+      return th;
+    });
+    var thead = node("thead");
+    var tbody = node("tbody");
+    var wrap = node("div", "skip-table-wrap");
+    var pager = node("div", "skip-pager");
+    thead.appendChild(headRow);
+    tableEl.appendChild(thead);
+    tableEl.appendChild(tbody);
+    wrap.appendChild(tableEl);
+    root.appendChild(wrap);
+    if (pageSize) root.appendChild(pager);
+
+    function visibleRows() {
+      var rows = state.rows;
+      if (state.query) {
+        rows = rows.filter(function (row) {
+          return cols.some(function (col) { return cellText(col, row).toLowerCase().indexOf(state.query) >= 0; });
+        });
+      }
+      if (state.key) {
+        var key = state.key, dir = state.dir;
+        rows = rows.slice().sort(function (a, b) { return dir * compareValues(a[key], b[key]); });
+      }
+      return rows;
+    }
+
+    function drawRow(row) {
+      var tr = node("tr");
+      cols.forEach(function (col) {
+        var td = node("td", isNumberColumn(col) ? "num" : "");
+        if (!col.render) {
+          td.textContent = cellText(col, row);
+        } else {
+          var content = col.render(row[col.key], row);
+          if (content instanceof Node) td.appendChild(content);
+          else td.innerHTML = content == null ? "" : String(content);
+        }
+        tr.appendChild(td);
+      });
+      // The row stays a row (no role) and takes focus, so a keyboard reaches
+      // the same action; keys pressed on a control inside a cell are its own.
+      if (cfg.onRowClick) {
+        tr.style.cursor = "pointer";
+        tr.tabIndex = 0;
+        tr.addEventListener("click", function () { cfg.onRowClick(row); });
+        tr.addEventListener("keydown", function (e) {
+          if (e.target !== tr || (e.key !== "Enter" && e.key !== " ")) return;
+          e.preventDefault();
+          cfg.onRowClick(row);
+        });
+      }
+      return tr;
+    }
+
+    function pagerButton(label, disabled, step) {
+      var button = node("button", "btn", label);
+      button.type = "button";
+      button.setAttribute("data-variant", "outline");
+      button.setAttribute("data-size", "sm");
+      button.disabled = disabled;
+      button.addEventListener("click", function () { state.page += step; draw(); });
+      return button;
+    }
+
+    function draw() {
+      var rows = visibleRows();
+      heads.forEach(function (th, i) {
+        if (cols[i].key === state.key) th.setAttribute("aria-sort", state.dir > 0 ? "ascending" : "descending");
+        else th.removeAttribute("aria-sort");
+      });
+      var pages = pageSize ? Math.max(1, Math.ceil(rows.length / pageSize)) : 1;
+      state.page = Math.min(state.page, pages - 1);
+      var shown = pageSize ? rows.slice(state.page * pageSize, (state.page + 1) * pageSize) : rows;
+      tbody.innerHTML = "";
+      if (!shown.length) {
+        var empty = node("td", "skip-table-empty", cfg.empty || "Nenhum registro encontrado.");
+        empty.colSpan = cols.length;
+        tbody.appendChild(node("tr")).appendChild(empty);
+      }
+      shown.forEach(function (row) { tbody.appendChild(drawRow(row)); });
+      if (!pageSize) return;
+      pager.innerHTML = "";
+      var from = rows.length ? state.page * pageSize + 1 : 0;
+      pager.appendChild(node("span", "", from + "–" + Math.min(rows.length, (state.page + 1) * pageSize) + " de " + rows.length));
+      var nav = node("div", "row gap-2");
+      nav.appendChild(pagerButton("Anterior", state.page === 0, -1));
+      nav.appendChild(pagerButton("Próxima", state.page >= pages - 1, 1));
+      pager.appendChild(nav);
+    }
+
+    draw();
+    return {
+      setRows: function (rows) { state.rows = rows.slice(); draw(); },
+      rows: visibleRows
+    };
+  }
+
+  // kpis(el, [{label, value, format?, delta?, hint?}]) — KPI cards in a
+  // responsive grid; delta is a fraction (0.12 renders as ▲ 12%).
+  function kpis(target, items) {
+    var root = resolve(target);
+    root.innerHTML = "";
+    root.classList.add("shell-grid");
+    items.forEach(function (item) {
+      var card = node("div", "panel kpi");
+      card.appendChild(node("span", "kpi-label", item.label));
+      // Large money values go compact ("R$ 27,5 mi"): the full amount does
+      // not fit a KPI card at four per row.
+      var kpiFormat = item.format === "brl" && Math.abs(item.value) >= 1e6 ? fmt.brlCompact : (item.format ? coerceFormat(item.format) : null);
+      card.appendChild(node("span", "kpi-value", kpiFormat ? kpiFormat(item.value) : String(item.value)));
+      if (typeof item.delta === "number") {
+        var up = item.delta >= 0;
+        card.appendChild(node("span", "kpi-delta " + (up ? "up" : "down"), (up ? "▲ " : "▼ ") + fmt.pct(Math.abs(item.delta))));
+      }
+      if (item.hint) card.appendChild(node("span", "kpi-label", item.hint));
+      root.appendChild(card);
+    });
+  }
+
+  // badge(text, variant?) — a .badge node for table cells and lists;
+  // variant is "secondary" | "outline" | "destructive" (default: primary).
+  function badge(text, variant) {
+    var el = node("span", "badge", text);
+    if (variant) el.setAttribute("data-variant", variant);
+    return el;
+  }
+
+  // tabs(el) — wires one .tabs block: [role=tab] buttons inside
+  // [role=tablist], each with aria-controls naming its [role=tabpanel].
+  function tabs(target) {
+    var root = resolve(target);
+    var buttons = Array.prototype.slice.call(root.querySelectorAll('[role="tab"]'));
+    function select(chosen) {
+      buttons.forEach(function (b) {
+        var on = b === chosen;
+        b.setAttribute("aria-selected", on ? "true" : "false");
+        b.tabIndex = on ? 0 : -1;
+        var panel = document.getElementById(b.getAttribute("aria-controls"));
+        if (panel) panel.hidden = !on;
+      });
+    }
+    buttons.forEach(function (b, i) {
+      b.addEventListener("click", function () { select(b); });
+      b.addEventListener("keydown", function (e) {
+        var step = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+        if (!step) return;
+        var next = buttons[(i + step + buttons.length) % buttons.length];
+        next.focus();
+        select(next);
+      });
+    });
+    select(buttons.filter(function (b) { return b.getAttribute("aria-selected") === "true"; })[0] || buttons[0]);
+  }
+
+  // toast(message, {type?: "success" | "error", title?, duration?}) — a
+  // .toast in a shared .toaster at the bottom of the page.
+  function toast(message, opts) {
+    opts = opts || {};
+    var toaster = document.querySelector(".toaster") || document.body.appendChild(node("div", "toaster"));
+    var item = node("div", "toast");
+    item.setAttribute("role", opts.type === "error" ? "alert" : "status");
+    item.setAttribute("aria-hidden", "true");
+    if (opts.type) item.setAttribute("data-type", opts.type);
+    var content = node("div", "toast-content");
+    var section = node("section");
+    if (opts.title) section.appendChild(node("h2", "", opts.title));
+    section.appendChild(node("p", "", message));
+    content.appendChild(section);
+    item.appendChild(content);
+    toaster.appendChild(item);
+    requestAnimationFrame(function () { item.setAttribute("aria-hidden", "false"); });
+    setTimeout(function () {
+      item.setAttribute("aria-hidden", "true");
+      setTimeout(function () { item.remove(); }, 400);
+    }, opts.duration || 3000);
+  }
+
+  // Dialogs are native <dialog class="dialog">: a [data-dialog-open="id"]
+  // anywhere opens one, a [data-dialog-close] inside closes it, and a click on
+  // its backdrop closes it too. Plain dialog.showModal()/close() still work.
+  document.addEventListener("click", function (e) {
+    var target = e.target;
+    if (!(target instanceof Element)) return;
+    var opener = target.closest("[data-dialog-open]");
+    if (opener) {
+      var dialog = document.getElementById(opener.getAttribute("data-dialog-open"));
+      if (dialog && dialog.showModal && !dialog.open) dialog.showModal();
+      return;
+    }
+    var closer = target.closest("[data-dialog-close]");
+    if (closer && closer.closest("dialog")) {
+      closer.closest("dialog").close();
+      return;
+    }
+    if (target.tagName === "DIALOG" && target.classList.contains("dialog") && target.open) target.close();
+  });
+
+  // store(key, fallback) — JSON state in localStorage that never throws (a
+  // private window or a full quota falls back to memory): {get, set, update}.
+  function store(key, fallback) {
+    var memory;
+    // Set while the last write did not reach localStorage: what is stored
+    // there is older than memory until a write goes through again.
+    var unsaved = false;
+    var initial = function () { return fallback === undefined ? undefined : JSON.parse(JSON.stringify(fallback)); };
+    function get() {
+      if (!unsaved) {
+        try {
+          var raw = localStorage.getItem(key);
+          if (raw != null) return JSON.parse(raw);
+        } catch (e) { /* storage unavailable: memory below */ }
+      }
+      return memory !== undefined ? memory : initial();
+    }
+    function set(value) {
+      memory = value;
+      try {
+        localStorage.setItem(key, JSON.stringify(value));
+        unsaved = false;
+      } catch (e) {
+        unsaved = true;
+      }
+      return value;
+    }
+    return { get: get, set: set, update: function (fn) { return set(fn(get())); } };
+  }
+
+  // mock — seeded random data, so a page asks for 90 days of numbers in one
+  // line instead of writing them out; the same seed gives the same data.
+  var FIRST = ["Ana", "Bruno", "Carla", "Diego", "Eduarda", "Felipe", "Gabriela", "Henrique", "Isabela", "João",
+    "Larissa", "Marcos", "Natália", "Otávio", "Paula", "Rafael", "Sofia", "Thiago", "Vanessa", "Lucas"];
+  var LAST = ["Silva", "Santos", "Oliveira", "Souza", "Pereira", "Costa", "Rodrigues", "Almeida", "Nascimento", "Lima",
+    "Araújo", "Fernandes", "Carvalho", "Gomes", "Martins", "Rocha", "Ribeiro", "Barbosa"];
+  var INITIALS = "ABCDEFGHIJLMNOPRSTV".split("");
+  var CITIES = ["São Paulo, SP", "Rio de Janeiro, RJ", "Belo Horizonte, MG", "Curitiba, PR", "Porto Alegre, RS",
+    "Salvador, BA", "Recife, PE", "Fortaleza, CE", "Brasília, DF", "Goiânia, GO", "Campinas, SP", "Florianópolis, SC",
+    "Manaus, AM", "Belém, PA", "Vitória, ES", "Natal, RN"];
+
+  function createMock(seed) {
+    var state = seed >>> 0;
+    var names = 0;
+    function random() {
+      state = (state + 0x6d2b79f5) >>> 0;
+      var t = state;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    }
+    function int(min, max) { return min + Math.floor(random() * (max - min + 1)); }
+    function pick(list) { return list[Math.floor(random() * list.length)]; }
+    var mock = {
+      seed: function (value) { state = value >>> 0; names = 0; return mock; },
+      random: random,
+      int: int,
+      float: function (min, max, decimals) {
+        var factor = Math.pow(10, decimals == null ? 2 : decimals);
+        return Math.round((min + random() * (max - min)) * factor) / factor;
+      },
+      pick: pick,
+      chance: function (p) { return random() < p; },
+      // There are 360 first/last pairs. A page that draws until the name is
+      // new (do { … } while (used.has(name))) froze the tab past them, so
+      // later draws widen the space: a second surname after 200 (6,480), a
+      // middle initial after 4,000.
+      name: function () {
+        names++;
+        var middle = names > 4000 ? pick(INITIALS) + ". " : "";
+        return pick(FIRST) + " " + middle + (names > 200 ? pick(LAST) + " " : "") + pick(LAST);
+      },
+      city: function () { return pick(CITIES); },
+      // series(n, {start, trend, noise, min, decimals}) — a walk: each value
+      // moves by trend (fraction per step) plus up to ±noise of itself.
+      series: function (n, opts) {
+        opts = opts || {};
+        var value = opts.start == null ? 100 : opts.start;
+        var factor = Math.pow(10, opts.decimals || 0);
+        var out = [];
+        for (var i = 0; i < n; i++) {
+          out.push(Math.max(opts.min == null ? 0 : opts.min, Math.round(value * factor) / factor));
+          value = value * (1 + (opts.trend || 0)) * (1 + (random() * 2 - 1) * (opts.noise == null ? 0.08 : opts.noise));
+        }
+        return out;
+      },
+      // dates(n, {end?, step?: "day" | "week" | "month"}) — ISO dates
+      // (YYYY-MM-DD), oldest first, ending at end (default: today).
+      dates: function (n, opts) {
+        opts = opts || {};
+        var end = opts.end ? new Date(opts.end) : new Date();
+        var out = [];
+        for (var i = n - 1; i >= 0; i--) {
+          var d = new Date(end.getTime());
+          if (opts.step === "month") d.setMonth(d.getMonth() - i);
+          else d.setDate(d.getDate() - i * (opts.step === "week" ? 7 : 1));
+          out.push(d.toISOString().slice(0, 10));
+        }
+        return out;
+      },
+      // rows(n, spec) — n objects; each spec value is a function(i), a list
+      // to pick from, or a constant.
+      rows: function (n, spec) {
+        var out = [];
+        for (var i = 0; i < n; i++) {
+          var row = {};
+          for (var key in spec) {
+            var value = spec[key];
+            row[key] = typeof value === "function" ? value(i) : Array.isArray(value) ? pick(value) : value;
+          }
+          out.push(row);
+        }
+        return out;
+      }
+    };
+    return mock;
+  }
+
+  window.skipShell = { fmt: fmt };
+  window.skipChart = { bar: bar, line: line, donut: donut };
+  window.skipUI = { table: table, kpis: kpis, badge: badge, tabs: tabs, toast: toast };
+  window.skipStore = store;
+  window.skipMock = createMock(20261022);
+})();
+
+</script>
+<style>
+:root {
+--accent: #9B4B42;
+--accent-text: #9B4B42;
+--accent-contrast: #ffffff;
+--cor-fundo: #FBFAF8;
+--cor-creme: #FAF7F2;
+--cor-creme-alt: #F5EFE8;
+--cor-texto: #1A1A1A;
+--cor-texto-suave: #5A5A5A;
+--text-muted: #6B6B6B;
+--cor-rosa: #E8B7B0;
+--cor-rosa-escura: #9B4B42;
+--cor-ocre: #F4C189;
+--cor-borda: #E8DDD6;
+--cor-perigo: #B03A2E;
+--cor-sucesso: #2E7D4F;
+--fonte-serif: Georgia, serif;
+--fonte-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+body {
+font-family: var(--fonte-sans);
+background: var(--cor-fundo);
+color: var(--cor-texto);
+margin: 0;
+min-height: 100vh;
+}
+.oculto { display: none !important; }
+.app-header {
+background: #ffffff;
+border-bottom: 1px solid var(--cor-borda);
+position: sticky;
+top: 0;
+z-index: 30;
+}
+.app-header .container-app {
+max-width: 1200px;
+margin: 0 auto;
+padding: 14px 20px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 16px;
+flex-wrap: wrap;
+}
+.container-app {
+max-width: 1200px;
+margin: 0 auto;
+padding: 24px 20px;
+}
+.marca {
+font-family: var(--fonte-serif);
+font-size: 1.35rem;
+color: var(--cor-texto);
+letter-spacing: 0.5px;
+}
+.marca span { color: var(--cor-rosa-escura); font-style: italic; }
+.eyebrow-pill {
+display: inline-block;
+background: var(--cor-creme-alt);
+color: var(--cor-rosa-escura);
+border: 1px solid var(--cor-rosa);
+border-radius: 999px;
+padding: 3px 12px;
+font-size: 0.75rem;
+font-weight: 600;
+letter-spacing: 0.5px;
+text-transform: uppercase;
+}
+.titulo-pagina {
+font-family: var(--fonte-serif);
+font-size: 1.8rem;
+margin: 10px 0 4px;
+}
+.sub-pagina { color: var(--cor-texto-suave); margin: 0 0 18px; font-size: 0.95rem; }
+.card {
+background: #ffffff;
+border: 1px solid var(--cor-borda);
+border-radius: 12px;
+padding: 20px;
+box-shadow: 0 1px 2px rgba(26,26,26,0.04);
+}
+.card h2, .card h3 { margin: 0 0 4px; font-size: 1.1rem; }
+.card .sub-card { color: var(--text-muted); font-size: 0.85rem; margin: 0 0 14px; }
+.btn-lolita, .btn-outline, .btn-perigo, .btn-suave {
+font-family: inherit;
+font-size: 0.9rem;
+border-radius: 8px;
+padding: 9px 16px;
+cursor: pointer;
+transition: background 0.18s, color 0.18s, border-color 0.18s;
+border: 1px solid transparent;
+display: inline-flex;
+align-items: center;
+gap: 6px;
+}
+.btn-lolita { background: #1A1A1A; color: #ffffff; }
+.btn-lolita:hover { background: var(--cor-rosa-escura); }
+.btn-outline { background: #ffffff; color: var(--cor-texto); border-color: var(--cor-borda); }
+.btn-outline:hover { border-color: var(--cor-rosa-escura); color: var(--cor-rosa-escura); }
+.btn-perigo { background: #ffffff; color: var(--cor-perigo); border-color: var(--cor-perigo); }
+.btn-perigo:hover { background: var(--cor-perigo); color: #ffffff; }
+.btn-suave { background: var(--cor-creme-alt); color: var(--cor-texto); }
+.btn-suave:hover { background: var(--cor-rosa); }
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
+outline: 2px solid var(--cor-rosa-escura);
+outline-offset: 2px;
+}
+.campo { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.campo label { font-size: 0.88rem; font-weight: 600; color: var(--cor-texto); }
+.ajuda { font-size: 0.78rem; color: var(--text-muted); }
+.input-lolita, select.input-lolita, textarea.input-lolita {
+font-family: inherit;
+font-size: 0.95rem;
+border: 1px solid var(--cor-borda);
+border-radius: 8px;
+padding: 9px 12px;
+background: #ffffff;
+color: var(--cor-texto);
+width: 100%;
+box-sizing: border-box;
+transition: border-color 0.18s, box-shadow 0.18s;
+}
+.input-lolita:focus, select.input-lolita:focus, textarea.input-lolita:focus {
+border-color: var(--cor-rosa-escura);
+box-shadow: 0 0 0 3px rgba(155,75,66,0.15);
+outline: none;
+}
+.msg-campo-erro { color: var(--cor-perigo); font-size: 0.8rem; min-height: 0; display: block; }
+.msg-campo-erro:empty { display: none; }
+.input-invalido { border-color: var(--cor-perigo) !important; }
+.abas {
+display: flex;
+gap: 4px;
+border-bottom: 1px solid var(--cor-borda);
+margin-bottom: 22px;
+overflow-x: auto;
+}
+.aba-btn {
+background: none;
+border: none;
+padding: 12px 18px;
+font-family: inherit;
+font-size: 0.95rem;
+color: var(--text-muted);
+cursor: pointer;
+border-bottom: 3px solid transparent;
+margin-bottom: -1px;
+white-space: nowrap;
+}
+.aba-btn:hover { color: var(--cor-texto); }
+.aba-btn[aria-selected="true"] {
+color: var(--cor-texto);
+font-weight: 600;
+border-bottom-color: var(--cor-rosa-escura);
+}
+.painel { display: none; }
+.painel.ativo { display: block; }
+.grid-duas-colunas {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 18px;
+}
+.grid-tres-colunas {
+display: grid;
+grid-template-columns: 2fr 1fr 1fr;
+gap: 18px;
+}
+.grid-kpi {
+display: grid;
+grid-template-columns: repeat(4, 1fr);
+gap: 14px;
+margin-bottom: 20px;
+}
+@media (max-width: 768px) {
+.grid-duas-colunas, .grid-tres-colunas, .grid-kpi { grid-template-columns: 1fr; }
+.titulo-pagina { font-size: 1.5rem; }
+}
+.kpi-valor { font-family: var(--fonte-serif); font-size: 2rem; color: var(--cor-rosa-escura); margin: 4px 0; }
+.kpi-rotulo { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
+.kpi-legenda { font-size: 0.78rem; color: var(--text-muted); }
+.grade-opcoes {
+display: flex;
+flex-wrap: wrap;
+gap: 8px;
+margin-top: 6px;
+}
+.grade-opcoes label {
+display: inline-flex;
+align-items: center;
+gap: 6px;
+border: 1px solid var(--cor-borda);
+border-radius: 8px;
+padding: 6px 12px;
+cursor: pointer;
+font-size: 0.9rem;
+background: #ffffff;
+}
+.grade-opcoes label:has(input:checked) {
+border-color: var(--cor-rosa-escura);
+background: var(--cor-creme-alt);
+color: var(--cor-rosa-escura);
+font-weight: 600;
+}
+.grade-opcoes input { accent-color: var(--cor-rosa-escura); }
+.oculto-grade { display: none; }
+.grupo-radios { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 8px; }
+.grupo-radios label { display: inline-flex; gap: 6px; align-items: center; cursor: pointer; font-size: 0.92rem; }
+.grupo-radios input { accent-color: var(--cor-rosa-escura); }
+.linha-cor {
+display: flex;
+align-items: center;
+gap: 8px;
+margin-bottom: 8px;
+}
+.input-cor-preview {
+width: 44px;
+height: 38px;
+border: 1px solid var(--cor-borda);
+border-radius: 8px;
+padding: 2px;
+background: #fff;
+cursor: pointer;
+}
+.campo-nome-cor { flex: 1; }
+.dropzone {
+border: 2px dashed var(--cor-rosa);
+border-radius: 12px;
+padding: 22px;
+text-align: center;
+background: var(--cor-creme);
+color: var(--cor-texto-suave);
+cursor: pointer;
+transition: background 0.2s, border-color 0.2s;
+}
+.dropzone.ativa { background: var(--cor-creme-alt); border-color: var(--cor-rosa-escura); }
+.dropzone strong { color: var(--cor-rosa-escura); }
+.miniaturas {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+gap: 10px;
+margin-top: 12px;
+}
+.miniatura {
+position: relative;
+border: 2px solid var(--cor-borda);
+border-radius: 10px;
+overflow: hidden;
+background: var(--cor-creme);
+aspect-ratio: 3/4;
+cursor: pointer;
+}
+.miniatura.capa { border-color: var(--cor-rosa-escura); box-shadow: 0 0 0 2px var(--cor-rosa); }
+.miniatura img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.miniatura .selo-capa {
+position: absolute;
+left: 6px;
+bottom: 6px;
+background: var(--cor-rosa-escura);
+color: #fff;
+font-size: 0.7rem;
+padding: 2px 8px;
+border-radius: 999px;
+}
+.miniatura .remover-foto {
+position: absolute;
+top: 4px;
+right: 4px;
+background: rgba(255,255,255,0.95);
+border: 1px solid var(--cor-borda);
+border-radius: 50%;
+width: 24px;
+height: 24px;
+cursor: pointer;
+font-size: 0.85rem;
+line-height: 1;
+color: var(--cor-perigo);
+}
+.barra-acoes {
+display: flex;
+gap: 10px;
+flex-wrap: wrap;
+justify-content: flex-end;
+margin-top: 16px;
+}
+.contador-texto { font-size: 0.78rem; color: var(--text-muted); text-align: right; margin-top: 4px; }
+.filtros {
+display: grid;
+grid-template-columns: 2fr 1fr 1fr;
+gap: 12px;
+margin-bottom: 14px;
+}
+@media (max-width: 768px) { .filtros { grid-template-columns: 1fr; } }
+.tabela-wrap { overflow-x: auto; }
+table.tabela-lolita {
+width: 100%;
+border-collapse: collapse;
+font-size: 0.9rem;
+}
+table.tabela-lolita th {
+text-align: left;
+font-size: 0.78rem;
+text-transform: uppercase;
+letter-spacing: 0.5px;
+color: var(--text-muted);
+border-bottom: 1px solid var(--cor-borda);
+padding: 10px 8px;
+}
+table.tabela-lolita td {
+padding: 10px 8px;
+border-bottom: 1px solid var(--cor-creme-alt);
+vertical-align: middle;
+}
+table.tabela-lolita tr:hover td { background: var(--cor-creme); }
+.capa-mini {
+width: 48px;
+height: 60px;
+border-radius: 6px;
+object-fit: cover;
+background: var(--cor-creme-alt);
+border: 1px solid var(--cor-borda);
+display: block;
+}
+.silhueta {
+width: 48px;
+height: 60px;
+border-radius: 6px;
+background: var(--cor-creme-alt);
+border: 1px solid var(--cor-borda);
+display: flex;
+align-items: center;
+justify-content: center;
+color: var(--cor-rosa-escura);
+font-size: 1.4rem;
+}
+.badge-lolita {
+display: inline-block;
+font-size: 0.72rem;
+font-weight: 600;
+padding: 3px 9px;
+border-radius: 999px;
+margin-right: 4px;
+}
+.badge-novo { background: var(--cor-ocre); color: #5C3A14; }
+.badge-destaque { background: var(--cor-rosa); color: #6B2A23; }
+.badge-ativo { background: #DDF0E4; color: var(--cor-sucesso); }
+.badge-cat { background: var(--cor-creme-alt); color: var(--cor-texto-suave); }
+.bolinhas-cor { display: inline-flex; gap: 3px; vertical-align: middle; }
+.bolinha { width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--cor-borda); display: inline-block; }
+.acoes-linha { display: flex; gap: 6px; flex-wrap: wrap; }
+.acoes-linha button { padding: 5px 10px; font-size: 0.8rem; }
+.lista-vazia {
+text-align: center;
+padding: 30px;
+color: var(--text-muted);
+border: 1px dashed var(--cor-borda);
+border-radius: 12px;
+margin-top: 14px;
+}
+.hero-resultado {
+background: linear-gradient(135deg, #FBF1EE 0%, #FAF7F2 100%);
+border: 1px solid var(--cor-rosa);
+border-radius: 12px;
+padding: 22px;
+margin-bottom: 18px;
+}
+.hero-resultado .rotulo-hero { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1px; color: var(--cor-rosa-escura); font-weight: 600; }
+.hero-resultado .valor-hero { font-family: var(--fonte-serif); font-size: 2.2rem; color: var(--cor-rosa-escura); margin: 6px 0; }
+.hero-resultado .legenda-hero { font-size: 0.85rem; color: var(--cor-texto-suave); }
+.texto-whats {
+background: var(--cor-creme);
+border: 1px solid var(--cor-borda);
+border-radius: 10px;
+padding: 14px;
+white-space: pre-wrap;
+font-size: 0.92rem;
+min-height: 120px;
+color: var(--cor-texto);
+}
+.login-caixa {
+max-width: 400px;
+margin: 70px auto;
+text-align: center;
+}
+.login-caixa .marca { font-size: 2rem; margin-bottom: 6px; display: block; }
+.erro-login { color: var(--cor-perigo); font-size: 0.88rem; margin-top: 10px; min-height: 1.2em; }
+.campo-senha-wrap { position: relative; }
+.campo-senha-wrap input { padding-right: 90px; }
+.campo-senha-wrap button {
+position: absolute;
+right: 6px;
+top: 50%;
+transform: translateY(-50%);
+background: none;
+border: none;
+color: var(--cor-rosa-escura);
+cursor: pointer;
+font-size: 0.85rem;
+font-family: inherit;
+padding: 4px 8px;
+}
+.overlay {
+position: fixed;
+inset: 0;
+background: rgba(26,26,26,0.45);
+display: flex;
+align-items: center;
+justify-content: center;
+z-index: 100;
+padding: 16px;
+}
+.modal {
+background: #fff;
+border-radius: 12px;
+padding: 24px;
+max-width: 440px;
+width: 100%;
+box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+}
+.modal h3 { margin: 0 0 8px; font-family: var(--fonte-serif); font-size: 1.25rem; }
+.modal p { color: var(--cor-texto-suave); font-size: 0.92rem; }
+.modal .barra-acoes { margin-top: 18px; }
+.toast-zona {
+position: fixed;
+right: 18px;
+bottom: 18px;
+display: flex;
+flex-direction: column;
+gap: 10px;
+z-index: 200;
+max-width: 340px;
+}
+.toast {
+background: #1A1A1A;
+color: #fff;
+padding: 12px 16px;
+border-radius: 10px;
+font-size: 0.9rem;
+box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+border-left: 4px solid var(--cor-rosa);
+animation: entrar 0.25s ease;
+}
+.toast.sucesso { border-left-color: var(--cor-sucesso); }
+.toast.erro { border-left-color: var(--cor-perigo); }
+@keyframes entrar { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.rodape {
+border-top: 1px solid var(--cor-borda);
+color: var(--text-muted);
+font-size: 0.82rem;
+padding: 18px 20px;
+text-align: center;
+margin-top: 30px;
+}
+.acoes-cabecalho { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.linha-titulo { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.erro-api {
+background: #FBEDEB;
+border: 1px solid var(--cor-perigo);
+color: var(--cor-perigo);
+border-radius: 10px;
+padding: 14px;
+margin-bottom: 14px;
+}
+@media print {
+.app-header, .abas, .barra-acoes, .toast-zona, .rodape { display: none !important; }
+body { background: #fff; }
+}
+</style>
+</head>
+<body>
+
+<!-- TELA DE LOGIN -->
+<section id="secao-login" class="oculto">
+<div class="container-app">
+<div class="card login-caixa">
+<span class="eyebrow-pill">Acesso restrito</span>
+<span class="marca" style="margin-top:12px;">Lolita <span>boutique</span></span>
+<p class="sub-pagina">Painel administrativo do catálogo de roupas femininas do 34 ao 52.</p>
+<form id="form-login" novalidate>
+<div class="campo">
+<label for="senha-acesso">Senha de acesso</label>
+<div class="campo-senha-wrap">
+<input class="input-lolita" type="password" id="senha-acesso" placeholder="Digite a senha do painel" autocomplete="current-password">
+<button type="button" id="btn-mostrar-senha" aria-label="Mostrar ou ocultar senha">Mostrar</button>
+</div>
+<span class="ajuda">Use a senha fornecida pela equipe da loja.</span>
+</div>
+<button type="submit" class="btn-lolita" style="width:100%; justify-content:center;">Entrar no painel</button>
+<p id="mensagem-erro-login" class="erro-login" role="alert"></p>
+</form>
+</div>
+</div>
+</section>
+
+<!-- PAINEL -->
+<section id="secao-painel" class="oculto">
+<header class="app-header">
+<div class="container-app">
+<div>
+<span class="marca">Lolita <span>boutique</span></span>
+<div class="ajuda">Painel administrativo · catálogo do 34 ao 52</div>
+</div>
+<div class="acoes-cabecalho">
+<span class="badge-lolita badge-ativo" id="badge-status-api">API conectada</span>
+<button class="btn-outline" id="btn-sair">Sair</button>
+</div>
+</div>
+</header>
+
+<main class="container-app">
+<span class="eyebrow-pill">Catálogo · Coleção vigente</span>
+<h1 class="titulo-pagina">Gerenciar produtos</h1>
+<p class="sub-pagina">Cadastre peças, organize a vitrine e acompanhe o catálogo publicado em tempo real.</p>
+
+<nav class="abas" role="tablist" aria-label="Seções do painel">
+<button class="aba-btn" id="tab-btn-novo" role="tab" aria-selected="true" aria-controls="painel-novo-produto">Novo produto</button>
+<button class="aba-btn" id="tab-btn-lista" role="tab" aria-selected="false" aria-controls="painel-lista-produtos">Lista de produtos</button>
+<button class="aba-btn" id="tab-btn-ferramentas" role="tab" aria-selected="false" aria-controls="painel-ferramentas">Ferramentas</button>
+</nav>
+
+<!-- ABA 1: NOVO / EDITAR PRODUTO -->
+<div class="painel ativo" id="painel-novo-produto" role="tabpanel">
+<div class="card">
+<div class="linha-titulo">
+<div>
+<h2 id="titulo-formulario">Cadastrar novo produto</h2>
+<p class="sub-card">Preencha os dados da peça. Campos com * são obrigatórios.</p>
+</div>
+<span class="badge-lolita badge-cat" id="badge-modo-form">Modo: cadastro</span>
+</div>
+
+<input type="hidden" id="produto-id-edicao" value="">
+
+<div class="grid-duas-colunas">
+<div>
+<div class="campo">
+<label for="prod-nome">Nome da peça *</label>
+<input class="input-lolita" id="prod-nome" type="text" placeholder="Ex.: Vestido midi floral com amarração">
+<span class="msg-campo-erro" id="erro-prod-nome"></span>
+<span class="ajuda">Nome que aparece na vitrine e no WhatsApp.</span>
+</div>
+<div class="campo">
+<label for="prod-codigo">Código do produto *</label>
+<input class="input-lolita" id="prod-codigo" type="text" placeholder="Ex.: LB-0421">
+<span class="msg-campo-erro" id="erro-prod-codigo"></span>
+<span class="ajuda">Somente letras, números e hífen. Não pode repetir.</span>
+</div>
+<div class="campo">
+<label for="prod-categoria">Categoria *</label>
+<select class="input-lolita" id="prod-categoria"></select>
+<span class="msg-campo-erro" id="erro-prod-categoria"></span>
+</div>
+<div class="campo">
+<label for="prod-preco">Preço (R$) *</label>
+<input class="input-lolita" id="prod-preco" type="text" inputmode="decimal" placeholder="Ex.: 289,90">
+<span class="msg-campo-erro" id="erro-prod-preco"></span>
+<span class="ajuda">Aceita vírgula ou ponto como separador decimal.</span>
+</div>
+</div>
+<div>
+<div class="campo">
+<label for="prod-descricao">Descrição</label>
+<textarea class="input-lolita" id="prod-descricao" rows="5" maxlength="400" placeholder="Tecido, caimento, modelagem e cuidados..."></textarea>
+<div class="contador-texto"><span id="contador-desc">0</span>/400 caracteres</div>
+</div>
+<div class="campo">
+<label>Marcações da vitrine</label>
+<div class="grupo-radios">
+<label><input type="checkbox" id="check-novidade"> Novidade</label>
+<label><input type="checkbox" id="check-destaque"> Destaque</label>
+</div>
+<span class="ajuda">Novidades aparecem primeiro na vitrine; destaques ganham selo especial.</span>
+</div>
+</div>
+</div>
+
+<div class="campo" style="margin-top:6px;">
+<label>Tipo de grade *</label>
+<div class="grupo-radios">
+<label><input type="radio" name="tipo-grade" id="radio-grade-letras" checked> Letras (PP ao XG)</label>
+<label><input type="radio" name="tipo-grade" id="radio-grade-numeros"> Números (34 ao 52)</label>
+</div>
+<div id="grade-letras-box" class="grade-opcoes">
+<label><input type="checkbox" name="tam-opcao" value="PP"> PP</label>
+<label><input type="checkbox" name="tam-opcao" value="P"> P</label>
+<label><input type="checkbox" name="tam-opcao" value="M"> M</label>
+<label><input type="checkbox" name="tam-opcao" value="G"> G</label>
+<label><input type="checkbox" name="tam-opcao" value="GG"> GG</label>
+<label><input type="checkbox" name="tam-opcao" value="GGG"> GGG</label>
+<label><input type="checkbox" name="tam-opcao" value="XG"> XG</label>
+</div>
+<div id="grade-numeros-box" class="grade-opcoes oculto-grade">
+<label><input type="checkbox" name="tam-opcao" value="34"> 34</label>
+<label><input type="checkbox" name="tam-opcao" value="36"> 36</label>
+<label><input type="checkbox" name="tam-opcao" value="38"> 38</label>
+<label><input type="checkbox" name="tam-opcao" value="40"> 40</label>
+<label><input type="checkbox" name="tam-opcao" value="42"> 42</label>
+<label><input type="checkbox" name="tam-opcao" value="44"> 44</label>
+<label><input type="checkbox" name="tam-opcao" value="46"> 46</label>
+<label><input type="checkbox" name="tam-opcao" value="48"> 48</label>
+<label><input type="checkbox" name="tam-opcao" value="50"> 50</label>
+<label><input type="checkbox" name="tam-opcao" value="52"> 52</label>
+</div>
+<span class="msg-campo-erro" id="erro-prod-tamanhos"></span>
+<span class="ajuda">Marque ao menos um tamanho disponível em estoque.</span>
+</div>
+
+<div class="campo" style="margin-top:10px;">
+<label>Cores disponíveis</label>
+<div id="container-linhas-cores"></div>
+<div>
+<button type="button" class="btn-suave" id="btn-adicionar-cor">+ Adicionar cor</button>
+</div>
+<span class="ajuda">Escolha o tom no seletor e dê um nome, como “Terracota” ou “Off-white”.</span>
+</div>
+
+<div class="campo" style="margin-top:10px;">
+<label>Fotos do produto *</label>
+<div class="dropzone" id="dropzone-fotos" tabindex="0" role="button" aria-label="Enviar fotos do produto">
+<strong>Clique ou arraste as fotos aqui</strong>
+<div class="ajuda">JPEG, PNG ou WebP · até 10 MB cada · redimensionamos para 900px</div>
+</div>
+<input type="file" id="input-arquivo-fotos" accept="image/jpeg,image/png,image/webp" multiple class="oculto">
+<div id="lista-miniaturas" class="miniaturas"></div>
+<span class="msg-campo-erro" id="erro-prod-fotos"></span>
+<span class="ajuda">Clique em uma miniatura para defini-la como capa (selo rosa).</span>
+</div>
+
+<div class="barra-acoes">
+<button class="btn-outline" id="btn-limpar-form">Limpar formulário</button>
+<button class="btn-outline oculto" id="btn-cancelar-edicao">Cancelar edição</button>
+<button class="btn-lolita" id="btn-salvar-produto">Salvar produto</button>
+</div>
+</div>
+</div>
+
+<!-- ABA 2: LISTA -->
+<div class="painel" id="painel-lista-produtos" role="tabpanel">
+<div class="card">
+<div class="linha-titulo">
+<div>
+<h2>Catálogo publicado</h2>
+<p class="sub-card">Busque, filtre e organize as peças. Os dados vêm direto da API.</p>
+</div>
+<span class="badge-lolita badge-cat" id="contador-lista-total">0 produtos</span>
+</div>
+
+<div class="filtros">
+<div class="campo" style="margin:0;">
+<label for="filtro-busca">Buscar</label>
+<input class="input-lolita" id="filtro-busca" type="search" placeholder="Nome ou código da peça">
+</div>
+<div class="campo" style="margin:0;">
+<label for="filtro-categoria">Categoria</label>
+<select class="input-lolita" id="filtro-categoria"></select>
+</div>
+<div class="campo" style="margin:0;">
+<label for="filtro-ordem">Ordenar por</label>
+<select class="input-lolita" id="filtro-ordem">
+<option value="recente">Mais recentes</option>
+<option value="nome-asc">Nome (A–Z)</option>
+<option value="preco-asc">Menor preço</option>
+<option value="preco-desc">Maior preço</option>
+</select>
+</div>
+</div>
+
+<div id="erro-api-lista" class="erro-api oculto">
+<strong>Não foi possível carregar os produtos.</strong>
+<p class="ajuda" style="color:inherit; margin:6px 0 10px;">Verifique sua conexão e tente novamente.</p>
+<button class="btn-outline" id="btn-tentar-novamente">Tentar novamente</button>
+</div>
+
+<div class="tabela-wrap">
+<table class="tabela-lolita">
+<thead>
+<tr>
+<th>Capa</th>
+<th>Produto</th>
+<th>Código</th>
+<th>Categoria</th>
+<th>Preço</th>
+<th>Cores</th>
+<th>Tamanhos</th>
+<th>Status</th>
+<th>Ações</th>
+</tr>
+</thead>
+<tbody id="tabela-produtos-corpo"></tbody>
+</table>
+</div>
+<div id="lista-vazia-aviso" class="lista-vazia oculto">
+Nenhum produto encontrado com esses filtros. Cadastre uma peça na aba “Novo produto”.
+</div>
+</div>
+</div>
+
+<!-- ABA 3: FERRAMENTAS -->
+<div class="painel" id="painel-ferramentas" role="tabpanel">
+<div class="grid-kpi">
+<div class="card">
+<div class="kpi-rotulo">Itens no catálogo</div>
+<div class="kpi-valor" id="kpi-total-itens">0</div>
+<div class="kpi-legenda">Peças publicadas na vitrine</div>
+</div>
+<div class="card">
+<div class="kpi-rotulo">Novidades</div>
+<div class="kpi-valor" id="kpi-total-novidades">0</div>
+<div class="kpi-legenda">Marcadas como lançamento</div>
+</div>
+<div class="card">
+<div class="kpi-rotulo">Destaques</div>
+<div class="kpi-valor" id="kpi-total-destaques">0</div>
+<div class="kpi-legenda">Aparecem com selo especial</div>
+</div>
+<div class="card">
+<div class="kpi-rotulo">Categorias</div>
+<div class="kpi-valor" id="kpi-total-categorias">0</div>
+<div class="kpi-legenda">Categorias com peças cadastradas</div>
+</div>
+</div>
+
+<div class="grid-duas-colunas">
+<div class="card">
+<h2>Backup do catálogo</h2>
+<p class="sub-card">Exporte todos os produtos em JSON ou importe um arquivo para cadastrar em lote pela API.</p>
+<div class="barra-acoes" style="justify-content:flex-start; margin-top:0;">
+<button class="btn-lolita" id="btn-exportar-json">Exportar JSON</button>
+</div>
+<div class="campo" style="margin-top:16px;">
+<label for="input-importar-json">Importar arquivo JSON</label>
+<input class="input-lolita" type="file" id="input-importar-json" accept="application/json,.json">
+<span class="ajuda">Formato: lista de produtos com os mesmos campos do cadastro. Cada item será enviado para a API.</span>
+</div>
+</div>
+
+<div class="card">
+<h2>Mensagem para WhatsApp</h2>
+<p class="sub-card">Escolha uma peça para gerar o texto pronto de divulgação com preço e link.</p>
+<div class="campo">
+<label for="select-prod-whatsapp">Produto</label>
+<select class="input-lolita" id="select-prod-whatsapp"></select>
+</div>
+<div class="campo">
+<label>Pré-visualização</label>
+<div class="texto-whats" id="texto-whatsapp-preview"></div>
+</div>
+<div class="barra-acoes" style="justify-content:flex-start; margin-top:0;">
+<button class="btn-lolita" id="btn-copiar-whatsapp">Copiar mensagem</button>
+</div>
+</div>
+</div>
+</div>
+
+<footer class="rodape">
+Lolita boutique · Painel administrativo · Catálogo do 34 ao 52 · Atualizações publicadas imediatamente
+</footer>
+</main>
+</section>
+
+<!-- MODAL CONFIRMAR EXCLUSÃO -->
+<div id="modal-confirmar-exclusao" class="overlay oculto" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-exclusao">
+<div class="modal">
+<h3 id="titulo-modal-exclusao">Excluir produto?</h3>
+<p id="texto-modal-exclusao">Esta ação remove a peça do catálogo publicado. Não é possível desfazer.</p>
+<div class="barra-acoes">
+<button class="btn-outline" id="btn-cancelar-exclusao">Cancelar</button>
+<button class="btn-perigo" id="btn-confirmar-exclusao">Excluir</button>
+</div>
+</div>
+</div>
+
+<div id="zona-toasts" class="toast-zona" aria-live="polite"></div>
+
+<script>
+/* ===========================================================
+   ESTADO GLOBAL
+   =========================================================== */
+const CATEGORIAS = ["Vestidos","Macacões","Blusas","Camisas","Saias","Calças","Shorts","Conjuntos","Casacos","Jaquetas","Bolsas","Cintos","Sapatos","Calçados","Acessórios","Plus Size","Bazar"];
+const GRADE_LETRAS = ["PP","P","M","G","GG","GGG","XG"];
+const GRADE_NUMEROS = ["34","36","38","40","42","44","46","48","50","52"];
+const TAMANHO_MAX_BYTES = 10 * 1024 * 1024;
+const LADO_MAX_FOTO = 900;
+const TIPOS_ACEITOS = ["image/jpeg","image/png","image/webp"];
+
+let produtosEmMemoria = [];
+let fotosCarregadas = [];
+let indiceFotoCapa = 0;
+let idParaExcluir = null;
+let tokenSessao = sessionStorage.getItem("lolita_token") || "";
+let produtoEmEdicaoOriginal = null;
+
+/* ===========================================================
+   UTILITÁRIOS
+   =========================================================== */
+
+// Escapa texto para uso seguro em innerHTML
+function escapeHtml(texto) {
+if (texto === null || texto === undefined) return "";
+return String(texto)
+.replace(/&/g, "&amp;")
+.replace(/</g, "&lt;")
+.replace(/>/g, "&gt;")
+.replace(/"/g, "&quot;")
+.replace(/'/g, "&#39;");
+}
+
+// Exibe um toast no canto inferior direito
+function mostrarToast(mensagem, tipo) {
+const zona = document.getElementById("zona-toasts");
+if (!zona) return;
+const div = document.createElement("div");
+div.className = "toast" + (tipo ? " " + tipo : "");
+div.textContent = mensagem;
+zona.appendChild(div);
+setTimeout(() => { if (div.parentNode) div.parentNode.removeChild(div); }, 3800);
+}
+
+// Converte "289,90" ou "289.90" para número
+function converterPreco(texto) {
+if (typeof texto === "number") return texto;
+const limpo = String(texto || "").trim().replace(/\s/g, "").replace("R$", "");
+if (!limpo) return NaN;
+const normalizado = limpo.includes(",") ? limpo.replace(/\./g, "").replace(",", ".") : limpo;
+const n = Number(normalizado);
+return isNaN(n) ? NaN : n;
+}
+
+// Formata número para moeda brasileira
+function formatarMoeda(valor) {
+const n = Number(valor);
+if (isNaN(n)) return "—";
+return n.toLocaleString("pt-BR", { style: "currentColor", minimumFractionDigits: 2 }).replace(/^/, "R$ ");
+}
+
+// Formata valor direto, sem depender de moeda do navegador
+function moeda(valor) {
+const n = Number(valor);
+if (isNaN(n)) return "—";
+return "R$ " + n.toFixed(2).replace(".", ",");
+}
+
+// Esconde ou mostra elemento com segurança
+function mostrar(el, visivel) {
+if (!el) return;
+el.classList.toggle("oculto", !visivel);
+}
+
+// Define texto de elemento se existir
+function definirTexto(id, texto) {
+const el = document.getElementById(id);
+if (el) el.textContent = texto;
+}
+
+// Promisifica canvas.toBlob
+function canvasParaBlob(canvas, tipo, qualidade) {
+return new Promise((resolve, reject) => {
+canvas.toBlob(blob => {
+if (blob) resolve(blob);
+else reject(new Error("Falha ao gerar imagem"));
+}, tipo, qualidade);
+});
+}
+
+// Gera slug de código para duplicação
+function proximoCodigo(codigo) {
+const m = String(codigo || "").match(/^(.*?)(\d+)$/);
+if (m) {
+const novo = String(Number(m[2]) + 1).padStart(m[2].length, "0");
+return m[1] + novo;
+}
+return codigo + "-2";
+}
+
+/* ===========================================================
+   CHAMADAS À API
+   =========================================================== */
+
+// Cabeçalhos com token quando existir
+function cabecalhosApi(comJson) {
+const h = {};
+if (comJson) h["Content-Type"] = "application/json";
+if (tokenSessao) h["Authorization"] = "Bearer " + tokenSessao;
+return h;
+}
+
+// Trata 401: volta ao login
+function tratarNaoAutorizado(resp) {
+if (resp && resp.status === 401) {
+encerrarSessao("Sessão expirada. Entre novamente.");
+return true;
+}
+return false;
+}
+
+// Requisição genérica com try/catch
+async function chamarApi(caminho, opcoes) {
+const resp = await fetch(caminho, opcoes);
+if (tratarNaoAutorizado(resp)) throw new Error("Sessão expirada");
+let dados = null;
+try { dados = await resp.json(); } catch (e) { dados = null; }
+if (!resp.ok) {
+const msg = (dados && dados.erro) || ("Erro " + resp.status);
+throw new Error(msg);
+}
+return dados;
+}
+
+// Login
+async function apiLogin(senha) {
+const resp = await fetch("/api/login", {
+method: "POST",
+headers: { "Content-Type": "application/json" },
+body: JSON.stringify({ senha: senha })
+});
+if (resp.status === 401) return null;
+if (!resp.ok) throw new Error("Falha no login");
+return await resp.json();
+}
+
+// Lista produtos
+async function apiListarProdutos() {
+return await chamarApi("/api/produtos", { method: "GET", headers: cabecalhosApi(false) });
+}
+
+// Cria produto
+async function apiCriarProduto(corpo) {
+return await chamarApi("/api/produtos", {
+method: "POST",
+headers: cabecalhosApi(true),
+body: JSON.stringify(corpo)
+});
+}
+
+// Atualiza produto
+async function apiAtualizarProduto(id, corpo) {
+return await chamarApi("/api/produtos/" + encodeURIComponent(id), {
+method: "PUT",
+headers: cabecalhosApi(true),
+body: JSON.stringify(corpo)
+});
+}
+
+// Remove produto
+async function apiRemoverProduto(id) {
+return await chamarApi("/api/produtos/" + encodeURIComponent(id), {
+method: "DELETE",
+headers: cabecalhosApi(false)
+});
+}
+
+// Upload de foto (multipart, campo "arquivo")
+async function apiUpload(blob, nomeArquivo) {
+const fd = new FormData();
+fd.append("arquivo", blob, nomeArquivo);
+const resp = await fetch("/api/upload", {
+method: "POST",
+headers: { "Authorization": "Bearer " + tokenSessao },
+body: fd
+});
+if (tratarNaoAutorizado(resp)) throw new Error("Sessão expirada");
+if (!resp.ok) throw new Error("Falha no envio da foto");
+return await resp.json();
+}
+
+/* ===========================================================
+   SESSÃO E TELAS
+   =========================================================== */
+
+// Mostra login
+function mostrarLogin(mensagem) {
+mostrar(document.getElementById("secao-login"), true);
+mostrar(document.getElementById("secao-painel"), false);
+const erro = document.getElementById("mensagem-erro-login");
+if (erro) erro.textContent = mensagem || "";
+const senha = document.getElementById("senha-acesso");
+if (senha) senha.focus();
+}
+
+// Mostra painel
+function mostrarPainel() {
+mostrar(document.getElementById("secao-login"), false);
+mostrar(document.getElementById("secao-painel"), true);
+}
+
+// Encerra sessão
+function encerrarSessao(mensagem) {
+tokenSessao = "";
+sessionStorage.removeItem("lolita_token");
+produtosEmMemoria = [];
+mostrarLogin(mensagem || "");
+}
+
+// Carrega produtos da API para memória e renderiza
+async function carregarProdutos() {
+const erroBox = document.getElementById("erro-api-lista");
+try {
+const lista = await apiListarProdutos();
+produtosEmMemoria = Array.isArray(lista) ? lista : [];
+mostrar(erroBox, false);
+atualizarCategoriasDinamicas();
+renderizarLista();
+renderizarFerramentas();
+atualizarSelectWhatsapp();
+definirTexto("badge-status-api", "API conectada");
+} catch (e) {
+if (e.message === "Sessão expirada") return;
+mostrar(erroBox, true);
+definirTexto("badge-status-api", "API indisponível");
+mostrarToast("Não foi possível carregar os produtos.", "erro");
+}
+}
+
+// Login: envia senha
+async function processarLogin(evento) {
+evento.preventDefault();
+const campoSenha = document.getElementById("senha-acesso");
+const erro = document.getElementById("mensagem-erro-login");
+const senha = campoSenha ? campoSenha.value.trim() : "";
+if (erro) erro.textContent = "";
+if (!senha) {
+if (erro) erro.textContent = "Digite a senha de acesso.";
+return;
+}
+try {
+const dados = await apiLogin(senha);
+if (!dados || !dados.ok) {
+if (erro) erro.textContent = "Senha incorreta. Tente novamente.";
+return;
+}
+tokenSessao = dados.token || "";
+sessionStorage.setItem("lolita_token", tokenSessao);
+if (campoSenha) campoSenha.value = "";
+mostrarPainel();
+await carregarProdutos();
+mostrarToast("Bem-vinda ao painel Lolita boutique!", "sucesso");
+} catch (e) {
+if (erro) erro.textContent = "Não foi possível conectar. Tente novamente.";
+}
+}
+
+// Mostrar/ocultar senha
+function alternarSenha() {
+const campo = document.getElementById("senha-acesso");
+const btn = document.getElementById("btn-mostrar-senha");
+if (!campo) return;
+const mostrarTexto = campo.type === "password";
+campo.type = mostrarTexto ? "text" : "password";
+if (btn) btn.textContent = mostrarTexto ? "Ocultar" : "Mostrar";
+}
+
+// Sair do painel
+function sair() {
+encerrarSessao("");
+mostrarToast("Você saiu do painel.");
+}
+
+// Troca de abas
+function ativarAba(nome) {
+const abas = [
+{ btn: "tab-btn-novo", painel: "painel-novo-produto" },
+{ btn: "tab-btn-lista", painel: "painel-lista-produtos" },
+{ btn: "tab-btn-ferramentas", painel: "painel-ferramentas" }
+];
+abas.forEach(a => {
+const b = document.getElementById(a.btn);
+const p = document.getElementById(a.painel);
+const ativo = a.painel === nome;
+if (b) b.setAttribute("aria-selected", ativo ? "true" : "false");
+if (p) p.classList.toggle("ativo", ativo);
+});
+}
+
+/* ===========================================================
+   CATEGORIAS
+   =========================================================== */
+
+// Preenche selects de categoria
+function preencherCategorias() {
+const sel = document.getElementById("prod-categoria");
+const filtro = document.getElementById("filtro-categoria");
+if (sel) {
+sel.innerHTML = '<option value="">Selecione uma categoria</option>' +
+CATEGORIAS.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join("");
+}
+if (filtro) {
+filtro.innerHTML = '<option value="">Todas as categorias</option>' +
+CATEGORIAS.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join("");
+}
+}
+
+// Adiciona ao filtro categorias vindas da API que não estão na lista
+function atualizarCategoriasDinamicas() {
+const filtro = document.getElementById("filtro-categoria");
+if (!filtro) return;
+produtosEmMemoria.forEach(p => {
+const cat = p.categoria;
+if (cat && !CATEGORIAS.includes(cat)) {
+CATEGORIAS.push(cat);
+const opt = document.createElement("option");
+opt.value = cat;
+opt.textContent = cat;
+filtro.appendChild(opt);
+const sel = document.getElementById("prod-categoria");
+if (sel) {
+const o2 = document.createElement("option");
+o2.value = cat;
+o2.textContent = cat;
+sel.appendChild(o2);
+}
+}
+});
+}
+
+/* ===========================================================
+   GRADE DE TAMANHOS E CORES
+   =========================================================== */
+
+// Alterna entre grade de letras e de números
+function alternarGrade() {
+const letras = document.getElementById("radio-grade-letras");
+const boxL = document.getElementById("grade-letras-box");
+const boxN = document.getElementById("grade-numeros-box");
+const usaLetras = letras ? letras.checked : true;
+mostrar(boxL, usaLetras);
+mostrar(boxN, !usaLetras);
+if (boxL) boxL.classList.toggle("oculto-grade", !usaLetras);
+if (boxN) boxN.classList.toggle("oculto-grade", usaLetras);
+}
+
+// Lê tamanhos marcados
+function lerTamanhosMarcados() {
+return Array.from(document.querySelectorAll('input[name="tam-opcao"]:checked')).map(i => i.value);
+}
+
+// Marca tamanhos específicos
+function marcarTamanhos(lista) {
+document.querySelectorAll('input[name="tam-opcao"]').forEach(i => {
+i.checked = Array.isArray(lista) && lista.includes(i.value);
+});
+const temNumero = (lista || []).some(t => GRADE_NUMEROS.includes(t));
+const radioN = document.getElementById("radio-grade-numeros");
+const radioL = document.getElementById("radio-grade-letras");
+if (radioN && radioL) {
+radioN.checked = temNumero;
+radioL.checked = !temNumero;
+}
+alternarGrade();
+}
+
+// Cria uma linha de cor
+function adicionarLinhaCor(nome, hex) {
+const container = document.getElementById("container-linhas-cores");
+if (!container) return;
+const linha = document.createElement("div");
+linha.className = "linha-cor";
+linha.innerHTML =
+'<input type="color" class="input-cor-preview" aria-label="Escolher cor" value="' + escapeHtml(hex || "#E8B7B0") + '">' +
+'<input type="text" class="input-lolita campo-nome-cor" placeholder="Nome da cor" maxlength="30" value="' + escapeHtml(nome || "") + '">' +
+'<button type="button" class="btn-outline" aria-label="Remover cor">Remover</button>';
+const botaoRemover = linha.querySelector("button");
+if (botaoRemover) {
+botaoRemover.addEventListener("click", () => linha.remove());
+}
+container.appendChild(linha);
+}
+
+// Lê cores do formulário
+function lerCoresForm() {
+const linhas = document.querySelectorAll("#container-linhas-cores .linha-cor");
+const cores = [];
+linhas.forEach(l => {
+const hex = l.querySelector(".input-cor-preview");
+const nome = l.querySelector(".campo-nome-cor");
+const nomeTxt = nome ? nome.value.trim() : "";
+if (nomeTxt) {
+cores.push({ nome: nomeTxt, hex: hex ? hex.value : "#000000" });
+}
+});
+return cores;
+}
+
+// Limpa linhas de cor
+function limparCoresForm() {
+const c = document.getElementById("container-linhas-cores");
+if (c) c.innerHTML = "";
+}
+
+/* ===========================================================
+   FOTOS: VALIDAÇÃO, REDIMENSIONAMENTO E UPLOAD
+   =========================================================== */
+
+// Carrega arquivo como imagem HTML
+function arquivoParaImagem(arquivo) {
+return new Promise((resolve, reject) => {
+const url = URL.createObjectURL(arquivo);
+const img = new Image();
+img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("Imagem inválida")); };
+img.src = url;
+});
+}
+
+// Redimensiona para no máximo LADO_MAX_FOTO e devolve Blob JPEG
+async function redimensionarFoto(arquivo) {
+const img = await arquivoParaImagem(arquivo);
+let w = img.naturalWidth;
+let h = img.naturalHeight;
+const maior = Math.max(w, h);
+if (maior > LADO_MAX_FOTO) {
+const f = LADO_MAX_FOTO / maior;
+w = Math.round(w * f);
+h = Math.round(h * f);
+}
+const canvas = document.createElement("canvas");
+canvas.width = w;
+canvas.height = h;
+const ctx = canvas.getContext("2d");
+ctx.fillStyle = "#ffffff";
+ctx.fillRect(0, 0, w, h);
+ctx.drawImage(img, 0, 0, w, h);
+return await canvasParaBlob(canvas, "image/jpeg", 0.85);
+}
+
+// Valida, redimensiona e envia uma foto
+async function processarArquivoFoto(arquivo) {
+if (!TIPOS_ACEITOS.includes(arquivo.type)) {
+mostrarToast("Formato não aceito: " + arquivo.name + ". Use JPEG, PNG ou WebP.", "erro");
+return;
+}
+if (arquivo.size > TAMANHO_MAX_BYTES) {
+mostrarToast("Arquivo muito grande (máx. 10 MB): " + arquivo.name, "erro");
+return;
+}
+try {
+mostrarToast("Enviando " + arquivo.name + "...");
+const blob = await redimensionarFoto(arquivo);
+const nome = (arquivo.name || "foto").replace(/\.[^.]+$/, "") + ".jpg";
+const dados = await apiUpload(blob, nome);
+if (!dados || !dados.chave) throw new Error("Chave não retornada");
+fotosCarregadas.push(dados.chave);
+if (fotosCarregadas.length === 1) indiceFotoCapa = 0;
+renderizarMiniaturas();
+limparErro("erro-prod-fotos");
+} catch (e) {
+if (e.message !== "Sessão expirada") {
+mostrarToast("Erro ao enviar foto: " + arquivo.name, "erro");
+}
+}
+}
+
+// Renderiza miniaturas com remover e capa
+function renderizarMiniaturas() {
+const lista = document.getElementById("lista-miniaturas");
+if (!lista) return;
+lista.innerHTML = "";
+fotosCarregadas.forEach((chave, i) => {
+const item = document.createElement("div");
+item.className = "miniatura" + (i === indiceFotoCapa ? " capa" : "");
+item.setAttribute("role", "button");
+item.setAttribute("tabindex", "0");
+item.setAttribute("aria-label", "Definir foto " + (i + 1) + " como capa");
+const img = document.createElement("img");
+img.src = "/fotos/" + encodeURIComponent(chave);
+img.alt = "Foto " + (i + 1) + " do produto";
+item.appendChild(img);
+if (i === indiceFotoCapa) {
+const selo = document.createElement("span");
+selo.className = "selo-capa";
+selo.textContent = "Capa";
+item.appendChild(selo);
+}
+const btnRemover = document.createElement("button");
+btnRemover.type = "button";
+btnRemover.className = "remover-foto";
+btnRemover.setAttribute("aria-label", "Remover foto");
+btnRemover.textContent = "×";
+btnRemover.addEventListener("click", ev => {
+ev.stopPropagation();
+removerFoto(i);
+});
+item.appendChild(btnRemover);
+item.addEventListener("click", () => definirCapa(i));
+item.addEventListener("keydown", ev => {
+if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); definirCapa(i); }
+});
+lista.appendChild(item);
+});
+}
+
+// Define foto de capa
+function definirCapa(indice) {
+if (indice < 0 || indice >= fotosCarregadas.length) return;
+indiceFotoCapa = indice;
+renderizarMiniaturas();
+mostrarToast("Foto " + (indice + 1) + " definida como capa.", "sucesso");
+}
+
+// Remove foto da lista
+function removerFoto(indice) {
+fotosCarregadas.splice(indice, 1);
+if (indiceFotoCapa >= fotosCarregadas.length) indiceFotoCapa = Math.max(0, fotosCarregadas.length - 1);
+if (indiceFotoCapa > indice) indiceFotoCapa--;
+renderizarMiniaturas();
+}
+
+// Configura dropzone e input de arquivo
+function configurarUploadFotos() {
+const zona = document.getElementById("dropzone-fotos");
+const input = document.getElementById("input-arquivo-fotos");
+if (!zona || !input) return;
+zona.addEventListener("click", () => input.click());
+zona.addEventListener("keydown", ev => {
+if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); input.click(); }
+});
+input.addEventListener("change", async () => {
+const arquivos = Array.from(input.files || []);
+for (const arq of arquivos) await processarArquivoFoto(arq);
+input.value = "";
+});
+["dragenter", "dragover"].forEach(ev => {
+zona.addEventListener(ev, e => { e.preventDefault(); zona.classList.add("ativa"); });
+});
+["dragleave", "drop"].forEach(ev => {
+zona.addEventListener(ev, e => { e.preventDefault(); zona.classList.remove("ativa"); });
+});
+zona.addEventListener("drop", async e => {
+const arquivos = Array.from((e.dataTransfer && e.dataTransfer.files) || []);
+for (const arq of arquivos) await processarArquivoFoto(arq);
+});
+}
+
+/* ===========================================================
+   VALIDAÇÃO E FORMULÁRIO
+   =========================================================== */
+
+// Mostra erro de campo
+function marcarErro(idCampo, mensagem) {
+const span = document.getElementById("erro-" + idCampo);
+if (span) span.textContent = mensagem;
+const campo = document.getElementById(idCampo);
+if (campo) campo.classList.add("input-invalido");
+}
+
+// Limpa erro de campo
+function limparErro(idErro) {
+const span = document.getElementById(idErro);
+if (span) span.textContent = "";
+const campoId = idErro.replace("erro-", "");
+const campo = document.getElementById(campoId);
+if (campo) campo.classList.remove("input-invalido");
+}
+
+// Limpa todos os erros
+function limparTodosErros() {
+document.querySelectorAll(".msg-campo-erro").forEach(s => s.textContent = "");
+document.querySelectorAll(".input-invalido").forEach(c => c.classList.remove("input-invalido"));
+}
+
+// Verifica duplicidade de código
+function codigoDuplicado(codigo, idIgnorado) {
+return produtosEmMemoria.some(p =>
+String(p.codigo).toLowerCase() === codigo.toLowerCase() &&
+String(p.id) !== String(idIgnorado || "")
+);
+}
+
+// Contador de descrição
+function atualizarContadorDesc() {
+const d = document.getElementById("prod-descricao");
+definirTexto("contador-desc", d ? d.value.length : 0);
+}
+
+// Limpa formulário
+function limparFormulario() {
+["prod-nome","prod-codigo","prod-preco","prod-descricao"].forEach(id => {
+const el = document.getElementById(id);
+if (el) el.value = "";
+});
+const cat = document.getElementById("prod-categoria");
+if (cat) cat.value = "";
+const n = document.getElementById("check-novidade");
+const d = document.getElementById("check-destaque");
+if (n) n.checked = false;
+if (d) d.checked = false;
+marcarTamanhos([]);
+limparCoresForm();
+fotosCarregadas = [];
+indiceFotoCapa = 0;
+renderizarMiniaturas();
+limparTodosErros();
+atualizarContadorDesc();
+sairModoEdicao();
+}
+
+// Entra no modo edição (texto e botões)
+function entrarModoEdicao(produto) {
+const idInput = document.getElementById("produto-id-edicao");
+if (idInput) idInput.value = produto.id;
+definirTexto("titulo-formulario", "Editar produto: " + produto.nome);
+definirTexto("badge-modo-form", "Modo: edição");
+mostrar(document.getElementById("btn-cancelar-edicao"), true);
+const btnSalvar = document.getElementById("btn-salvar-produto");
+if (btnSalvar) btnSalvar.textContent = "Salvar alterações";
+}
+
+// Sai do modo edição
+function sairModoEdicao() {
+const idInput = document.getElementById("produto-id-edicao");
+if (idInput) idInput.value = "";
+definirTexto("titulo-formulario", "Cadastrar novo produto");
+definirTexto("badge-modo-form", "Modo: cadastro");
+mostrar(document.getElementById("btn-cancelar-edicao"), false);
+const btnSalvar = document.getElementById("btn-salvar-produto");
+if (btnSalvar) btnSalvar.textContent = "Salvar produto";
+produtoEmEdicaoOriginal = null;
+}
+
+// Preenche formulário com produto para edição
+function carregarProdutoParaEdicao(id) {
+const p = produtosEmMemoria.find(x => String(x.id) === String(id));
+if (!p) {
+mostrarToast("Produto não encontrado.", "erro");
+return;
+}
+limparTodosErros();
+produtoEmEdicaoOriginal = p;
+definirValorCampo("prod-nome", p.nome);
+definirValorCampo("prod-codigo", p.codigo);
+definirValorCampo("prod-categoria", p.categoria);
+definirValorCampo("prod-preco", String(p.preco).replace(".", ","));
+definirValorCampo("prod-descricao", p.descricao || "");
+const n = document.getElementById("check-novidade");
+const d = document.getElementById("check-destaque");
+if (n) n.checked = !!p.novo;
+if (d) d.checked = !!p.destaque;
+marcarTamanhos(p.tamanhos || []);
+limparCoresForm();
+(p.cores || []).forEach(c => adicionarLinhaCor(c.nome, c.hex));
+fotosCarregadas = Array.isArray(p.fotos) ? p.fotos.slice() : [];
+indiceFotoCapa = Number.isInteger(p.foto_principal) ? p.foto_principal : 0;
+if (indiceFotoCapa >= fotosCarregadas.length) indiceFotoCapa = 0;
+renderizarMiniaturas();
+atualizarContadorDesc();
+entrarModoEdicao(p);
+ativarAba("painel-novo-produto");
+const aba = document.getElementById("tab-btn-novo");
+if (aba) aba.click();
+const titulo = document.getElementById("titulo-formulario");
+if (titulo) titulo.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+// Define valor de campo se existir
+function definirValorCampo(id, valor) {
+const el = document.getElementById(id);
+if (el) el.value = valor == null ? "" : valor;
+}
+
+// Monta objeto do produto a partir do formulário, validando
+function coletarEValidarForm() {
+limparTodosErros();
+let ok = true;
+const nome = (document.getElementById("prod-nome") || {}).value || "";
+const codigo = ((document.getElementById("prod-codigo") || {}).value || "").trim();
+const categoria = (document.getElementById("prod-categoria") || {}).value || "";
+const precoTxt = (document.getElementById("prod-preco") || {}).value || "";
+const idEdicao = (document.getElementById("produto-id-edicao") || {}).value || "";
+
+if (nome.trim().length < 3) {
+marcarErro("prod-nome", "Informe um nome com pelo menos 3 caracteres.");
+ok = false;
+}
+if (!codigo) {
+marcarErro("prod-codigo", "Informe o código do produto.");
+ok = false;
+} else if (!/^[A-Za-z0-9-]+$/.test(codigo)) {
+marcarErro("prod-codigo", "Use apenas letras, números e hífen.");
+ok = false;
+} else if (codigoDuplicado(codigo, idEdicao)) {
+marcarErro("prod-codigo", "Já existe um produto com este código.");
+ok = false;
+}
+if (!categoria) {
+marcarErro("prod-categoria", "Escolha uma categoria.");
+ok = false;
+}
+const preco = converterPreco(precoTxt);
+if (isNaN(preco) || preco <= 0) {
+marcarErro("prod-preco", "Informe um preço válido, como 289,90.");
+ok = false;
+}
+const tamanhos = lerTamanhosMarcados();
+if (tamanhos.length === 0) {
+definirTexto("erro-prod-tamanhos", "Marque ao menos um tamanho.");
+ok = false;
+}
+if (fotosCarregadas.length === 0) {
+definirTexto("erro-prod-fotos", "Envie ao menos uma foto do produto.");
+ok = false;
+}
+
+if (!ok) return null;
+
+const descricao = ((document.getElementById("prod-descricao") || {}).value || "").trim();
+const novo = !!(document.getElementById("check-novidade") || {}).checked;
+const destaque = !!(document.getElementById("check-destaque") || {}).checked;
+
+return {
+codigo: codigo,
+nome: nome.trim(),
+categoria: categoria,
+preco: preco,
+tamanhos: tamanhos,
+cores: lerCoresForm(),
+fotos: fotosCarregadas.slice(),
+foto_principal: indiceFotoCapa,
+descricao: descricao,
+novo: novo,
+destaque: destaque
+};
+}
+
+// Salva produto (cria ou atualiza)
+async function processarSalvarProduto() {
+const corpo = coletarEValidarForm();
+if (!corpo) {
+mostrarToast("Revise os campos destacados.", "erro");
+return;
+}
+const idEdicao = (document.getElementById("produto-id-edicao") || {}).value || "";
+const btn = document.getElementById("btn-salvar-produto");
+if (btn) btn.disabled = true;
+try {
+if (idEdicao) {
+await apiAtualizarProduto(idEdicao, corpo);
+mostrarToast("Alterações salvas com sucesso.", "sucesso");
+} else {
+await apiCriarProduto(corpo);
+mostrarToast("Produto cadastrado com sucesso.", "sucesso");
+}
+limparFormulario();
+await carregarProdutos();
+} catch (e) {
+if (e.message !== "Sessão expirada") {
+mostrarToast("Não foi possível salvar: " + e.message, "erro");
+}
+} finally {
+if (btn) btn.disabled = false;
+}
+}
+
+// Duplica produto com código incrementado
+async function duplicarProduto(id) {
+const p = produtosEmMemoria.find(x => String(x.id) === String(id));
+if (!p) return;
+let novoCodigo = proximoCodigo(p.codigo);
+while (codigoDuplicado(novoCodigo, "")) {
+novoCodigo = proximoCodigo(novoCodigo);
+}
+const copia = {
+codigo: novoCodigo,
+nome: p.nome + " (cópia)",
+categoria: p.categoria,
+preco: p.preco,
+tamanhos: p.tamanhos || [],
+cores: p.cores || [],
+fotos: p.fotos || [],
+foto_principal: Number.isInteger(p.foto_principal) ? p.foto_principal : 0,
+descricao: p.descricao || "",
+novo: !!p.novo,
+destaque: !!p.destaque
+};
+try {
+await apiCriarProduto(copia);
+mostrarToast("Cópia criada com código " + novoCodigo + ".", "sucesso");
+await carregarProdutos();
+} catch (e) {
+if (e.message !== "Sessão expirada") mostrarToast("Erro ao duplicar produto.", "erro");
+}
+}
+
+// Abre modal de exclusão
+function abrirConfirmarExclusao(id) {
+const p = produtosEmMemoria.find(x => String(x.id) === String(id));
+idParaExcluir = id;
+const texto = document.getElementById("texto-modal-exclusao");
+if (texto) {
+texto.textContent = p
+? "Remover “" + p.nome + "” (" + p.codigo + ") do catálogo publicado? Esta ação não pode ser desfeita."
+: "Esta ação remove a peça do catálogo publicado. Não é possível desfazer.";
+}
+mostrar(document.getElementById("modal-confirmar-exclusao"), true);
+}
+
+// Fecha modal
+function fecharConfirmarExclusao() {
+idParaExcluir = null;
+mostrar(document.getElementById("modal-confirmar-exclusao"), false);
+}
+
+// Confirma exclusão
+async function confirmarExclusao() {
+if (idParaExcluir === null) return;
+const id = idParaExcluir;
+fecharConfirmarExclusao();
+try {
+await apiRemoverProduto(id);
+mostrarToast("Produto removido.", "sucesso");
+if (produtoEmEdicaoOriginal && String(produtoEmEdicaoOriginal.id) === String(id)) {
+limparFormulario();
+}
+await carregarProdutos();
+} catch (e) {
+if (e.message !== "Sessão expirada") mostrarToast("Erro ao excluir produto.", "erro");
+}
+}
+
+/* ===========================================================
+   LISTA DE PRODUTOS
+   =========================================================== */
+
+// Filtra e ordena produtos conforme controles
+function obterProdutosFiltrados() {
+const busca = ((document.getElementById("filtro-busca") || {}).value || "").toLowerCase().trim();
+const cat = (document.getElementById("filtro-categoria") || {}).value || "";
+const ordem = (document.getElementById("filtro-ordem") || {}).value || "recente";
+let lista = produtosEmMemoria.filter(p => {
+const textoOk = !busca ||
+String(p.nome || "").toLowerCase().includes(busca) ||
+String(p.codigo || "").toLowerCase().includes(busca);
+const catOk = !cat || p.categoria === cat;
+return textoOk && catOk;
+});
+if (ordem === "nome-asc") lista.sort((a, b) => String(a.nome).localeCompare(String(b.nome), "pt-BR"));
+else if (ordem === "preco-asc") lista.sort((a, b) => Number(a.preco) - Number(b.preco));
+else if (ordem === "preco-desc") lista.sort((a, b) => Number(b.preco) - Number(a.preco));
+else lista.sort((a, b) => Number(b.id || 0) - Number(a.id || 0));
+return lista;
+}
+
+// Renderiza tabela
+function renderizarLista() {
+const corpo = document.getElementById("tabela-produtos-corpo");
+const aviso = document.getElementById("lista-vazia-aviso");
+if (!corpo) return;
+const lista = obterProdutosFiltrados();
+definirTexto("contador-lista-total", produtosEmMemoria.length + (produtosEmMemoria.length === 1 ? " produto" : " produtos"));
+corpo.innerHTML = "";
+if (lista.length === 0) {
+mostrar(aviso, true);
+return;
+}
+mostrar(aviso, false);
+lista.forEach(p => corpo.appendChild(criarLinhaProduto(p)));
+}
+
+// Monta uma linha da tabela
+function criarLinhaProduto(p) {
+const tr = document.createElement("tr");
+const fotos = Array.isArray(p.fotos) ? p.fotos : [];
+const idxCapa = Number.isInteger(p.foto_principal) ? p.foto_principal : 0;
+const chaveCapa = fotos[idxCapa] || fotos[0];
+
+const tdCapa = document.createElement("td");
+if (chaveCapa) {
+const img = document.createElement("img");
+img.className = "capa-mini";
+img.src = "/fotos/" + encodeURIComponent(chaveCapa);
+img.alt = "Capa de " + (p.nome || "produto");
+tdCapa.appendChild(img);
+} else {
+const sil = document.createElement("div");
+sil.className = "silhueta";
+sil.setAttribute("aria-label", "Sem foto");
+sil.textContent = "👗";
+tdCapa.appendChild(sil);
+}
+tr.appendChild(tdCapa);
+
+const tdNome = document.createElement("td");
+tdNome.innerHTML = '<strong>' + escapeHtml(p.nome) + '</strong>';
+tr.appendChild(tdNome);
+
+const tdCodigo = document.createElement("td");
+tdCodigo.textContent = p.codigo || "—";
+tr.appendChild(tdCodigo);
+
+const tdCat = document.createElement("td");
+tdCat.innerHTML = '<span class="badge-lolita badge-cat">' + escapeHtml(p.categoria || "—") + '</span>';
+tr.appendChild(tdCat);
+
+const tdPreco = document.createElement("td");
+tdPreco.textContent = moeda(p.preco);
+tr.appendChild(tdPreco);
+
+const tdCores = document.createElement("td");
+const cores = Array.isArray(p.cores) ? p.cores : [];
+tdCores.innerHTML = cores.length
+? '<span class="bolinhas-cor">' + cores.map(c =>
+'<span class="bolinha" title="' + escapeHtml(c.nome) + '" style="background:' + escapeHtml(c.hex) + '"></span>'
+).join("") + '</span>'
+: '<span class="ajuda">—</span>';
+tr.appendChild(tdCores);
+
+const tdTam = document.createElement("td");
+tdTam.textContent = (p.tamanhos || []).join(" · ") || "—";
+tr.appendChild(tdTam);
+
+const tdStatus = document.createElement("td");
+let badges = "";
+if (p.novo) badges += '<span class="badge-lolita badge-novo">Novidade</span>';
+if (p.destaque) badges += '<span class="badge-lolita badge-destaque">Destaque</span>';
+if (!badges) badges = '<span class="badge-lolita badge-ativo">Ativo</span>';
+tdStatus.innerHTML = badges;
+tr.appendChild(tdStatus);
+
+const tdAcoes = document.createElement("td");
+const acoes = document.createElement("div");
+acoes.className = "acoes-linha";
+acoes.appendChild(criarBotaoAcao("Editar", "btn-outline", () => carregarProdutoParaEdicao(p.id)));
+acoes.appendChild(criarBotaoAcao("Duplicar", "btn-suave", () => duplicarProduto(p.id)));
+acoes.appendChild(criarBotaoAcao("Excluir", "btn-perigo", () => abrirConfirmarExclusao(p.id)));
+tdAcoes.appendChild(acoes);
+tr.appendChild(tdAcoes);
+
+return tr;
+}
+
+// Cria botão de ação com handler
+function criarBotaoAcao(texto, classe, handler) {
+const b = document.createElement("button");
+b.type = "button";
+b.className = classe;
+b.textContent = texto;
+b.addEventListener("click", handler);
+return b;
+}
+
+/* ===========================================================
+   FERRAMENTAS: KPIs, EXPORTAÇÃO, IMPORTAÇÃO, WHATSAPP
+   =========================================================== */
+
+// Atualiza indicadores
+function renderizarFerramentas() {
+const total = produtosEmMemoria.length;
+const novidades = produtosEmMemoria.filter(p => p.novo).length;
+const destaques = produtosEmMemoria.filter(p => p.destaque).length;
+const categorias = new Set(produtosEmMemoria.map(p => p.categoria).filter(Boolean)).size;
+definirTexto("kpi-total-itens", total);
+definirTexto("kpi-total-novidades", novidades);
+definirTexto("kpi-total-destaques", destaques);
+definirTexto("kpi-total-categorias", categorias);
+}
+
+// Exporta JSON com a data no nome
+function exportarJson() {
+const dados = JSON.stringify(produtosEmMemoria, null, 2);
+const blob = new Blob([dados], { type: "application/json" });
+const url = URL.createObjectURL(blob);
+const a = document.createElement("a");
+const hoje = new Date();
+const data = hoje.getFullYear() + "-" + String(hoje.getMonth() + 1).padStart(2, "0") + "-" + String(hoje.getDate()).padStart(2, "0");
+a.href = url;
+a.download = "lolita_catalogo_" + data + ".json";
+document.body.appendChild(a);
+a.click();
+document.body.removeChild(a);
+setTimeout(() => URL.revokeObjectURL(url), 1000);
+mostrarToast("Catálogo exportado em JSON.", "sucesso");
+}
+
+// Importa JSON e cadastra cada item via API
+async function importarJson(evento) {
+const arq = evento.target.files && evento.target.files[0];
+if (!arq) return;
+try {
+const texto = await arq.text();
+const lista = JSON.parse(texto);
+if (!Array.isArray(lista)) throw new Error("Formato inválido");
+let ok = 0;
+let falhas = 0;
+for (const item of lista) {
+try {
+const corpo = {
+codigo: String(item.codigo || "").trim(),
+nome: String(item.nome || "").trim(),
+categoria: item.categoria || "Bazar",
+preco: converterPreco(item.preco),
+tamanhos: Array.isArray(item.tamanhos) ? item.tamanhos : [],
+cores: Array.isArray(item.cores) ? item.cores : [],
+fotos: Array.isArray(item.fotos) ? item.fotos : [],
+foto_principal: Number.isInteger(item.foto_principal) ? item.foto_principal : 0,
+descricao: item.descricao || "",
+novo: !!item.novo,
+destaque: !!item.destaque
+};
+if (!corpo.codigo || codigoDuplicado(corpo.codigo, "")) { falhas++; continue; }
+await apiCriarProduto(corpo);
+ok++;
+} catch (e) {
+if (e.message === "Sessão expirada") return;
+falhas++;
+}
+}
+mostrarToast("Importação concluída: " + ok + " cadastrados, " + falhas + " ignorados.", ok ? "sucesso" : "erro");
+await carregarProdutos();
+} catch (e) {
+mostrarToast("Arquivo JSON inválido.", "erro");
+} finally {
+evento.target.value = "";
+}
+}
+
+// Preenche select do WhatsApp
+function atualizarSelectWhatsapp() {
+const sel = document.getElementById("select-prod-whatsapp");
+if (!sel) return;
+const atual = sel.value;
+sel.innerHTML = produtosEmMemoria.length
+? produtosEmMemoria.map(p => '<option value="' + escapeHtml(p.id) + '">' + escapeHtml(p.nome) + ' (' + escapeHtml(p.codigo) + ')</option>').join("")
+: '<option value="">Nenhum produto cadastrado</option>';
+if (atual && produtosEmMemoria.some(p => String(p.id) === atual)) sel.value = atual;
+atualizarPreviewWhatsapp();
+}
+
+// Gera texto de divulgação
+function atualizarPreviewWhatsapp() {
+const sel = document.getElementById("select-prod-whatsapp");
+const area = document.getElementById("texto-whatsapp-preview");
+if (!sel || !area) return;
+const p = produtosEmMemoria.find(x => String(x.id) === sel.value);
+if (!p) {
+area.textContent = "Cadastre um produto para gerar a mensagem.";
+return;
+}
+const link = "https://lolitaboutique.com.br/produto/" + encodeURIComponent(p.codigo);
+area.textContent =
+"✨ Chegou na Lolita boutique!\n\n" +
+"👗 " + p.nome + "\n" +
+"Código: " + p.codigo + "\n" +
+"Preço: " + moeda(p.preco) + "\n" +
+"Tamanhos: " + ((p.tamanhos || []).join(", ") || "consulte") + "\n\n" +
+"Veja mais fotos e peça pelo link: " + link;
+}
+
+// Copia mensagem do WhatsApp
+async function copiarWhatsapp() {
+const area = document.getElementById("texto-whatsapp-preview");
+const texto = area ? area.textContent : "";
+if (!texto) {
+mostrarToast("Nada para copiar.", "erro");
+return;
+}
+try {
+await navigator.clipboard.writeText(texto);
+mostrarToast("Mensagem copiada! Cole no WhatsApp.", "sucesso");
+} catch (e) {
+mostrarToast("Não foi possível copiar automaticamente.", "erro");
+}
+}
+
+/* ===========================================================
+   INICIALIZAÇÃO
+   =========================================================== */
+
+// Liga todos os listeners da página
+function configurarListeners() {
+const formLogin = document.getElementById("form-login");
+if (formLogin) formLogin.addEventListener("submit", processarLogin);
+
+const btnMostrar = document.getElementById("btn-mostrar-senha");
+if (btnMostrar) btnMostrar.addEventListener("click", alternarSenha);
+
+const btnSair = document.getElementById("btn-sair");
+if (btnSair) btnSair.addEventListener("click", sair);
+
+const abas = [
+["tab-btn-novo", "painel-novo-produto"],
+["tab-btn-lista", "painel-lista-produtos"],
+["tab-btn-ferramentas", "painel-ferramentas"]
+];
+abas.forEach(([btnId, painelId]) => {
+const b = document.getElementById(btnId);
+if (b) b.addEventListener("click", () => ativarAba(painelId));
+});
+
+const radioL = document.getElementById("radio-grade-letras");
+const radioN = document.getElementById("radio-grade-numeros");
+if (radioL) radioL.addEventListener("change", alternarGrade);
+if (radioN) radioN.addEventListener("change", alternarGrade);
+
+const btnAddCor = document.getElementById("btn-adicionar-cor");
+if (btnAddCor) btnAddCor.addEventListener("click", () => adicionarLinhaCor("", "#E8B7B0"));
+
+const descricao = document.getElementById("prod-descricao");
+if (descricao) descricao.addEventListener("input", atualizarContadorDesc);
+
+const btnSalvar = document.getElementById("btn-salvar-produto");
+if (btnSalvar) btnSalvar.addEventListener("click", processarSalvarProduto);
+
+const btnLimpar = document.getElementById("btn-limpar-form");
+if (btnLimpar) btnLimpar.addEventListener("click", () => {
+limparFormulario();
+mostrarToast("Formulário limpo.");
+});
+
+const btnCancelar = document.getElementById("btn-cancelar-edicao");
+if (btnCancelar) btnCancelar.addEventListener("click", () => {
+limparFormulario();
+mostrarToast("Edição cancelada.");
+});
+
+configurarUploadFotos();
+
+["filtro-busca", "filtro-categoria", "filtro-ordem"].forEach(id => {
+const el = document.getElementById(id);
+if (el) el.addEventListener(el.tagName === "SELECT" ? "change" : "input", renderizarLista);
+});
+
+const btnRetry = document.getElementById("btn-tentar-novamente");
+if (btnRetry) btnRetry.addEventListener("click", carregarProdutos);
+
+const btnExport = document.getElementById("btn-exportar-json");
+if (btnExport) btnExport.addEventListener("click", exportarJson);
+
+const inputImport = document.getElementById("input-importar-json");
+if (inputImport) inputImport.addEventListener("change", importarJson);
+
+const selWhats = document.getElementById("select-prod-whatsapp");
+if (selWhats) selWhats.addEventListener("change", atualizarPreviewWhatsapp);
+
+const btnCopiar = document.getElementById("btn-copiar-whatsapp");
+if (btnCopiar) btnCopiar.addEventListener("click", copiarWhatsapp);
+
+const btnCancelarExc = document.getElementById("btn-cancelar-exclusao");
+if (btnCancelarExc) btnCancelarExc.addEventListener("click", fecharConfirmarExclusao);
+
+const btnConfirmarExc = document.getElementById("btn-confirmar-exclusao");
+if (btnConfirmarExc) btnConfirmarExc.addEventListener("click", confirmarExclusao);
+
+const modal = document.getElementById("modal-confirmar-exclusao");
+if (modal) modal.addEventListener("click", ev => {
+if (ev.target === modal) fecharConfirmarExclusao();
+});
+}
+
+// Ao abrir a página: verifica sessão e exibe a tela certa
+async function iniciar() {
+preencherCategorias();
+configurarListeners();
+alternarGrade();
+atualizarContadorDesc();
+renderizarMiniaturas();
+if (tokenSessao) {
+mostrarPainel();
+await carregarProdutos();
+} else {
+mostrarLogin("");
+}
+}
+
+document.addEventListener("DOMContentLoaded", iniciar);
+</script>
+</body>
+</html>
